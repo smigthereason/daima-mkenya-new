@@ -2,6 +2,8 @@
 import React, { useState } from 'react'
 import { Menu, X, Heart, User, ShoppingBag, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image';
+import { HeroImage2, HeroImage3 } from '@/public/assets';
 
 const Navbar = () => {
    const [isOpen, setIsOpen] = useState(false)
@@ -17,7 +19,7 @@ const Navbar = () => {
    ]
 
    return (
-      <nav className="fixed top-0 w-full z-50 bg-white border-b border-gray-100 px-6 lg:px-12 py-5">
+      <nav className=" absolute top-0 w-full z-50 bg-transparent  px-6 lg:px-12 py-5">
          {/* Grid Container for Perfect Centering */}
          <div className="grid grid-cols-3 items-center w-full">
 
@@ -45,11 +47,11 @@ const Navbar = () => {
 
             {/* 3. Right Section: Icons */}
             <div className="flex justify-end items-center gap-6">
-               <Heart size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" />
-               <User size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" />
+               <Heart size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" color='#a1a1a1' />
+               <User size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" color='#a1a1a1' />
                <div className="relative cursor-pointer hover:scale-110 transition-transform">
-                  <ShoppingBag size={20} className="stroke-[1.5px]" />
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  <ShoppingBag size={20} className="stroke-[1.5px]" color='#a1a1a1' />
+                  <span className="absolute -top-2 -right-2 bg-black  text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                      3
                   </span>
                </div>
@@ -58,7 +60,7 @@ const Navbar = () => {
 
          {/* Full-Screen Luxury Menu Overlay */}
          <div
-            className={`fixed inset-0 bg-white z-[100] transition-all duration-700 ease-[cubic-bezier(0.85,0,0.15,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'
+            className={`fixed inset-0 bg-[#e8e8e8] z-[100] transition-all duration-700 ease-[cubic-bezier(0.85,0,0.15,1)] ${isOpen ? 'translate-x-0' : '-translate-x-full'
                }`}
          >
             <div className="p-8 md:p-16 flex flex-col h-full max-w-7xl mx-auto">
@@ -100,11 +102,13 @@ const Navbar = () => {
                   {/* Aesthetic Menu Side-Content */}
                   <div className={`hidden md:flex flex-col justify-center border-l border-gray-100 pl-20 transition-all duration-1000 delay-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}>
                      <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">Featured</p>
-                     <div className="aspect-[3/4] bg-gray-50 w-64 relative overflow-hidden rounded-sm">
-                        {/* This is where you'd put a featured HeroImage */}
-                        <div className="absolute inset-0 bg-black/5 flex items-center justify-center italic text-gray-400">
-                           New Season Preview
-                        </div>
+                     <div className="aspect-square bg-gray-50 w-64 relative overflow-hidden rounded-sm">
+                        <Image
+                           src={HeroImage2}
+                           alt='Featured Image'
+                           fill
+                           objectFit='cover'
+                        />
                      </div>
                   </div>
                </div>

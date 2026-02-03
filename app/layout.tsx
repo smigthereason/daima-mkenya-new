@@ -2,20 +2,17 @@ import type { Metadata } from "next";
 import { Manrope, } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/landing-page/Footer";
-import { Inter, Gothic_A1 } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import localFont from 'next/font/local'
 import Navbar from "@/components/landing-page/Navbar";
 
 
-
-const manrope = Gothic_A1({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-manrope',
-  weight: ['400', '500', '600', '700']
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  style: ["normal", "italic"],
+  display: "swap"
 });
-
-
 
 const gotham = localFont({
   src: [
@@ -53,7 +50,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" >
-      <body className={` ${gotham.className} antialiased BG-[#DDDDDD]`}>
+      <body className={` ${playfair.className} antialiased bg-[#e8e8e8]`}>
         <Navbar />
         {children}
         <Footer />
