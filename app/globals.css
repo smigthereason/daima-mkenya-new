@@ -1,26 +1,115 @@
+/* globals.css */
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #111;
+  --foreground: #ededed;
+  --dark: #1d1d1d;
+  --light: #fff;
+  --mid: #ededed;
+  --gray: #989898;
+  --green: #28a92b;
+  --blue: #2c7ad2;
+  --purple: #8d3dae;
+  --red: #dc2626;
+  --orange: #e77614;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  /* --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono); */
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Signika Negative', sans-serif, Arial;
+  overscroll-behavior: none;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling container */
+#smooth-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#smooth-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  will-change: transform;
+}
+
+/* Section layering */
+.hero-section {
+  z-index: 30;
+  position: relative;
+}
+
+.new-arrivals-section {
+  z-index: 20;
+  position: relative;
+}
+
+.africa-map-wrapper {
+  z-index: 10;
+  position: relative;
+}
+
+.sdg-section-wrapper {
+  z-index: 5;
+  position: relative;
+}
+
+/* Product card hover effects */
+.product-card {
+  transition: transform 0.3s ease-out;
+}
+
+.product-card:hover {
+  transform: translateY(-10px);
+}
+
+/* Horizontal Gallery Styles */
+.horiz-gallery-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.horiz-gallery-strip {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+/* Hide scrollbar but keep functionality */
+.horiz-gallery-wrapper,
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.horiz-gallery-wrapper::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line clamp for product names */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Font utilities */
+.font-georgia {
+  font-family: Georgia, serif;
 }

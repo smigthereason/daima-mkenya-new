@@ -9,33 +9,38 @@ export default function AfricaDottedMap() {
       const map = new DottedMap({
          height: 60,
          grid: "diagonal",
-         // approximate bounding box of Africa
+         // Full Africa view
          region: {
-            lat: { min: -35, max: 37 },   // from South Africa up to Mediterranean
-            lng: { min: -20, max: 55 }    // from West Africa to Horn of Africa
+            lat: { min: -35, max: 37 },
+            lng: { min: -20, max: 55 }
          }
       });
 
-      // optional: example pins (Nairobi & Lagos)
+      // Add pin for Nairobi
       map.addPin({
          lat: -1.286389,
          lng: 36.817223,
-         svgOptions: { color: "#171717", radius: 0.5 }
+         svgOptions: { 
+            color: "#ef4444",
+            radius: 0.6
+         }
       });
 
       return map.getSVG({
          radius: 0.22,
-         color: "#e5e5e5",
+         color: "#a3a3a3",
          shape: "circle",
-         backgroundColor: "transparent"
+         backgroundColor: "transparent",
+         borderColor: "#eab308",  // Yellow for country borders
+         borderWidth: 0.3
       });
    }, []);
 
    return (
-      <div className=" flex justify-center mt-20 bg-transparent">
+      <div className="flex justify-center mt-20 bg-transparent">
          <img
             src={`data:image/svg+xml;utf8,${encodeURIComponent(svgMap)}`}
-            alt="Dotted map of Africa"
+            alt="Dotted map of Africa with Nairobi marked"
             className="w-[40%] h-[40%]"
          />
       </div>
