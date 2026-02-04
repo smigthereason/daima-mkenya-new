@@ -30,261 +30,408 @@ export interface Product {
 // Sample product data
 export const sampleProduct: Product = {
   id: 1,
-  name: "CAMILLE HENROT ARTWORK TROUSERS",
-  price: "1.150,00€",
+  name: "MAASAI HERITAGE WRAP PASHMINA",
+  price: "Ksh 8,500",
   description: [
-    "Black Wide Leg Pants In Technical Nylon",
-    "Elasticated Waist Band",
-    "Side Slit Pockets With Zip",
-    "Drawstring On Hem To Adjust The Leg",
-    "Zip-Off System Below The Knee",
+    "Traditional Kenyan Maasai Shuka Wrap",
+    "Vibrant Geometric Pattern in National Colors",
+    "Versatile Styling for Headwear or Shoulder Drape",
+    "Hand-Finished Tassel Edges",
   ],
   details: {
-    material: "100% Technical Nylon",
-    care: "Dry Clean Only",
-    origin: "Made in Italy",
+    material: "Heavyweight Acrylic Blend",
+    care: "Hand Wash Cold, Dry Flat",
+    origin: "Ethically Sourced in Kenya",
   },
   colors: [
-    { label: "BLACK", hex: "#000000" },
-    { label: "WHITE", hex: "#f0f0f0" },
+    { label: "NATIONAL RED", hex: "#BB1D2C" },
+    { label: "FOREST GREEN", hex: "#006600" },
   ],
-  sizes: ["36", "38", "40"],
+  sizes: ["One Size"],
   images: {
     thumbnails: [
-      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=160&h=280&fit=crop&crop=top",
-      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=160&h=280&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=160&h=280&fit=crop&crop=bottom",
+      "/assets/1.jpg",
+      "/assets/1.12.png",
     ],
-    hero: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=680&h=900&fit=crop&crop=top",
+    hero: "/assets/1.12.png",
   },
-  category: "Trousers"
+  category: "Accessories"
 };
 
 // Enhanced related products with full Product structure
 export const relatedProducts: Product[] = [
   {
     id: 2,
-    name: "ROYAL KITENGE MERMAID GOWN",
-    price: "Ksh 15,000",
+    name: "SHIELD EMBLEM OVERSIZED HOODIE",
+    price: "Ksh 7,200",
     description: [
-      "Handcrafted African Kitenge Fabric Gown",
-      "Mermaid Silhouette with Flared Hem",
-      "Intricate Beadwork on Bodice",
-      "Adjustable Corset Back Closure",
-      "Side Slit for Elegant Movement",
+      "Oversized Boxy Fit for Modern Silhouette",
+      "Hand-Painted Maasai Shield Graphic on Back",
+      "Drop Shoulder Design with Ribbed Cuffs",
+      "Premium Heavyweight Fleece Lining",
     ],
     details: {
-      material: "100% African Wax Print Cotton",
-      care: "Hand Wash Cold, Line Dry",
-      origin: "Handmade in Kenya",
+      material: "80% Organic Cotton, 20% Polyester",
+      care: "Machine Wash Cold, Iron on Reverse",
+      origin: "Crafted in Nairobi",
     },
     colors: [
-      { label: "MULTICOLOR", hex: "#8B4513" },
-      { label: "BLUE/GOLD", hex: "#1E3A8A" },
-      { label: "RED/BLACK", hex: "#DC2626" },
+      { label: "PITCH BLACK", hex: "#000000" },
     ],
     sizes: ["S", "M", "L", "XL"],
     images: {
       thumbnails: [
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=bottom",
+        "/assets/2.webp",
+        "/assets/2.12.png",
       ],
-      hero: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=680&h=900&fit=crop&crop=top",
+      hero: "/assets/2.12.png",
     },
-    category: "Dresses"
+    category: "Streetwear"
   },
   {
     id: 3,
-    name: "MODERN SENATOR SUIT",
-    price: "Ksh 21,000",
+    name: "RUNWAY POPLIN SHIRT & SHORT SET",
+    price: "Ksh 12,500",
     description: [
-      "Contemporary African Senator Style Suit",
-      "Tailored Fit with Modern Silhouette",
-      "Contrasting Ankara Fabric Lapels",
-      "Four-Button Jacket with Notched Lapels",
-      "Slim Fit Trousers with Pleated Detail",
+      "Crisp White Poplin Over-Shirt",
+      "Elasticated High-Waisted Relaxed Shorts",
+      "Includes Striped Ribbed Crop Inner",
+      "Designed for High-Fashion Versatility",
     ],
     details: {
-      material: "Wool Blend with Ankara Accents",
-      care: "Dry Clean Only, Steam Press",
-      origin: "Tailored in Nigeria",
+      material: "100% Cotton Poplin",
+      care: "Machine Wash Cold, Steam Iron",
+      origin: "Tailored in Kenya",
     },
     colors: [
-      { label: "NAVY/BLUE", hex: "#1E3A8A" },
-      { label: "CHARCOAL/GOLD", hex: "#374151" },
-      { label: "BURGUNDY", hex: "#7F1D1D" },
+      { label: "OPTIC WHITE", hex: "#FFFFFF" },
     ],
-    sizes: ["38", "40", "42", "44", "46"],
+    sizes: ["36", "38", "40", "42"],
     images: {
       thumbnails: [
-        "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=160&h=280&fit=crop&crop=bottom",
+        "/assets/3.jpg",
+        "/assets/3.32.png",
       ],
-      hero: "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=680&h=900&fit=crop&crop=top",
+      hero: "/assets/3.32.png",
     },
-    category: "Suits"
+    category: "Sets"
   },
   {
     id: 4,
-    name: "FUSCHIA GODDESS CORSET DRESS",
-    price: "Ksh 10,000",
-    description: [
-      "Vibrant Fuschia Corset Style Dress",
-      "Boneless Corset with Adjustable Lacing",
-      "A-Line Skirt with Hidden Zipper",
-      "Off-Shoulder Neckline with Puff Sleeves",
-      "Silk-Lined for Comfort and Structure",
-    ],
-    details: {
-      material: "Premium Satin with Silk Lining",
-      care: "Dry Clean Only, Store in Garment Bag",
-      origin: "Designed in Ghana, Made in Africa",
-    },
-    colors: [
-      { label: "FUSCHIA", hex: "#DB2777" },
-      { label: "EMERALD", hex: "#059669" },
-      { label: "ROYAL BLUE", hex: "#2563EB" },
-    ],
-    sizes: ["XS", "S", "M", "L"],
-    images: {
-      thumbnails: [
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=face",
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=entropy",
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=160&h=280&fit=crop&crop=focalpoint",
-      ],
-      hero: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=680&h=900&fit=crop&crop=entropy",
-    },
-    category: "Dresses"
-  },
-  {
-    id: 5,
-    name: "KENTE WEAVE BLAZER JACKET",
-    price: "Ksh 12,500",
-    description: [
-      "Traditional Kente Weave Modern Blazer",
-      "Handwoven Kente Fabric Panels",
-      "Single-Breasted with Notched Lapels",
-      "Two Front Flap Pockets",
-      "Lined with Contrasting African Print",
-    ],
-    details: {
-      material: "Handwoven Kente Cotton Blend",
-      care: "Professional Dry Clean Only",
-      origin: "Handwoven in Ghana",
-    },
-    colors: [
-      { label: "GOLD/YELLOW", hex: "#F59E0B" },
-      { label: "RED/GREEN", hex: "#DC2626" },
-      { label: "BLUE/WHITE", hex: "#1E40AF" },
-    ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
-    images: {
-      thumbnails: [
-        "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=160&h=280&fit=crop&crop=bottom",
-      ],
-      hero: "https://images.unsplash.com/photo-1520975916090-3105956dac38?w=680&h=900&fit=crop&crop=top",
-    },
-    category: "Jackets"
-  },
-  {
-    id: 6,
-    name: "ANKARA PRINT WRAP DRESS",
-    price: "Ksh 8,500",
-    description: [
-      "Versatile Ankara Print Wrap Dress",
-      "Adjustable Tie Waist for Custom Fit",
-      "V-Neckline with Three-Quarter Sleeves",
-      "Knee-Length with Side Slit",
-      "Lightweight and Breathable Fabric",
-    ],
-    details: {
-      material: "100% African Ankara Cotton",
-      care: "Machine Wash Cold, Tumble Dry Low",
-      origin: "Made in Tanzania",
-    },
-    colors: [
-      { label: "PURPLE/YELLOW", hex: "#7C3AED" },
-      { label: "GREEN/ORANGE", hex: "#10B981" },
-      { label: "PINK/BLUE", hex: "#EC4899" },
-    ],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    images: {
-      thumbnails: [
-        "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=160&h=280&fit=crop&crop=bottom",
-      ],
-      hero: "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=680&h=900&fit=crop&crop=top",
-    },
-    category: "Dresses"
-  },
-  {
-    id: 7,
-    name: "AFRICAN PRINT CASUAL SHIRT",
+    name: "STRIPED NATIONAL BUTTON-DOWN",
     price: "Ksh 6,800",
     description: [
-      "Casual African Print Button-Down Shirt",
-      "Short Sleeve with Button Cuffs",
-      "Two Chest Pockets with Flap Detail",
-      "Regular Fit for All-Day Comfort",
-      "Perfect for Casual or Smart Casual Wear",
+      "Vertical Stripe Motif in National Colors",
+      "Classic Button-Down Collar",
+      "Contrasting Cuff Detail",
+      "Tailored Modern Fit",
     ],
     details: {
-      material: "African Print Cotton Poplin",
-      care: "Machine Wash Gentle, Iron Medium Heat",
-      origin: "Printed in Senegal, Sewn in Kenya",
+      material: "Premium Cotton Twill",
+      care: "Dry Clean Recommended",
+      origin: "Nairobi Workshop",
     },
     colors: [
-      { label: "BLUE PATTERN", hex: "#3B82F6" },
-      { label: "RED PATTERN", hex: "#EF4444" },
-      { label: "GREEN PATTERN", hex: "#10B981" },
+      { label: "STRIPED MULTI", hex: "#BB1D2C" },
     ],
-    sizes: ["S", "M", "L", "XL", "XXL"],
+    sizes: ["M", "L", "XL", "XXL"],
     images: {
       thumbnails: [
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=160&h=280&fit=crop&crop=bottom",
+        "/assets/4.jpg",
+        "/assets/4.42.png",
       ],
-      hero: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=680&h=900&fit=crop&crop=top",
+      hero: "/assets/4.42.png",
     },
     category: "Shirts"
   },
   {
+    id: 5,
+    name: "UNITY RIBBED TANK TOP",
+    price: "Ksh 3,500",
+    description: [
+      "Signature Ribbed Stretch Fabric",
+      "Horizontal National Stripe Pattern",
+      "Embroidered Logo Detail on Chest",
+      "Form-Fitting Athletic Cut",
+    ],
+    details: {
+      material: "95% Cotton, 5% Elastane",
+      care: "Machine Wash Cold",
+      origin: "Made in Kenya",
+    },
+    colors: [
+      { label: "STRIPED MULTI", hex: "#BB1D2C" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    images: {
+      thumbnails: [
+        "/assets/5.jpg",
+        "/assets/5.5.jpg",
+      ],
+      hero: "/assets/5.5.jpg",
+    },
+    category: "Tops"
+  },
+  {
+    id: 6,
+    name: "SHIELD STRIPE MAXI SKIRT",
+    price: "Ksh 9,500",
+    description: [
+      "Full-Length High-Waisted Maxi Skirt",
+      "Bold Vertical Stripe Heritage Print",
+      "Internal Drawstring for Custom Fit",
+      "Side Hidden Pockets",
+    ],
+    details: {
+      material: "Lightweight Cotton Canvas",
+      care: "Gentle Machine Wash",
+      origin: "Hand-finished in Kenya",
+    },
+    colors: [
+      { label: "STRIPED MULTI", hex: "#BB1D2C" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    images: {
+      thumbnails: [
+        "/assets/6.6.jpg",
+        "/assets/6.62.png",
+      ],
+      hero: "/assets/6.62.png",
+    },
+    category: "Skirts"
+  },
+  {
+    id: 7,
+    name: "SAFARI CHECK FRINGE SCARF",
+    price: "Ksh 4,800",
+    description: [
+      "Oversized Checkered Winter Scarf",
+      "Multi-color Grid Pattern with Fringed Edges",
+      "Extra Long for Layered Styling",
+      "Brushed Soft-Touch Fabric",
+    ],
+    details: {
+      material: "Soft Wool Blend",
+      care: "Hand Wash Only",
+      origin: "Artisanal Weave",
+    },
+    colors: [
+      { label: "CHECKERED MULTI", hex: "#BB1D2C" },
+    ],
+    sizes: ["One Size"],
+    images: {
+      thumbnails: [
+        "/assets/7.jpg",
+        "/assets/7.72.png",
+      ],
+      hero: "/assets/7.72.png",
+    },
+    category: "Accessories"
+  },
+  {
     id: 8,
-    name: "KANGA WRAP SKIRT SET",
+    name: "TRADITIONAL KANGA WRAP SET",
     price: "Ksh 9,200",
     description: [
-      "Traditional Kanga Fabric Wrap Skirt Set",
+      "Traditional Kanga Fabric Wrap Set",
       "Includes Matching Head Wrap",
       "Adjustable Tie Closure",
       "Bold Swahili Proverb Print",
-      "Versatile for Multiple Styling Options",
     ],
     details: {
       material: "100% Kanga Cotton",
-      care: "Hand Wash Separate Colors, Line Dry",
-      origin: "Traditional Kanga from Zanzibar",
+      care: "Hand Wash Separate Colors",
+      origin: "Zanzibar Heritage Print",
     },
     colors: [
       { label: "RED/BLACK", hex: "#DC2626" },
       { label: "BLUE/WHITE", hex: "#1E40AF" },
-      { label: "YELLOW/GREEN", hex: "#F59E0B" },
     ],
     sizes: ["One Size Fits Most"],
     images: {
       thumbnails: [
-        "https://images.unsplash.com/photo-1582418702059-97ebafb35d09?w=160&h=280&fit=crop&crop=top",
-        "https://images.unsplash.com/photo-1582418702059-97ebafb35d09?w=160&h=280&fit=crop&crop=center",
-        "https://images.unsplash.com/photo-1582418702059-97ebafb35d09?w=160&h=280&fit=crop&crop=bottom",
+        "/assets/8.jpg",
+        "/assets/8.82.png",
       ],
-      hero: "https://images.unsplash.com/photo-1582418702059-97ebafb35d09?w=680&h=900&fit=crop&crop=top",
+      hero: "/assets/8.82.png",
     },
     category: "Skirts"
+  },
+  {
+    id: 9,
+    name: "HERITAGE STRIPE KAFTAN GOWN",
+    price: "Ksh 11,500",
+    description: [
+      "Floor-Length Kaftan Silhouette",
+      "Bold Vertical Heritage Stripes",
+      "Flowing Lightweight Fabric",
+      "Matching Headwrap Included",
+    ],
+    details: {
+      material: "Silk Blend",
+      care: "Dry Clean Only",
+      origin: "Made in Kenya",
+    },
+    colors: [
+      { label: "HERITAGE STRIPE", hex: "#BB1D2C" },
+    ],
+    sizes: ["Free Size"],
+    images: {
+      thumbnails: [
+        "/assets/9.jpg",
+        "/assets/9.92.png",
+      ],
+      hero: "/assets/9.92.png",
+    },
+    category: "Dresses"
+  },
+  {
+    id: 10,
+    name: "MAASAI SHIELD GRAPHIC TEE",
+    price: "Ksh 4,500",
+    description: [
+      "Premium Cotton Graphic T-Shirt",
+      "Hand-Screened Maasai Shield Design",
+      "Ribbed Crew Neckline",
+      "Standard Fit",
+    ],
+    details: {
+      material: "100% Organic Cotton",
+      care: "Machine Wash Cold",
+      origin: "Made in Nairobi",
+    },
+    colors: [
+      { label: "BLACK", hex: "#000000" },
+    ],
+    sizes: ["M", "L", "XL"],
+    images: {
+      thumbnails: ["/assets/10.jpg", "/assets/10.102.png"],
+      hero: "/assets/10.102.png",
+    },
+    category: "Shirts"
+  },
+  {
+    id: 11,
+    name: "URBAN SAFARI UTILITY VEST",
+    price: "Ksh 8,000",
+    description: [
+      "Functional Safari Vest with Multi-pockets",
+      "Lightweight and Durable Construction",
+      "Adjustable Side Straps",
+      "Perfect for Layering",
+    ],
+    details: {
+      material: "Technical Twill",
+      care: "Machine Washable",
+      origin: "Nairobi Workshop",
+    },
+    colors: [
+      { label: "OLIVE", hex: "#556B2F" },
+      { label: "TAN", hex: "#D2B48C" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    images: {
+      thumbnails: ["/assets/11.jpg", "/assets/11.11.jpg"],
+      hero: "/assets/11.11.jpg",
+    },
+    category: "Jackets"
+  },
+  {
+    id: 12,
+    name: "SAVANNAH PLEATED TROUSERS",
+    price: "Ksh 7,500",
+    description: [
+      "High-Waisted Trousers with Front Pleats",
+      "Tapered Leg for a Sharp Look",
+      "Concealed Zip Fastening",
+      "Breathable Summer Fabric",
+    ],
+    details: {
+      material: "Linen Blend",
+      care: "Dry Clean Only",
+      origin: "Made in Kenya",
+    },
+    colors: [
+      { label: "SAND", hex: "#C2B280" },
+    ],
+    sizes: ["30", "32", "34", "36"],
+    images: {
+      thumbnails: ["/assets/12.jpg", "/assets/12.122.png"],
+      hero: "/assets/12.122.png",
+    },
+    category: "Trousers"
+  },
+  {
+    id: 13,
+    name: "RIFT VALLEY KNIT SWEATER",
+    price: "Ksh 6,200",
+    description: [
+      "Chunk Knit Sweater with Traditional Patterns",
+      "Warm and Cozy for Cooler Evenings",
+      "Relaxed Fit Silhouette",
+    ],
+    details: {
+      material: "Soft Wool Blend",
+      care: "Hand Wash Cold",
+      origin: "Hand-knit in Kenya",
+    },
+    colors: [
+      { label: "EARTH TONES", hex: "#704214" },
+    ],
+    sizes: ["S", "M", "L"],
+    images: {
+      thumbnails: ["/assets/13.jpg", "/assets/13.132.png"],
+      hero: "/assets/13.132.png",
+    },
+    category: "Knitwear"
+  },
+  {
+    id: 14,
+    name: "NATIONAL PRIDE STRIPED SHIRT",
+    price: "Ksh 5,800",
+    description: [
+      "Modern Vertical Stripe Design",
+      "Button-Down Front with Wooden Buttons",
+      "Lightweight Cotton for Comfort",
+    ],
+    details: {
+      material: "100% Kenyan Cotton",
+      care: "Machine Wash Cold",
+      origin: "Made in Mombasa",
+    },
+    colors: [
+      { label: "STRIPED MULTI", hex: "#BB1D2C" },
+    ],
+    sizes: ["M", "L", "XL", "XXL"],
+    images: {
+      thumbnails: ["/assets/14.jpg", "/assets/14.142.png"],
+      hero: "/assets/14.142.png",
+    },
+    category: "Shirts"
+  },
+  {
+    id: 15,
+    name: "LEOPARD SHIELD PRINT VEST",
+    price: "Ksh 3,500",
+    description: [
+      "Abstract Leopard and Shield Fusion Print",
+      "Sleeveless Graphic Muscle Tee",
+      "Signature Ribbed Neckline",
+    ],
+    details: {
+      material: "95% Cotton, 5% Elastane",
+      care: "Machine Wash Cold",
+      origin: "Designed in Nairobi",
+    },
+    colors: [
+      { label: "SAFARI GOLD", hex: "#C5B358" },
+    ],
+    sizes: ["S", "M", "L"],
+    images: {
+      thumbnails: ["/assets/15.jpg", "/assets/15.152.png"],
+      hero: "/assets/15.152.png",
+    },
+    category: "Streetwear"
   },
 ];
 

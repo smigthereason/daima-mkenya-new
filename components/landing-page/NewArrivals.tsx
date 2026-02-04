@@ -21,51 +21,51 @@ interface Product {
 const products: Product[] = [
   {
     id: 1,
-    name: "Royal Kitenge Mermaid Gown",
-    price: "Ksh 15,000",
-    modelImage: "/assets/afro_dress.png",
+    name: "MAASAI HERITAGE WRAP PASHMINA",
+    price: "Ksh 8,500",
+    modelImage: "/assets/1.jpg",
     modelVideo: "/assets/afro-dress.mp4",
-    productImage: "/assets/afro_dress_1.png",
+    productImage: "/assets/1.12.png",
   },
   {
     id: 2,
-    name: "Modern Senator Suit (Two-Piece)",
-    price: "Ksh 21,000",
-    modelImage: "/assets/afro_man.png",
+    name: "SHIELD EMBLEM OVERSIZED HOODIE",
+    price: "Ksh 7,200",
+    modelImage: "/assets/2.webp",
     modelVideo: "/assets/afro_man.mp4",
-    productImage: "/assets/afro_man_1.png",
+    productImage: "/assets/2.12.png",
   },
   {
     id: 3,
-    name: "Fuchsia Goddess Corset Dress",
-    price: "Ksh 10,000",
-    modelImage: "/assets/afro_dress2.png",
+    name: "RUNWAY POPLIN SHIRT & SHORT SET",
+    price: "Ksh 12,500",
+    modelImage: "/assets/3.jpg",
     modelVideo: "/assets/afro_dress_2.mp4",
-    productImage: "/assets/afro_dress_2.png",
+    productImage: "/assets/3.32.png",
   },
   {
     id: 4,
-    name: "Traditional Dashiki Set",
-    price: "Ksh 12,000",
-    modelImage: "/assets/afro_dress.png",
+    name: "STRIPED NATIONAL BUTTON-DOWN",
+    price: "Ksh 6,800",
+    modelImage: "/assets/4.jpg",
     modelVideo: "/assets/afro-dress.mp4",
-    productImage: "/assets/afro_dress_1.png",
+    productImage: "/assets/4.42.png",
   },
   {
-    id: 5,
-    name: "Ankara Office Wear",
-    price: "Ksh 18,000",
-    modelImage: "/assets/afro_man.png",
+    id: 9,
+    name: "HERITAGE STRIPE KAFTAN GOWN",
+    price: "Ksh 11,500",
+    modelImage: "/assets/9.jpg",
     modelVideo: "/assets/afro_man.mp4",
-    productImage: "/assets/afro_man_1.png",
+    productImage: "/assets/9.92.png",
   },
   {
-    id: 6,
-    name: "Kitenge Evening Dress",
-    price: "Ksh 22,000",
-    modelImage: "/assets/afro_dress2.png",
+    id: 14,
+    name: "NATIONAL PRIDE STRIPED SHIRT",
+    price: "Ksh 5,800",
+    modelImage: "/assets/14.jpg",
     modelVideo: "/assets/afro_dress_2.mp4",
-    productImage: "/assets/afro_dress_2.png",
+    productImage: "/assets/14.142.png",
   },
 ];
 
@@ -288,10 +288,10 @@ export default function NewArrivals() {
         }}
       />
 
-      {/* Header - Updated with better visibility */}
-      <div className="flex items-start justify-between mb-8 max-w-7xl mx-auto relative z-10 px-4 sm:px-6">
+      {/* Header - Always at the top */}
+      <div className="absolute top-0 left-0 right-0 z-50 px-4 sm:px-6 py-6">
         <h2
-          className="new-arrivals-header text-black font-black uppercase tracking-tighter leading-none"
+          className="new-arrivals-header text-black font-black uppercase tracking-tighter leading-none text-center"
           style={{
             fontSize: "clamp(2rem, 5vw, 3.5rem)",
             fontFamily: "'Playfair Display', serif",
@@ -301,32 +301,12 @@ export default function NewArrivals() {
         >
           NEW ARRIVALS
         </h2>
-        <Link
-          href="/products" 
-          className="see-all-link flex items-center gap-1 text-black text-sm uppercase tracking-widest hover:opacity-80 transition-all duration-300 ease-out mt-2 group"
-          style={{ 
-            fontFamily: "'Playfair Display', serif",
-            opacity: 0, // Start invisible - will be animated by GSAPProvider
-            transform: "translateY(50px)", // Start below - will be animated by GSAPProvider
-            textDecoration: "none",
-          }}
-        >
-          <span className="group-hover:translate-x-1 transition-transform duration-300">
-            SEE ALL
-          </span>
-          <span
-            className="text-base transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
-            style={{ transform: "rotate(-45deg)", display: "inline-block" }}
-          >
-            ↗
-          </span>
-        </Link>
       </div>
 
       {/* Horizontal Scrolling Gallery */}
       <div
         ref={horizontalWrapperRef}
-        className="horiz-gallery-wrapper w-full h-[70vh] relative overflow-hidden"
+        className="horiz-gallery-wrapper w-full h-[70vh] relative overflow-hidden mt-20"
       >
         <div
           ref={horizontalStripRef}
@@ -335,7 +315,7 @@ export default function NewArrivals() {
           {/* Spacer for better centering */}
           <div className="w-[5vw] flex-shrink-0" />
 
-          {/* Product Cards - Original design */}
+          {/* Product Cards */}
           {products.map((product, index) => (
             <div
               key={product.id}
@@ -398,35 +378,26 @@ export default function NewArrivals() {
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 flex items-center gap-3 text-black/50 text-xs uppercase tracking-widest">
-        <svg
-          className="w-4 h-4 animate-pulse"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
+      {/* SEE ALL Button - Always accessible at bottom center */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50">
+        <Link
+          href="/products" 
+          className="see-all-button flex items-center gap-3 text-black hover:opacity-80 transition-all duration-300 ease-out group px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
+          style={{ 
+            fontFamily: "'Playfair Display', serif",
+            textDecoration: "none",
+          }}
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M7 16l-4-4m0 0l4-4m-4 4h18"
-          />
-        </svg>
-        <span>SCROLL TO NAVIGATE</span>
-        <svg
-          className="w-4 h-4 animate-pulse"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M17 8l4 4m0 0l-4 4m4-4H3"
-          />
-        </svg>
+          <span className="text-sm uppercase tracking-widest group-hover:translate-x-1 transition-transform duration-300">
+            SEE ALL PRODUCTS
+          </span>
+          <span
+            className="text-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
+            style={{ transform: "rotate(-45deg)", display: "inline-block" }}
+          >
+            ↗
+          </span>
+        </Link>
       </div>
     </section>
   );

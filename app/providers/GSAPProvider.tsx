@@ -26,143 +26,88 @@ export default function GSAPProvider({ children }: { children: ReactNode }) {
         ignoreMobileResize: true,
       });
 
-      // Get sections for layered pinning
+      // Get sections
       const heroSection = document.querySelector("#hero-section");
       const newArrivalsSection = document.querySelector(".new-arrivals-section");
       
       if (heroSection && newArrivalsSection) {
-        // DEBUG: Add markers to see what's happening
-        ScrollTrigger.config({
-          ignoreMobileResize: true,
-          autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
-        });
-
-        // Make NewArrivals initially hidden and positioned
+        // Set initial state for NewArrivals - hidden behind hero
         gsap.set(newArrivalsSection, {
           opacity: 0,
-          y: 50,
+          y: 100,
           scale: 0.95,
         });
 
-        // Create the layered pinning effect between Hero and New Arrivals
+        // Hero fade backward (push to back) animation
         ScrollTrigger.create({
           trigger: heroSection,
           start: "top top",
-          end: "+=100%", // Scroll 100% of viewport height
-          pin: true,
-          pinSpacing: false,
+          end: "bottom top", // End when hero bottom reaches viewport top
           scrub: true,
-          markers: true, // ENABLE THIS TO SEE WHAT'S HAPPENING
-          id: "hero-pin",
-          onEnter: () => {
-            console.log("Hero pin started");
-          },
+          markers: false,
+          id: "hero-fade-backward",
           onUpdate: (self) => {
             const progress = self.progress;
-            console.log("Hero progress:", progress);
             
-            // Animate Hero fade out
-            const heroOverlay = heroSection.querySelector(".hero-overlay");
-            if (heroOverlay) {
-              gsap.to(heroOverlay, {
-                opacity: Math.min(progress * 1.5, 1),
-                duration: 0,
-              });
-            }
-            
-            // Animate Hero background COLLAPSE to center
-            const leftBg = heroSection.querySelector(".bg-left-animated");
-            const rightBg = heroSection.querySelector(".bg-right-animated");
-            
-            if (leftBg && rightBg) {
-              // Collapse backgrounds back to center
-              const collapseProgress = Math.min(progress * 1.8, 1);
-              
-              gsap.to(leftBg, {
-                clipPath: `polygon(0 0, ${50 - (30 * collapseProgress)}% 0, ${50 - (30 * collapseProgress)}% 100%, 0 100%)`,
-                opacity: 1 - (collapseProgress * 0.8),
-                duration: 0,
-              });
-              
-              gsap.to(rightBg, {
-                clipPath: `polygon(${50 + (30 * collapseProgress)}% 0, 100% 0, 100% 100%, ${50 + (30 * collapseProgress)}% 100%)`,
-                opacity: 1 - (collapseProgress * 0.8),
-                duration: 0,
-              });
-            }
-            
-            // Animate Hero content fade out and scale down
-            const heroTitles = heroSection.querySelectorAll(".hero-title-left, .hero-title-right");
-            const heroCopy = heroSection.querySelector(".hero-copy");
-            const modelImage = heroSection.querySelector(".model-image");
-            const shopBtn = heroSection.querySelector(".shop-now-btn");
-            
-            if (heroTitles.length > 0) {
-              gsap.to(heroTitles, {
-                opacity: 1 - (progress * 1.5),
-                y: progress * 40,
-                scale: 1 - (progress * 0.25),
-                duration: 0,
-              });
-            }
-            
-            if (heroCopy) {
-              gsap.to(heroCopy, {
-                opacity: 1 - (progress * 2),
-                y: progress * 50,
-                duration: 0,
-              });
-            }
-            
-            if (modelImage) {
-              gsap.to(modelImage, {
-                opacity: 1 - (progress * 1.2),
-                scale: 1 - (progress * 0.2),
-                duration: 0,
-              });
-            }
-            
-            if (shopBtn) {
-              gsap.to(shopBtn, {
-                opacity: 1 - (progress * 2),
-                y: progress * 40,
-                duration: 0,
-              });
-            }
-            
-            // Animate New Arrivals coming IN FROM BELOW (layered above)
-            // Start at y: 50, end at y: 0 (normal position)
-            gsap.to(newArrivalsSection, {
-              y: 50 - (progress * 50), // Start at 50px below, end at 0
-              opacity: Math.min(progress * 3, 1), // Faster fade in
-              scale: 0.95 + (progress * 0.05),
+            // Hero fades backward (pushes to back) with scale and opacity
+            gsap.to(heroSection, {
+              opacity: 1 - (progress * 1.5), // Faster fade out
+              scale: 1 - (progress * 0.2), // Scale down to go backward
+              filter: `blur(${progress * 5}px)`, // Add blur for depth effect
               duration: 0,
-              ease: "power2.out",
+            });
+            
+            // Hero background elements also fade
+            const heroBackgrounds = heroSection.querySelectorAll(".bg-left-animated, .bg-right-animated");
+            gsap.to(heroBackgrounds, {
+              opacity: 1 - (progress * 1.8),
+              duration: 0,
+            });
+            
+            // Hero content elements fade faster - COMPLETELY FADE OUT FIRST
+            const heroContent = heroSection.querySelectorAll(".hero-title-left, .hero-title-right, .model-image, .hero-copy, .shop-now-btn");
+            gsap.to(heroContent, {
+              opacity: Math.max(0, 1 - (progress * 3)), // Complete fade by 33%
+              y: -progress * 40,
+              duration: 0,
+            });
+            
+            // New Arrivals section comes up from behind - DELAYED START
+            // Only start appearing when hero is 40% faded
+            const newArrivalsProgress = Math.max(0, (progress - 0.4) * 1.67); // Scale to 0-1 range
+            gsap.to(newArrivalsSection, {
+              opacity: Math.min(newArrivalsProgress * 3, 1),
+              y: 100 - (newArrivalsProgress * 100),
+              scale: 0.95 + (newArrivalsProgress * 0.05),
+              duration: 0,
             });
 
-            // Animate New Arrivals header and see-all link
+            // New Arrivals header animation - DELAYED START
             const newArrivalsHeader = document.querySelector(".new-arrivals-header");
-            const seeAllLink = document.querySelector(".see-all-link");
+            const seeAllButton = document.querySelector(".see-all-button");
             
             if (newArrivalsHeader) {
+              // Header appears slightly after section starts appearing
+              const headerOpacity = Math.max(0, (progress - 0.45) * 2.5);
               gsap.to(newArrivalsHeader, {
-                opacity: Math.min(progress * 4, 1),
-                y: 30 - (progress * 30),
+                opacity: Math.min(headerOpacity, 1),
+                y: 50 - (progress * 100),
                 duration: 0,
               });
             }
             
-            if (seeAllLink) {
-              gsap.to(seeAllLink, {
-                opacity: Math.min(progress * 4, 1),
-                y: 30 - (progress * 30),
+            if (seeAllButton) {
+              // Button appears last
+              const buttonOpacity = Math.max(0, (progress - 0.5) * 2.5);
+              gsap.to(seeAllButton, {
+                opacity: Math.min(buttonOpacity, 1),
+                y: 20 - (progress * 40),
                 duration: 0,
               });
             }
           },
           onLeave: () => {
-            console.log("Hero pin ended");
-            // Ensure NewArrivals is fully visible when Hero pin ends
+            // Ensure everything is fully visible when hero animation ends
             gsap.to(newArrivalsSection, {
               opacity: 1,
               y: 0,
@@ -170,15 +115,28 @@ export default function GSAPProvider({ children }: { children: ReactNode }) {
               duration: 0.5,
             });
             
-            gsap.to(".new-arrivals-header, .see-all-link", {
+            gsap.to(".new-arrivals-header", {
               opacity: 1,
               y: 0,
               duration: 0.5,
+            });
+            
+            gsap.to(".see-all-button", {
+              opacity: 1,
+              y: 0,
+              duration: 0.5,
+            });
+            
+            // Ensure hero content is completely gone
+            gsap.to("#hero-section .hero-title-left, #hero-section .hero-title-right, #hero-section .model-image, #hero-section .hero-copy, #hero-section .shop-now-btn", {
+              opacity: 0,
+              duration: 0,
             });
           }
         });
       }
 
+      // KEEP ALL EXISTING INITIAL ANIMATIONS FOR OTHER COMPONENTS
       // Initial split background animations
       gsap.from(".bg-left-animated", {
         x: -200,

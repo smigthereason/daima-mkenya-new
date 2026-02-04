@@ -29,7 +29,7 @@ export default function ProductCard({
   useEffect(() => {
     if (activeProduct.images.thumbnails.length > 0) {
       setCarouselImages(activeProduct.images.thumbnails);
-      setActiveThumb(0); // Reset to first thumbnail when product changes
+      setActiveThumb(0);
     }
   }, [activeProduct]);
 
@@ -82,67 +82,42 @@ export default function ProductCard({
 
   return (
     <div
-      className="flex w-full bg-[#E8E8E8] relative min-h-screen"
+      className="flex flex-col lg:flex-row w-full bg-[#E8E8E8] relative min-h-screen"
       style={{ 
         fontFamily: "'Playfair Display', serif, 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
       {/* Product Navigation Overlay */}
-      <div className="absolute top-4 right-4 z-10 flex items-center gap-2">
-        <span className="text-xs text-gray-600 font-medium">
+      <div className="absolute top-3 sm:top-4 md:top-6 right-3 sm:right-4 md:right-6 z-10 flex items-center gap-1.5 sm:gap-2">
+        <span className="text-xs sm:text-sm text-gray-600 font-medium">
           {currentProductIndex + 1} / {allProducts.length}
         </span>
         <button
           onClick={goToPrevProduct}
-          className="text-black bg-white border border-gray-300 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+          className="text-black bg-white border border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm sm:text-base"
           aria-label="Previous product"
         >
           ←
         </button>
         <button
           onClick={goToNextProduct}
-          className="text-black bg-white border border-gray-300 rounded-full w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors"
+          className="text-black bg-white border border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm sm:text-base"
           aria-label="Next product"
         >
           →
         </button>
       </div>
 
-      {/* Product Quick Select */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10 flex gap-2">
-        {allProducts.slice(0, 5).map((product, index) => (
-          <button
-            key={product.id}
-            onClick={() => goToProduct(product.id)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              product.id === activeProduct.id 
-                ? 'bg-black scale-125' 
-                : 'bg-gray-300 hover:bg-gray-400'
-            }`}
-            aria-label={`View ${product.name}`}
-          />
-        ))}
-        {allProducts.length > 5 && (
-          <span className="text-xs text-gray-500 flex items-center ml-2">
-            +{allProducts.length - 5} more
-          </span>
-        )}
-      </div>
+     
 
       {/* ───────── LEFT PANEL ───────── */}
       <div
-        className="flex flex-col overflow-y-auto no-scrollbar"
-        style={{
-          width: "640px",
-          minWidth: "260px",
-          padding: "28px 20px 28px 28px",
-        }}
+        className="flex flex-col overflow-y-auto w-full lg:w-[45%] xl:w-[30%] p-4 sm:p-6 md:p-8 lg:py-8 lg:pl-8 lg:pr-6"
       >
         {/* Product Category */}
-        <div className="mb-6">
-          <span className="text-black font-bold uppercase tracking-widest px-3 py-1 border border-black"
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <span className="text-black font-bold uppercase tracking-widest px-2 sm:px-3 py-1 border border-black text-xs sm:text-sm"
             style={{ 
-              fontSize: "10px", 
               letterSpacing: "0.15em",
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
             }}
@@ -151,22 +126,21 @@ export default function ProductCard({
           </span>
         </div>
 
-        {/* thumbnail strip - infinite carousel */}
-        <div className="flex gap-6 mb-3 flex-shrink-0">
-          {carouselImages.slice(0, 2).map((src, i) => {
+        {/* thumbnail strip - mobile horizontal, desktop vertical */}
+        <div className="flex flex-row lg:flex-col gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8 flex-shrink-0 overflow-x-auto lg:overflow-x-visible">
+          {carouselImages.slice(0, 3).map((src, i) => {
             const displayIndex = (activeThumb + i) % carouselImages.length;
             return (
               <button
                 key={displayIndex}
                 onClick={() => handleThumbnailClick(displayIndex)}
-                className="relative overflow-hidden transition-all duration-200 hover:opacity-90"
+                className="relative overflow-hidden transition-all duration-200 hover:opacity-90 flex-shrink-0"
                 style={{
-                  width: "200px",
-                  height: "320px",
-                  border:
-                    displayIndex === activeThumb
-                      ? "2px solid #000"
-                      : "1px solid #e5e5e5",
+                  width: "80px",
+                  height: "120px",
+                  minWidth: "80px",
+                  minHeight: "120px",
+                  border: displayIndex === activeThumb ? "2px solid #000" : "1px solid #e5e5e5",
                   outline: "none",
                   borderRadius: "2px",
                 }}
@@ -174,8 +148,8 @@ export default function ProductCard({
                 <Image
                   src={src}
                   alt={`Thumb ${displayIndex + 1}`}
-                  width={200}
-                  height={320}
+                  width={80}
+                  height={120}
                   className="object-cover w-full h-full"
                   priority={displayIndex === activeThumb}
                 />
@@ -185,22 +159,17 @@ export default function ProductCard({
         </div>
 
         {/* prev / next arrows */}
-        <div
-          className="flex items-center gap-3 mb-8 flex-shrink-0"
-          style={{ paddingLeft: "4px" }}
-        >
+        <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 md:mb-10 flex-shrink-0">
           <button
             onClick={prevThumb}
-            className="text-black hover:opacity-50 transition-opacity p-2"
-            style={{ fontSize: "20px", lineHeight: 1 }}
+            className="text-black hover:opacity-50 transition-opacity p-1.5 sm:p-2 text-lg sm:text-xl"
             aria-label="Previous image"
           >
             ←
           </button>
           <span
-            className="text-black"
+            className="text-black text-sm sm:text-base"
             style={{ 
-              fontSize: "13px",
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               letterSpacing: "0.05em"
             }}
@@ -209,8 +178,7 @@ export default function ProductCard({
           </span>
           <button
             onClick={nextThumb}
-            className="text-black hover:opacity-50 transition-opacity p-2"
-            style={{ fontSize: "20px", lineHeight: 1 }}
+            className="text-black hover:opacity-50 transition-opacity p-1.5 sm:p-2 text-lg sm:text-xl"
             aria-label="Next image"
           >
             →
@@ -221,45 +189,31 @@ export default function ProductCard({
         <div style={{ borderTop: "2px solid #000" }} className="flex-shrink-0">
           <button
             onClick={() => setDescOpen(!descOpen)}
-            className="w-full flex items-center justify-between py-3 focus:outline-none hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between py-3 sm:py-4 focus:outline-none hover:opacity-70 transition-opacity"
             aria-expanded={descOpen}
           >
             <span
-              className="text-black font-bold uppercase tracking-wider"
-              style={{ fontSize: "18px", letterSpacing: "0.1em" }}
+              className="text-black font-bold uppercase tracking-wider text-base sm:text-lg md:text-xl"
+              style={{ letterSpacing: "0.1em" }}
             >
               Description
             </span>
-            <span
-              className="text-black"
-              style={{
-                fontSize: "16px",
-                transition: "transform 0.2s ease",
-                transform: descOpen ? "rotate(180deg)" : "rotate(0deg)",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-              }}
-            >
-              ▾
+            <span className="text-black font-bold text-xl sm:text-2xl">
+              {descOpen ? "−" : "+"}
             </span>
           </button>
-
           {descOpen && (
-            <div className="pb-4" style={{ borderBottom: "1px solid #e5e5e5" }}>
-              {activeProduct.description.map((line, i) => (
-                <p
-                  key={i}
-                  className="text-black"
-                  style={{ 
-                    fontSize: "15px", 
-                    lineHeight: "1.7", 
-                    margin: "0.5em 0",
-                    fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                    fontWeight: 400
-                  }}
-                >
-                  {line}
-                </p>
-              ))}
+            <div className="pb-4 sm:pb-6 md:pb-8">
+              <p
+                className="text-black leading-relaxed text-sm sm:text-base md:text-lg"
+                style={{
+                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
+                  lineHeight: "1.7",
+                  fontWeight: 400
+                }}
+              >
+                {activeProduct.description}
+              </p>
             </div>
           )}
         </div>
@@ -268,36 +222,24 @@ export default function ProductCard({
         <div style={{ borderTop: "2px solid #000" }} className="flex-shrink-0">
           <button
             onClick={() => setDetailsOpen(!detailsOpen)}
-            className="w-full flex items-center justify-between py-3 focus:outline-none hover:opacity-70 transition-opacity"
+            className="w-full flex items-center justify-between py-3 sm:py-4 focus:outline-none hover:opacity-70 transition-opacity"
             aria-expanded={detailsOpen}
           >
             <span
-              className="text-black font-bold uppercase tracking-wider"
-              style={{ fontSize: "18px", letterSpacing: "0.1em" }}
+              className="text-black font-bold uppercase tracking-wider text-base sm:text-lg md:text-xl"
+              style={{ letterSpacing: "0.1em" }}
             >
-              Details
+              Product Details
             </span>
-            <span
-              className="text-black"
-              style={{
-                fontSize: "16px",
-                transition: "transform 0.2s ease",
-                transform: detailsOpen ? "rotate(180deg)" : "rotate(0deg)",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-              }}
-            >
-              ▾
+            <span className="text-black font-bold text-xl sm:text-2xl">
+              {detailsOpen ? "−" : "+"}
             </span>
           </button>
-
           {detailsOpen && (
-            <div className="pb-4" style={{ borderBottom: "1px solid #e5e5e5" }}>
+            <div className="pb-4 sm:pb-6 md:pb-8 space-y-2 text-sm sm:text-base md:text-lg">
               <p
                 className="text-black"
-                style={{ 
-                  fontSize: "15px", 
-                  lineHeight: "1.7",
-                  margin: "0.5em 0",
+                style={{
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                   fontWeight: 400
                 }}
@@ -306,10 +248,7 @@ export default function ProductCard({
               </p>
               <p
                 className="text-black"
-                style={{ 
-                  fontSize: "15px", 
-                  lineHeight: "1.7",
-                  margin: "0.5em 0",
+                style={{
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                   fontWeight: 400
                 }}
@@ -318,10 +257,7 @@ export default function ProductCard({
               </p>
               <p
                 className="text-black"
-                style={{ 
-                  fontSize: "15px", 
-                  lineHeight: "1.7",
-                  margin: "0.5em 0",
+                style={{
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                   fontWeight: 400
                 }}
@@ -335,7 +271,7 @@ export default function ProductCard({
 
       {/* ───────── CENTER — hero image ───────── */}
       <div
-        className="relative flex-1 flex items-center justify-center"
+        className="relative flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px] order-first lg:order-none"
         style={{
           background: "#fafafa",
         }}
@@ -343,25 +279,20 @@ export default function ProductCard({
         <Image
           src={carouselImages[activeThumb] || activeProduct.images.hero}
           alt={activeProduct.name}
-          width={400}
-          height={500}
-          className="object-cover object-top"
+          width={600}
+          height={800}
+          className="object-cover object-top w-full h-full max-w-[90%] max-h-[90%] lg:max-w-full lg:max-h-full"
           priority
         />
       </div>
 
       {/* ───────── RIGHT PANEL ───────── */}
       <div
-        className="flex flex-col justify-start"
-        style={{
-          width: "640px",
-          minWidth: "340px",
-          padding: "52px 40px 40px 36px",
-        }}
+        className="flex flex-col justify-start w-full lg:w-[45%] xl:w-[30%] p-4 sm:p-6 md:p-8 lg:py-8 lg:px-8"
       >
         {/* Product ID */}
-        <div className="mb-2">
-          <span className="text-gray-500 text-xs tracking-wider"
+        <div className="mb-2 sm:mb-3 md:mb-4">
+          <span className="text-gray-500 text-sm sm:text-base tracking-wider"
             style={{ 
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               letterSpacing: "0.1em"
@@ -373,9 +304,8 @@ export default function ProductCard({
 
         {/* title – two lines */}
         <h1
-          className="text-black font-black uppercase leading-tight"
+          className="text-black font-black uppercase leading-tight text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] xl:text-[3rem]"
           style={{
-            fontSize: "26px",
             letterSpacing: "-0.5px",
             lineHeight: "1.1",
             margin: 0,
@@ -388,9 +318,8 @@ export default function ProductCard({
 
         {/* price */}
         <p
-          className="text-black mt-4"
+          className="text-black mt-4 sm:mt-5 md:mt-6 text-lg sm:text-xl md:text-2xl"
           style={{ 
-            fontSize: "18px", 
             fontWeight: 500,
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             letterSpacing: "0.02em"
@@ -400,12 +329,11 @@ export default function ProductCard({
         </p>
 
         {/* ── COLOR ── */}
-        <div className="mt-7">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <span
-              className="text-black font-bold uppercase"
+              className="text-black font-bold uppercase text-sm sm:text-base"
               style={{ 
-                fontSize: "12px", 
                 letterSpacing: "0.12em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
               }}
@@ -413,9 +341,8 @@ export default function ProductCard({
               Color
             </span>
             <span
-              className="text-black"
+              className="text-black text-sm sm:text-base"
               style={{ 
-                fontSize: "12px", 
                 letterSpacing: "0.06em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 400
@@ -425,20 +352,20 @@ export default function ProductCard({
             </span>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 sm:gap-3">
             {activeProduct.colors.map((c, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedColor(i)}
                 className="transition-all duration-150 focus:outline-none hover:scale-105"
                 style={{
-                  width: "36px",
-                  height: "36px",
+                  width: "32px",
+                  height: "32px",
+                  minWidth: "32px",
+                  minHeight: "32px",
                   background: c.hex,
-                  border:
-                    i === selectedColor ? "2px solid #000" : "1px solid #ccc",
-                  boxShadow:
-                    i === selectedColor ? "inset 0 0 0 2px #fff" : "none",
+                  border: i === selectedColor ? "2px solid #000" : "1px solid #ccc",
+                  boxShadow: i === selectedColor ? "inset 0 0 0 2px #fff" : "none",
                   borderRadius: "50%",
                 }}
                 aria-label={`Select color: ${c.label}`}
@@ -448,12 +375,11 @@ export default function ProductCard({
         </div>
 
         {/* ── SIZE ── */}
-        <div className="mt-6">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="mt-6 sm:mt-8 md:mt-10">
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <span
-              className="text-black font-bold uppercase"
+              className="text-black font-bold uppercase text-sm sm:text-base"
               style={{ 
-                fontSize: "12px", 
                 letterSpacing: "0.12em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
               }}
@@ -461,9 +387,8 @@ export default function ProductCard({
               Size
             </span>
             <span
-              className="text-black"
+              className="text-black text-sm sm:text-base"
               style={{ 
-                fontSize: "12px", 
                 letterSpacing: "0.06em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 400
@@ -473,7 +398,7 @@ export default function ProductCard({
             </span>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 sm:gap-3 flex-wrap">
             {activeProduct.sizes.map((s, i) => (
               <button
                 key={s}
@@ -481,11 +406,13 @@ export default function ProductCard({
                 className="transition-all duration-150 focus:outline-none hover:opacity-90"
                 style={{
                   width: "44px",
-                  height: "40px",
+                  height: "44px",
+                  minWidth: "44px",
+                  minHeight: "44px",
                   background: i === selectedSize ? "#000" : "#fff",
                   color: i === selectedSize ? "#fff" : "#000",
                   border: "1.5px solid #000",
-                  fontSize: "14px",
+                  fontSize: "16px",
                   fontWeight: 500,
                   letterSpacing: "0.04em",
                   fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
@@ -499,8 +426,8 @@ export default function ProductCard({
         </div>
 
         {/* Product Category Info */}
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <p className="text-gray-600 text-sm"
+        <div className="mt-8 sm:mt-10 md:mt-12 pt-4 sm:pt-6 border-t border-gray-200">
+          <p className="text-gray-600 text-sm sm:text-base md:text-lg"
             style={{ 
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               lineHeight: "1.6"
@@ -509,8 +436,7 @@ export default function ProductCard({
             Part of our <strong className="text-black">{activeProduct.category || "Premium"}</strong> collection. 
             Browse <button 
               onClick={() => goToNextProduct()}
-              className="text-black underline hover:no-underline transition-all ml-1"
-              style={{ fontSize: "13px" }}
+              className="text-black underline hover:no-underline transition-all ml-1 text-sm sm:text-base"
             >
               next product
             </button> or view all {allProducts.length} products.
@@ -518,14 +444,11 @@ export default function ProductCard({
         </div>
 
         {/* ── buttons ── */}
-        <div className="flex gap-3 mt-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 sm:mt-10 md:mt-12">
           <button
-            className="text-white bg-black uppercase tracking-widest hover:bg-gray-800 transition-all duration-200 focus:outline-none hover:scale-[1.02]"
+            className="text-white bg-black uppercase tracking-widest hover:bg-gray-800 transition-all duration-200 focus:outline-none hover:scale-[1.02] text-sm sm:text-base md:text-lg py-4 sm:py-5 px-4 sm:px-8 flex-1"
             style={{
-              fontSize: "12px",
               fontWeight: 600,
-              padding: "16px 28px",
-              flex: 1,
               borderRadius: "2px",
               letterSpacing: "0.15em",
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
@@ -534,12 +457,9 @@ export default function ProductCard({
             Buy Product
           </button>
           <button
-            className="text-black bg-white border border-black uppercase tracking-widest hover:bg-gray-50 transition-all duration-200 focus:outline-none hover:scale-[1.02]"
+            className="text-black bg-white border border-black uppercase tracking-widest hover:bg-gray-50 transition-all duration-200 focus:outline-none hover:scale-[1.02] text-sm sm:text-base md:text-lg py-4 sm:py-5 px-4 sm:px-8 flex-1"
             style={{
-              fontSize: "12px",
               fontWeight: 600,
-              padding: "16px 24px",
-              flex: 1,
               borderRadius: "2px",
               letterSpacing: "0.15em",
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"

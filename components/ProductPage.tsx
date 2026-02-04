@@ -55,7 +55,7 @@ export default function ProductPage() {
 
       {/* Product Grid - PASS THE PRODUCTS PROP! */}
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h2 className="text-3xl md:text-4xl font-black mb-8 tracking-tight uppercase">
+        <h2 className="text-3xl md:text-4xl font-black text-black mb-8 tracking-tight uppercase">
           You May Also Like
         </h2>
         <ProductGrid products={relatedProducts} columns={3} />
