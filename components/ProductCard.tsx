@@ -4,15 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Product, sampleProduct, getAllProducts } from "@/types/Product";
 
-/* ─────────────────────────── props ─────────────────────────── */
-export interface ProductCardProps {
-  initialProductId?: number;
-}
-
-/* ─────────────────────────── component ─────────────────────── */
-export default function ProductCard({
-  initialProductId = 1,
-}: any) {
+export default function ProductCard({ initialProductId = 1 }: { initialProductId?: number }) {
   const allProducts = getAllProducts();
   const initialProduct = allProducts.find(p => p.id === initialProductId) || sampleProduct;
 
@@ -21,452 +13,203 @@ export default function ProductCard({
     allProducts.findIndex(p => p.id === initialProductId)
   );
 
-  /* thumbnails carousel */
   const [activeThumb, setActiveThumb] = useState(0);
-  const [carouselImages, setCarouselImages] = useState<string[]>([]);
+  const [isFading, setIsFading] = useState(false);
 
-  // Initialize carousel with all thumbnail images
-  useEffect(() => {
-    if (activeProduct.images.thumbnails.length > 0) {
-      setCarouselImages(activeProduct.images.thumbnails);
-      setActiveThumb(0);
-    }
-  }, [activeProduct]);
+  // Transition handler for both thumb clicks and product changes
+  const triggerFade = (callback: () => void) => {
+    setIsFading(true);
+    setTimeout(() => {
+      callback();
+      setIsFading(false);
+    }, 350);
+  };
 
-  // Navigation between products
   const goToNextProduct = () => {
     const nextIndex = (currentProductIndex + 1) % allProducts.length;
-    setCurrentProductIndex(nextIndex);
-    setActiveProduct(allProducts[nextIndex]);
+    triggerFade(() => {
+      setCurrentProductIndex(nextIndex);
+      setActiveProduct(allProducts[nextIndex]);
+      setActiveThumb(0);
+    });
   };
 
   const goToPrevProduct = () => {
     const prevIndex = currentProductIndex === 0 ? allProducts.length - 1 : currentProductIndex - 1;
-    setCurrentProductIndex(prevIndex);
-    setActiveProduct(allProducts[prevIndex]);
+    triggerFade(() => {
+      setCurrentProductIndex(prevIndex);
+      setActiveProduct(allProducts[prevIndex]);
+      setActiveThumb(0);
+    });
   };
 
-  const goToProduct = (productId: number) => {
-    const index = allProducts.findIndex(p => p.id === productId);
-    if (index !== -1) {
-      setCurrentProductIndex(index);
-      setActiveProduct(allProducts[index]);
-    }
+  const handleThumbChange = (index: number) => {
+    if (index === activeThumb) return;
+    triggerFade(() => setActiveThumb(index));
   };
 
-  // Thumbnail carousel functions
-  const prevThumb = () =>
-    setActiveThumb((i) => (i === 0 ? carouselImages.length - 1 : i - 1));
-
-  const nextThumb = () =>
-    setActiveThumb((i) => (i === carouselImages.length - 1 ? 0 : i + 1));
-
-  const handleThumbnailClick = (index: number) => {
-    setActiveThumb(index);
-  };
-
-  /* color / size */
   const [selectedColor, setSelectedColor] = useState(0);
-  const [selectedSize, setSelectedSize] = useState(
-    activeProduct.sizes.indexOf("38") !== -1 ? activeProduct.sizes.indexOf("38") : 0,
-  );
-
-  /* accordion */
+  const [selectedSize, setSelectedSize] = useState(0);
   const [descOpen, setDescOpen] = useState(true);
-  const [detailsOpen, setDetailsOpen] = useState(false);
 
-  /* split the title for the two-line heading */
   const titleParts = activeProduct.name.split(" ");
   const titleLine1 = titleParts.slice(0, 2).join(" ");
   const titleLine2 = titleParts.slice(2).join(" ");
 
   return (
-    <div
-      className="flex flex-col lg:flex-row w-full bg-[#E8E8E8] relative min-h-screen"
-      style={{
-        fontFamily: "'Playfair Display', serif, 'Helvetica Neue', Helvetica, Arial, sans-serif",
-      }}
-    >
-      {/* Product Navigation Overlay */}
-      <div className="absolute top-3 sm:top-4 md:top-6 right-3 sm:right-4 md:right-6 z-10 flex items-center gap-1.5 sm:gap-2">
-        <span className="text-xs sm:text-sm text-gray-600 font-medium">
-          {currentProductIndex + 1} / {allProducts.length}
-        </span>
-        <button
-          onClick={goToPrevProduct}
-          className="text-black bg-white border border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm sm:text-base"
-          aria-label="Previous product"
-        >
-          ←
-        </button>
-        <button
-          onClick={goToNextProduct}
-          className="text-black bg-white border border-gray-300 rounded-full w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9 flex items-center justify-center hover:bg-gray-100 transition-colors text-sm sm:text-base"
-          aria-label="Next product"
-        >
-          →
-        </button>
+    <div className="flex flex-col lg:flex-row w-full bg-white relative min-h-screen text-black antialiased overflow-x-hidden">
+      
+      {/* ── LUXURY FLOATING NAV ── */}
+      <div className="absolute top-6 right-6 lg:top-10 lg:right-12 z-30 flex items-center gap-8">
+        <div className="flex items-center gap-8 bg-white/40 backdrop-blur-md px-6 py-3 rounded-full border border-gray-100/50">
+          <button onClick={goToPrevProduct} className="hover:opacity-30 transition-opacity p-1 group">
+            <span className="text-[14px] uppercase tracking-[0.4em] font-medium">Prev</span>
+          </button>
+          <span className="text-[14px] tracking-[0.5em] text-gray-400 font-light">
+            {String(currentProductIndex + 1).padStart(2, '0')} / {String(allProducts.length).padStart(2, '0')}
+          </span>
+          <button onClick={goToNextProduct} className="hover:opacity-30 transition-opacity p-1 group">
+            <span className="text-[14px] uppercase tracking-[0.4em] font-medium">Next</span>
+          </button>
+        </div>
       </div>
 
-
-
-      {/* ───────── LEFT PANEL ───────── */}
-      <div
-        className="flex flex-col overflow-y-auto w-full lg:w-[45%] xl:w-[30%] p-4 sm:p-6 md:p-8 lg:py-8 lg:pl-8 lg:pr-6"
-      >
-        {/* Product Category */}
-        <div className="mb-4 sm:mb-6 md:mb-8">
-          <span className="text-black font-bold uppercase tracking-widest px-2 sm:px-3 py-1 border border-black text-xs sm:text-sm"
-            style={{
-              letterSpacing: "0.15em",
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-            }}
-          >
-            {activeProduct.category || "Premium"}
+      {/* ───────── LEFT PANEL (Doubled Thumbnails & Info) ───────── */}
+      <div className="order-2 lg:order-1 flex flex-col w-full lg:w-[40%] xl:w-[32%] p-8 lg:p-16 border-r border-gray-50 bg-white">
+        <div className="mb-16">
+          <span className="text-[14px] uppercase tracking-[0.5em] text-gray-400 block mb-4 font-light">The Collection</span>
+          <span className="text-[12px] uppercase tracking-[0.3em] font-bold border-b-2 border-black pb-2">
+            {activeProduct.category || "Exotic Leather"}
           </span>
         </div>
 
-        {/* thumbnail strip - mobile horizontal, desktop vertical */}
-        <div className="flex flex-row lg:flex-col gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8 flex-shrink-0 overflow-x-auto lg:overflow-x-visible">
-          {carouselImages.slice(0, 3).map((src, i) => {
-            const displayIndex = (activeThumb + i) % carouselImages.length;
-            return (
-              <button
-                key={displayIndex}
-                onClick={() => handleThumbnailClick(displayIndex)}
-                className="relative overflow-hidden transition-all duration-200 hover:opacity-90 flex-shrink-0"
-                style={{
-                  width: "80px",
-                  height: "120px",
-                  minWidth: "80px",
-                  minHeight: "120px",
-                  border: displayIndex === activeThumb ? "2px solid #000" : "1px solid #e5e5e5",
-                  outline: "none",
-                  borderRadius: "2px",
-                }}
-              >
-                <Image
-                  src={src}
-                  alt={`Thumb ${displayIndex + 1}`}
-                  width={80}
-                  height={120}
-                  className="object-cover w-full h-full"
-                  priority={displayIndex === activeThumb}
-                />
-              </button>
-            );
-          })}
-        </div>
-
-        {/* prev / next arrows */}
-        <div className="flex items-center gap-2 sm:gap-3 mb-6 sm:mb-8 md:mb-10 flex-shrink-0">
-          <button
-            onClick={prevThumb}
-            className="text-black hover:opacity-50 transition-opacity p-1.5 sm:p-2 text-lg sm:text-xl"
-            aria-label="Previous image"
-          >
-            ←
-          </button>
-          <span
-            className="text-black text-sm sm:text-base"
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              letterSpacing: "0.05em"
-            }}
-          >
-            {activeThumb + 1} / {carouselImages.length}
-          </span>
-          <button
-            onClick={nextThumb}
-            className="text-black hover:opacity-50 transition-opacity p-1.5 sm:p-2 text-lg sm:text-xl"
-            aria-label="Next image"
-          >
-            →
-          </button>
-        </div>
-
-        {/* ── DESCRIPTION accordion ── */}
-        <div style={{ borderTop: "2px solid #000" }} className="flex-shrink-0">
-          <button
-            onClick={() => setDescOpen(!descOpen)}
-            className="w-full flex items-center justify-between py-3 sm:py-4 focus:outline-none hover:opacity-70 transition-opacity"
-            aria-expanded={descOpen}
-          >
-            <span
-              className="text-black font-bold uppercase tracking-wider text-base sm:text-lg md:text-xl"
-              style={{ letterSpacing: "0.1em" }}
+        {/* THUMBNAILS: Doubled Size (200px x 260px) */}
+        <div className="flex flex-row gap-6 mb-20 overflow-x-auto no-scrollbar pb-4 -mx-2 px-2">
+          {activeProduct.images.thumbnails.map((src, i) => (
+            <button
+              key={i}
+              onClick={() => handleThumbChange(i)}
+              className={`relative flex-shrink-0 transition-all duration-700 ease-in-out group ${
+                i === activeThumb ? "opacity-100 scale-100" : "opacity-30 hover:opacity-60 scale-[0.96]"
+              }`}
             >
-              Description
-            </span>
-            <span className="text-black font-bold text-xl sm:text-2xl">
-              {descOpen ? "−" : "+"}
-            </span>
-          </button>
-          {descOpen && (
-            <div className="pb-4 sm:pb-6 md:pb-8">
-              <p
-                className="text-black leading-relaxed text-sm sm:text-base md:text-lg"
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  lineHeight: "1.7",
-                  fontWeight: 400
-                }}
-              >
+              <div className="w-[180px] h-[240px] lg:w-[200px] lg:h-[260px] bg-[#fcfcfc] relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+                <Image 
+                  src={src} 
+                  alt="" 
+                  fill 
+                  className={`object-cover transition-transform duration-1000 ${i === activeThumb ? 'scale-110' : 'scale-100 group-hover:scale-105'}`} 
+                  sizes="200px"
+                />
+              </div>
+              {i === activeThumb && (
+                <div className="absolute -bottom-3 left-0 w-full h-[2px] bg-black animate-in fade-in slide-in-from-left-4 duration-500" />
+              )}
+            </button>
+          ))}
+        </div>
+
+        {/* ELEGANT ACCORDION */}
+        <div className="border-t border-gray-100 mt-auto">
+          <div className="border-b border-gray-100">
+            <button onClick={() => setDescOpen(!descOpen)} className="w-full flex justify-between items-center py-8">
+              <span className="text-[14px] uppercase tracking-[0.3em] font-bold">Product Narrative</span>
+              <span className="text-xl font-extralight transition-transform duration-300" style={{ transform: descOpen ? 'rotate(0deg)' : 'rotate(45deg)' }}>
+                {descOpen ? "—" : "+"}
+              </span>
+            </button>
+            <div className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${descOpen ? "max-h-[500px] pb-12" : "max-h-0"}`}>
+              <p className="text-[16px] leading-[1.8] text-gray-900 font-medium tracking-wide ">
                 {activeProduct.description}
               </p>
             </div>
-          )}
-        </div>
-
-        {/* ── DETAILS accordion ── */}
-        <div style={{ borderTop: "2px solid #000" }} className="flex-shrink-0">
-          <button
-            onClick={() => setDetailsOpen(!detailsOpen)}
-            className="w-full flex items-center justify-between py-3 sm:py-4 focus:outline-none hover:opacity-70 transition-opacity"
-            aria-expanded={detailsOpen}
-          >
-            <span
-              className="text-black font-bold uppercase tracking-wider text-base sm:text-lg md:text-xl"
-              style={{ letterSpacing: "0.1em" }}
-            >
-              Product Details
-            </span>
-            <span className="text-black font-bold text-xl sm:text-2xl">
-              {detailsOpen ? "−" : "+"}
-            </span>
-          </button>
-          {detailsOpen && (
-            <div className="pb-4 sm:pb-6 md:pb-8 space-y-2 text-sm sm:text-base md:text-lg">
-              <p
-                className="text-black"
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontWeight: 400
-                }}
-              >
-                <strong>Material:</strong> {activeProduct.details.material}
-              </p>
-              <p
-                className="text-black"
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontWeight: 400
-                }}
-              >
-                <strong>Care:</strong> {activeProduct.details.care}
-              </p>
-              <p
-                className="text-black"
-                style={{
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  fontWeight: 400
-                }}
-              >
-                <strong>Origin:</strong> {activeProduct.details.origin}
-              </p>
-            </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* ───────── CENTER — hero image ───────── */}
-      <div
-        className="relative flex-1 flex items-center justify-center min-h-[300px] sm:min-h-[400px] md:min-h-[500px] lg:min-h-[600px] xl:min-h-[700px] order-first lg:order-none"
-        style={{
-          background: "#fafafa",
-        }}
-      >
-        <Image
-          src={carouselImages[activeThumb] || activeProduct.images.hero}
-          alt={activeProduct.name}
-          width={600}
-          height={800}
-          className="object-cover object-top w-full h-full max-w-[90%] max-h-[90%] lg:max-w-full lg:max-h-full"
-          priority
-        />
+      {/* ───────── CENTER PANEL (Hero Section) ───────── */}
+      <div className="order-1 lg:order-2 flex-1 bg-[#F9F9F9] relative flex items-center justify-center overflow-hidden h-[70vh] lg:h-screen p-8 lg:p-20">
+        <div 
+          className={`relative w-full h-full transition-all duration-700 ease-out flex items-center justify-center ${
+            isFading ? "opacity-0 scale-[1.02] blur-md" : "opacity-100 scale-100 blur-0"
+          }`}
+        >
+          <div className="relative w-full h-full">
+            <Image
+              src={activeProduct.images.thumbnails[activeThumb] || activeProduct.images.hero}
+              alt={activeProduct.name}
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+        </div>
       </div>
 
-      {/* ───────── RIGHT PANEL ───────── */}
-      <div
-        className="flex flex-col justify-start w-full lg:w-[45%] xl:w-[30%] p-4 sm:p-6 md:p-8 lg:py-8 lg:px-8"
-      >
-        {/* Product ID */}
-        <div className="mb-2 sm:mb-3 md:mb-4">
-          <span className="text-gray-500 text-sm sm:text-base tracking-wider"
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              letterSpacing: "0.1em"
-            }}
-          >
-            #{activeProduct.id.toString().padStart(3, '0')}
+      {/* ───────── RIGHT PANEL (Purchase Details) ───────── */}
+      <div className="order-3 flex flex-col w-full lg:w-[35%] xl:w-[28%] p-8 lg:p-16 bg-white justify-center border-l border-gray-50">
+        <div className="max-w-sm mx-auto lg:ml-0 w-full">
+          <span className="text-[12px] tracking-[0.6em] text-gray-900 uppercase block mb-8 font-light">
+            Identification No. {activeProduct.id.toString().padStart(6, '0')}
           </span>
-        </div>
+          
+          <h1 className="text-4xl lg:text-[3.2rem] font-light tracking-tighter leading-[1] mb-6 uppercase">
+            {titleLine1} <br />
+            <span className="font-black text-zinc-900">{titleLine2}</span>
+          </h1>
 
-        {/* title – two lines */}
-        <h1
-          className="text-black font-black uppercase leading-tight text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] xl:text-[3rem]"
-          style={{
-            letterSpacing: "-0.5px",
-            lineHeight: "1.1",
-            margin: 0,
-          }}
-        >
-          {titleLine1}
-          <br />
-          {titleLine2}
-        </h1>
-
-        {/* price */}
-        <p
-          className="text-black mt-4 sm:mt-5 md:mt-6 text-lg sm:text-xl md:text-2xl"
-          style={{
-            fontWeight: 500,
-            fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-            letterSpacing: "0.02em"
-          }}
-        >
-          {activeProduct.price}
-        </p>
-
-        {/* ── COLOR ── */}
-        <div className="mt-6 sm:mt-8 md:mt-10">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <span
-              className="text-black font-bold uppercase text-sm sm:text-base"
-              style={{
-                letterSpacing: "0.12em",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-              }}
-            >
-              Color
-            </span>
-            <span
-              className="text-black text-sm sm:text-base"
-              style={{
-                letterSpacing: "0.06em",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 400
-              }}
-            >
-              |&nbsp; {activeProduct.colors[selectedColor].label}
-            </span>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3">
-            {activeProduct.colors.map((c, i) => (
-              <button
-                key={i}
-                onClick={() => setSelectedColor(i)}
-                className="transition-all duration-150 focus:outline-none hover:scale-105"
-                style={{
-                  width: "32px",
-                  height: "32px",
-                  minWidth: "32px",
-                  minHeight: "32px",
-                  background: c.hex,
-                  border: i === selectedColor ? "2px solid #000" : "1px solid #ccc",
-                  boxShadow: i === selectedColor ? "inset 0 0 0 2px #fff" : "none",
-                  borderRadius: "50%",
-                }}
-                aria-label={`Select color: ${c.label}`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* ── SIZE ── */}
-        <div className="mt-6 sm:mt-8 md:mt-10">
-          <div className="flex items-center gap-2 mb-3 sm:mb-4">
-            <span
-              className="text-black font-bold uppercase text-sm sm:text-base"
-              style={{
-                letterSpacing: "0.12em",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-              }}
-            >
-              Size
-            </span>
-            <span
-              className="text-black text-sm sm:text-base"
-              style={{
-                letterSpacing: "0.06em",
-                fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                fontWeight: 400
-              }}
-            >
-              |&nbsp; {activeProduct.sizes[selectedSize]}
-            </span>
-          </div>
-
-          <div className="flex gap-2 sm:gap-3 flex-wrap">
-            {activeProduct.sizes.map((s, i) => (
-              <button
-                key={s}
-                onClick={() => setSelectedSize(i)}
-                className="transition-all duration-150 focus:outline-none hover:opacity-90"
-                style={{
-                  width: "44px",
-                  height: "44px",
-                  minWidth: "44px",
-                  minHeight: "44px",
-                  background: i === selectedSize ? "#000" : "#fff",
-                  color: i === selectedSize ? "#fff" : "#000",
-                  border: "1.5px solid #000",
-                  fontSize: "16px",
-                  fontWeight: 500,
-                  letterSpacing: "0.04em",
-                  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-                  borderRadius: "2px",
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Product Category Info */}
-        <div className="mt-8 sm:mt-10 md:mt-12 pt-4 sm:pt-6 border-t border-gray-200">
-          <p className="text-gray-600 text-sm sm:text-base md:text-lg"
-            style={{
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-              lineHeight: "1.6"
-            }}
-          >
-            Part of our <strong className="text-black">{activeProduct.category || "Premium"}</strong> collection.
-            Browse <button
-              onClick={() => goToNextProduct()}
-              className="text-black underline hover:no-underline transition-all ml-1 text-sm sm:text-base"
-            >
-              next product
-            </button> or view all {allProducts.length} products.
+          <p className="text-[2rem] font-light tracking-[0.15em] mt-10 mb-20 text-zinc-800">
+            {activeProduct.price}
           </p>
-        </div>
 
-        {/* ── buttons ── */}
-        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-8 sm:mt-10 md:mt-12">
-          <button
-            className="text-white bg-black uppercase tracking-widest hover:bg-gray-800 transition-all duration-200 focus:outline-none hover:scale-[1.02] text-sm sm:text-base md:text-lg py-4 sm:py-5 px-4 sm:px-8 flex-1"
-            style={{
-              fontWeight: 600,
-              borderRadius: "2px",
-              letterSpacing: "0.15em",
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-            }}
-          >
-            Buy Product
-          </button>
-          <button
-            className="text-black bg-white border border-black uppercase tracking-widest hover:bg-gray-50 transition-all duration-200 focus:outline-none hover:scale-[1.02] text-sm sm:text-base md:text-lg py-4 sm:py-5 px-4 sm:px-8 flex-1"
-            style={{
-              fontWeight: 600,
-              borderRadius: "2px",
-              letterSpacing: "0.15em",
-              fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
-            }}
-          >
-            Add to Cart
-          </button>
+          {/* ATTRIBUTES */}
+          <div className="space-y-16">
+            <div>
+              <p className="text-[14px] uppercase tracking-[0.4em] font-bold mb-6 text-gray-900">Palettes</p>
+              <div className="flex gap-6">
+                {activeProduct.colors.map((c, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setSelectedColor(i)}
+                    className={`w-8 h-8 rounded-full transition-all duration-500 ring-offset-8 ring-1 ${
+                      i === selectedColor ? "ring-black scale-125 shadow-xl" : "ring-transparent hover:ring-gray-200"
+                    }`}
+                    style={{ backgroundColor: c.hex }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <p className="text-[14px] uppercase tracking-[0.4em] font-bold text-gray-900">Dimensions</p>
+                <button className="text-[11px] uppercase tracking-[0.3em] text-gray-700 hover:text-black transition-colors border-b border-transparent hover:border-black">Sizing Guide</button>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                {activeProduct.sizes.map((s, i) => (
+                  <button
+                    key={s}
+                    onClick={() => setSelectedSize(i)}
+                    className={`py-5 text-[16px] tracking-[0.2em] font-medium transition-all duration-500 border ${
+                      i === selectedSize ? "bg-black text-white border-black shadow-2xl" : "border-gray-100 hover:border-zinc-800"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* CTA BUTTONS */}
+          <div className="mt-20 space-y-4">
+            <button className="w-full bg-black text-white text-[14px] font-bold uppercase tracking-[0.4em] py-7 hover:bg-zinc-800 transition-all transform active:scale-95 shadow-lg">
+              Purchase Item
+            </button>
+            <button className="w-full bg-white text-black border border-zinc-100 text-[12px] font-bold uppercase tracking-[0.4em] py-7 hover:border-black transition-all transform active:scale-95">
+              Check Boutique Availability
+            </button>
+          </div>
         </div>
       </div>
     </div>
