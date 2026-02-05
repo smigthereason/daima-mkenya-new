@@ -12,19 +12,19 @@ export interface ProductCardProps {
 /* ─────────────────────────── component ─────────────────────── */
 export default function ProductCard({
   initialProductId = 1,
-}: ProductCardProps) {
+}: any) {
   const allProducts = getAllProducts();
   const initialProduct = allProducts.find(p => p.id === initialProductId) || sampleProduct;
-  
+
   const [activeProduct, setActiveProduct] = useState<Product>(initialProduct);
   const [currentProductIndex, setCurrentProductIndex] = useState(
     allProducts.findIndex(p => p.id === initialProductId)
   );
-  
+
   /* thumbnails carousel */
   const [activeThumb, setActiveThumb] = useState(0);
   const [carouselImages, setCarouselImages] = useState<string[]>([]);
-  
+
   // Initialize carousel with all thumbnail images
   useEffect(() => {
     if (activeProduct.images.thumbnails.length > 0) {
@@ -57,7 +57,7 @@ export default function ProductCard({
   // Thumbnail carousel functions
   const prevThumb = () =>
     setActiveThumb((i) => (i === 0 ? carouselImages.length - 1 : i - 1));
-  
+
   const nextThumb = () =>
     setActiveThumb((i) => (i === carouselImages.length - 1 ? 0 : i + 1));
 
@@ -83,7 +83,7 @@ export default function ProductCard({
   return (
     <div
       className="flex flex-col lg:flex-row w-full bg-[#E8E8E8] relative min-h-screen"
-      style={{ 
+      style={{
         fontFamily: "'Playfair Display', serif, 'Helvetica Neue', Helvetica, Arial, sans-serif",
       }}
     >
@@ -108,7 +108,7 @@ export default function ProductCard({
         </button>
       </div>
 
-     
+
 
       {/* ───────── LEFT PANEL ───────── */}
       <div
@@ -117,7 +117,7 @@ export default function ProductCard({
         {/* Product Category */}
         <div className="mb-4 sm:mb-6 md:mb-8">
           <span className="text-black font-bold uppercase tracking-widest px-2 sm:px-3 py-1 border border-black text-xs sm:text-sm"
-            style={{ 
+            style={{
               letterSpacing: "0.15em",
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
             }}
@@ -169,7 +169,7 @@ export default function ProductCard({
           </button>
           <span
             className="text-black text-sm sm:text-base"
-            style={{ 
+            style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               letterSpacing: "0.05em"
             }}
@@ -293,7 +293,7 @@ export default function ProductCard({
         {/* Product ID */}
         <div className="mb-2 sm:mb-3 md:mb-4">
           <span className="text-gray-500 text-sm sm:text-base tracking-wider"
-            style={{ 
+            style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               letterSpacing: "0.1em"
             }}
@@ -319,7 +319,7 @@ export default function ProductCard({
         {/* price */}
         <p
           className="text-black mt-4 sm:mt-5 md:mt-6 text-lg sm:text-xl md:text-2xl"
-          style={{ 
+          style={{
             fontWeight: 500,
             fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
             letterSpacing: "0.02em"
@@ -333,7 +333,7 @@ export default function ProductCard({
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <span
               className="text-black font-bold uppercase text-sm sm:text-base"
-              style={{ 
+              style={{
                 letterSpacing: "0.12em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
               }}
@@ -342,7 +342,7 @@ export default function ProductCard({
             </span>
             <span
               className="text-black text-sm sm:text-base"
-              style={{ 
+              style={{
                 letterSpacing: "0.06em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 400
@@ -379,7 +379,7 @@ export default function ProductCard({
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <span
               className="text-black font-bold uppercase text-sm sm:text-base"
-              style={{ 
+              style={{
                 letterSpacing: "0.12em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif"
               }}
@@ -388,7 +388,7 @@ export default function ProductCard({
             </span>
             <span
               className="text-black text-sm sm:text-base"
-              style={{ 
+              style={{
                 letterSpacing: "0.06em",
                 fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
                 fontWeight: 400
@@ -428,13 +428,13 @@ export default function ProductCard({
         {/* Product Category Info */}
         <div className="mt-8 sm:mt-10 md:mt-12 pt-4 sm:pt-6 border-t border-gray-200">
           <p className="text-gray-600 text-sm sm:text-base md:text-lg"
-            style={{ 
+            style={{
               fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
               lineHeight: "1.6"
             }}
           >
-            Part of our <strong className="text-black">{activeProduct.category || "Premium"}</strong> collection. 
-            Browse <button 
+            Part of our <strong className="text-black">{activeProduct.category || "Premium"}</strong> collection.
+            Browse <button
               onClick={() => goToNextProduct()}
               className="text-black underline hover:no-underline transition-all ml-1 text-sm sm:text-base"
             >
