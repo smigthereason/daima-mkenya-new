@@ -1,11 +1,8 @@
 "use client";
-
-import { useState, useRef, useCallback, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronLeft, ChevronRight, ArrowUpRight, Play, Volume2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ScrollSmoother } from "gsap/ScrollSmoother";
 
 /* ─────────────────────────── types ─────────────────────────── */
 interface Product {
@@ -17,7 +14,7 @@ interface Product {
   productImage: string;
 }
 
-/* ─────────────────────────── data ──────────────────────────── */
+/* ─────────────────────────── data (YOUR LOCAL ASSETS) ──────────────────────────── */
 const products: Product[] = [
   {
     id: 1,
@@ -61,7 +58,7 @@ const products: Product[] = [
   },
   {
     id: 14,
-    name: "NATIONAL PRIDE STRIPED SHIRT",
+    name: "NATIONAL PRIDE STRIPE SHIRT",
     price: "Ksh 5,800",
     modelImage: "/assets/14.jpg",
     modelVideo: "/assets/afro_dress_2.mp4",
@@ -69,336 +66,204 @@ const products: Product[] = [
   },
 ];
 
-/* ────────────────── ProductMedia sub-component ─────────────── */
-const MAX_PLAY_MS = 15000; // video auto-stops after 15 s
+const ProductCard = ({ product, isActive }: { product: Product; isActive: boolean }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
-interface ProductMediaProps {
-  image: string;
-  video: string;
-  alt: string;
-  aspectClass: string;
-}
-
-function ProductMedia({ image, video, alt, aspectClass }: ProductMediaProps) {
-  const [playing, setPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const stop = useCallback(() => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
+  useEffect(() => {
+    if (isHovered && videoRef.current) {
+      videoRef.current.play().catch(() => { });
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
     }
-    const v = videoRef.current;
-    if (v) {
-      v.pause();
-      v.currentTime = 0;
-    }
-    setPlaying(false);
-  }, []);
-
-  const handleEnter = useCallback(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.currentTime = 0;
-    v.play().catch(() => {});
-    setPlaying(true);
-    timerRef.current = setTimeout(stop, MAX_PLAY_MS);
-  }, [stop]);
+  }, [isHovered]);
 
   return (
     <div
-      className={`relative w-full ${aspectClass} overflow-hidden cursor-pointer group`}
-      onMouseEnter={handleEnter}
-      onMouseLeave={stop}
+      className={`relative transition-all duration-700 ease-out h-[65vh] md:h-[75vh]
+                 ${isActive ? "w-[70vw] md:w-[45vw] scale-100" : "w-[15vw] md:w-[10vw] grayscale opacity-40 scale-95"}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* still image – always present, fades out when video plays */}
-      <Image
-        src={image}
-        alt={alt}
-        fill
-        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        className="object-cover object-top transition-all duration-500 ease-out"
-        style={{
-          opacity: playing ? 0 : 1,
-          transform: playing ? "scale(1.05)" : "scale(1)",
-        }}
-      />
+      <div className="relative w-full h-full overflow-hidden rounded-[2px] bg-neutral-100 shadow-2xl">
+        {/* Model Media */}
+        <div className="absolute inset-0 z-0">
+          {/* Static Image */}
+          <Image
+            src={product.modelImage}
+            alt={product.name}
+            fill
+            className={`object-cover object-top transition-transform duration-1000 ease-in-out
+                       ${isHovered ? "scale-110" : "scale-100"}`}
+          />
 
-      {/* video layer – fades in on hover */}
-      <video
-        ref={videoRef}
-        src={video}
-        muted
-        playsInline
-        loop={false}
-        preload="metadata"
-        className="absolute inset-0 w-full h-full object-cover object-top transition-all duration-500 ease-out"
-        style={{
-          opacity: playing ? 1 : 0,
-          transform: playing ? "scale(1)" : "scale(1.05)",
-        }}
-      />
+          {/* Video Layer */}
+          <video
+            ref={videoRef}
+            src={product.modelVideo}
+            muted
+            loop
+            playsInline
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500
+                       ${isHovered ? "opacity-100" : "opacity-0"}`}
+          />
+        </div>
 
-      {/* Overlay for extra smoothness */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-500 ease-out z-10 pointer-events-none" />
+        {/* Overlay Gradients */}
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 opacity-60" />
+
+        {/* Floating Product Flat Lay (Revealed on Hover) */}
+        <div
+          className={`absolute top-6 right-6 z-20 w-24 md:w-32 aspect-[3/4] bg-white p-1 rounded-sm shadow-xl transition-all duration-500 delay-100
+                        ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
+        >
+          <Image
+            src={product.productImage}
+            alt="product flat"
+            fill
+            className="object-cover"
+          />
+        </div>
+
+        {/* Content Box */}
+        <div
+          className={`absolute bottom-0 left-0 right-0 p-6 md:p-10 transition-all duration-500
+                        ${isActive ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
+        >
+          <div className="flex flex-col gap-2">
+            <span className="text-white/70 text-xs tracking-[0.3em] font-light">LIMITED RELEASE</span>
+            <h3 className="text-white text-2xl md:text-4xl font-serif tracking-tight leading-tight uppercase max-w-[80%]">
+              {product.name}
+            </h3>
+            <div className="flex items-center gap-4 mt-2">
+              <span className="text-white font-medium text-lg">{product.price}</span>
+              <div className="h-[1px] w-12 bg-white/30" />
+              <button className="flex items-center gap-2 text-white text-xs tracking-widest uppercase hover:text-neutral-300 transition-colors">
+                SHOP NOW <ArrowUpRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
-}
+};
 
-/* ──────────────────── main component ───────────────────────── */
 export default function NewArrivals() {
-  const [hoveredId, setHoveredId] = useState<number | null>(null);
-  const sectionRef = useRef<HTMLElement>(null);
-  const horizontalWrapperRef = useRef<HTMLDivElement>(null);
-  const horizontalStripRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Inline SVG pattern as a separate variable to avoid parsing issues
-  const patternSVG = `data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='grid' width='20' height='20' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='10' cy='10' r='0.5' fill='rgba(0,0,0,0.05)'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23grid)'/%3E%3C/svg%3E`;
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % products.length);
+  };
 
-  useEffect(() => {
-    // Register GSAP plugins
-    if (typeof window !== "undefined") {
-      gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
-    }
-
-    // Initialize GSAP context
-    const ctx = gsap.context(() => {
-      // Horizontal scrolling animation
-      if (horizontalWrapperRef.current && horizontalStripRef.current) {
-        const pinWrap = horizontalStripRef.current;
-
-        // Function to calculate horizontal scroll length
-        const refresh = () => {
-          const pinWrapWidth = pinWrap.scrollWidth;
-          const horizontalScrollLength = pinWrapWidth - window.innerWidth;
-          return { pinWrapWidth, horizontalScrollLength };
-        };
-
-        // Initial calculation
-        const { pinWrapWidth, horizontalScrollLength } = refresh();
-
-        // Create horizontal scroll animation WITHOUT opacity changes
-        gsap.to(pinWrap, {
-          x: () => -horizontalScrollLength,
-          ease: "none",
-          scrollTrigger: {
-            trigger: horizontalWrapperRef.current,
-            pin: true,
-            scrub: 1,
-            start: "center center",
-            end: () => `+=${pinWrapWidth}`,
-            invalidateOnRefresh: true,
-            anticipatePin: 1,
-          },
-        });
-
-        // Refresh on window resize
-        ScrollTrigger.addEventListener("refreshInit", refresh);
-
-        // Animate individual cards as they come into view
-        cardRefs.current.forEach((card, index) => {
-          if (card) {
-            gsap.from(card, {
-              y: 100,
-              opacity: 0,
-              rotationY: 20,
-              duration: 1,
-              delay: index * 0.1,
-              ease: "back.out(1.7)",
-              scrollTrigger: {
-                trigger: card,
-                start: "left 90%",
-                end: "left 20%",
-                toggleActions: "play none none reverse",
-              },
-            });
-
-            // Hover animation for product images (original behavior)
-            const productImage = card.querySelector(".product-image-flat");
-            if (productImage) {
-              // Initial state for product image
-              gsap.set(productImage, {
-                y: 20,
-                opacity: 0,
-                rotate: 5,
-                scale: 0.9,
-              });
-
-              // Animation for product image on card hover
-              const mouseEnter = () => {
-                gsap.to(productImage, {
-                  y: -5,
-                  opacity: 1,
-                  rotate: 0,
-                  scale: 1.05,
-                  duration: 0.5,
-                  ease: "power3.out",
-                });
-              };
-
-              const mouseLeave = () => {
-                gsap.to(productImage, {
-                  y: 20,
-                  opacity: 0,
-                  rotate: 5,
-                  scale: 0.9,
-                  duration: 0.5,
-                  ease: "power3.in",
-                });
-              };
-
-              card.addEventListener("mouseenter", mouseEnter);
-              card.addEventListener("mouseleave", mouseLeave);
-
-              // Cleanup event listeners
-              return () => {
-                card.removeEventListener("mouseenter", mouseEnter);
-                card.removeEventListener("mouseleave", mouseLeave);
-              };
-            }
-          }
-        });
-      }
-    }, sectionRef);
-
-    return () => ctx.revert();
-  }, []);
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+  };
 
   return (
-    <section
-      ref={sectionRef}
-      className="scroll-section new-arrivals-section bg-[#e8e8e8] w-full min-h-screen px-4 sm:px-6 py-8 overflow-hidden relative"
-      style={{
-        opacity: 0, // Start invisible - will be animated by GSAPProvider
-        transform: "translateY(100px)", // Start below - will be animated by GSAPProvider
-        marginTop: "-100vh", // Pull up to overlap with Hero section
-        position: "relative",
-        zIndex: 20,
-      }}
-    >
-      {/* Subtle background pattern for depth */}
-      <div
-        ref={containerRef}
-        className="absolute inset-0 opacity-[0.02] pointer-events-none"
-        style={{
-          backgroundImage: `url("${patternSVG}")`,
-        }}
-      />
-
-      {/* Header - Always at the top */}
-      <div className="absolute top-0 left-0 right-0 z-50 px-4 sm:px-6 py-6">
-        <h2
-          className="new-arrivals-header text-black font-black uppercase tracking-tighter leading-none text-center"
-          style={{
-            fontSize: "clamp(2rem, 5vw, 3.5rem)",
-            fontFamily: "'Playfair Display', serif",
-            opacity: 0, // Start invisible - will be animated by GSAPProvider
-            transform: "translateY(50px)", // Start below - will be animated by GSAPProvider
-          }}
-        >
-          NEW ARRIVALS
-        </h2>
+    <section className="relative min-h-screen bg-white overflow-hidden flex flex-col">
+      {/* Background Large Text Decor */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none select-none overflow-hidden whitespace-nowrap opacity-[0.03] z-0">
+        <h1 className="text-[25vw] font-black tracking-tighter leading-none italic uppercase">
+          Arrivals
+        </h1>
       </div>
 
-      {/* Horizontal Scrolling Gallery */}
-      <div
-        ref={horizontalWrapperRef}
-        className="horiz-gallery-wrapper w-full h-[70vh] relative overflow-hidden mt-20"
-      >
-        <div
-          ref={horizontalStripRef}
-          className="horiz-gallery-strip flex items-center h-full will-change-transform py-8"
-        >
-          {/* Spacer for better centering */}
-          <div className="w-[5vw] flex-shrink-0" />
+      {/* Header */}
+      <header className="relative z-10 pt-12 pb-8 px-6 md:px-12 flex justify-between items-end">
+        <div className="flex flex-col">
+          <span className="text-neutral-900 text-xs tracking-[0.5em] mb-2">CURATED COLLECTION</span>
+          <h2 className="text-neutral-900 text-5xl md:text-7xl font-serif font-black tracking-tighter leading-none">
+            NEW<br />ARRIVALS
+          </h2>
+        </div>
 
-          {/* Product Cards */}
+        <div className="hidden md:flex flex-col items-end text-right">
+          <p className="max-w-[300px] text-neutral-700 text-sm leading-relaxed mb-4">
+            A fusion of traditional heritage and modern luxury silhouettes.
+            Crafted for the bold, designed for the legacy.
+          </p>
+          <a
+            href="/products"
+            className="group flex items-center gap-4 border-b border-black pb-1 text-sm font-bold tracking-widest transition-all hover:gap-6 text-neutral-900"
+          >
+            EXPLORE ALL <ArrowUpRight size={18} />
+          </a>
+        </div>
+      </header>
+
+      {/* Main Slider Container */}
+      <div className="relative flex-1 flex items-center justify-center py-10">
+        <div className="flex items-center gap-4 md:gap-8 px-4 overflow-visible">
           {products.map((product, index) => (
-            <div
+            <ProductCard
               key={product.id}
-              ref={(el) => {
-                cardRefs.current[index] = el;
-              }}
-              className="product-card relative flex flex-col group flex-shrink-0 mx-4"
-              style={{ width: "clamp(300px, 30vw, 400px)" }}
-              onMouseEnter={() => setHoveredId(product.id)}
-              onMouseLeave={() => setHoveredId(null)}
-            >
-              <div className="relative z-10 flex-1">
-                <ProductMedia
-                  image={product.modelImage}
-                  video={product.modelVideo}
-                  alt={product.name}
-                  aspectClass="aspect-[3/4]"
-                />
-                {/* Product flat image with GSAP animation - Original position */}
-                <div
-                  className="product-image-flat absolute z-20 hidden md:block"
-                  style={{
-                    top: "20%",
-                    right: "-5%",
-                    width: "clamp(80px, 15vw, 120px)",
-                    height: "clamp(120px, 20vw, 180px)",
-                  }}
-                >
-                  <div className="relative w-full h-full">
-                    <Image
-                      src={product.productImage}
-                      alt={`${product.name} flat`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover shadow-lg bg-gray-50 transition-all duration-500"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative z-10 mt-4">
-                <p
-                  className="text-black text-lg font-medium tracking-wide transition-all duration-300 group-hover:translate-x-1"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  {product.price}
-                </p>
-                <p
-                  className="text-black text-sm uppercase tracking-widest mt-1 font-medium transition-all duration-300 group-hover:translate-x-1 line-clamp-2"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
-                >
-                  {product.name}
-                </p>
-              </div>
-            </div>
+              product={product}
+              isActive={index === currentIndex}
+            />
           ))}
-
-          {/* End spacer */}
-          <div className="w-[5vw] flex-shrink-0" />
         </div>
       </div>
 
-      {/* SEE ALL Button - Always accessible at bottom center */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-50">
-        <Link
-          href="/products" 
-          className="see-all-button flex items-center gap-3 text-black hover:opacity-80 transition-all duration-300 ease-out group px-6 py-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
-          style={{ 
-            fontFamily: "'Playfair Display', serif",
-            textDecoration: "none",
-          }}
-        >
-          <span className="text-sm uppercase tracking-widest group-hover:translate-x-1 transition-transform duration-300">
-            SEE ALL PRODUCTS
-          </span>
-          <span
-            className="text-xl transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1"
-            style={{ transform: "rotate(-45deg)", display: "inline-block" }}
+      {/* Controls & Navigation */}
+      <footer className="relative z-10 px-6 md:px-12 pb-12 flex flex-col md:flex-row justify-between items-center gap-8">
+        {/* Progress bar and counter */}
+        <div className="flex items-center gap-8 w-full md:w-auto">
+          <div className="flex items-center gap-4">
+            <span className="font-serif text-2xl text-neutral-900">0{currentIndex + 1}</span>
+            <div className="w-48 h-[2px] bg-neutral-100 relative overflow-hidden">
+              <div
+                className="absolute inset-y-0 left-0 bg-black transition-all duration-700 ease-out"
+                style={{ width: `${((currentIndex + 1) / products.length) * 100}%` }}
+              />
+            </div>
+            <span className="font-serif text-2xl text-neutral-900">0{products.length}</span>
+          </div>
+        </div>
+
+        {/* Directional buttons */}
+        <div className="flex gap-4">
+          <button
+            onClick={prevSlide}
+            className="w-14 h-14 rounded-full border border-neutral-900 flex items-center justify-center hover:bg-neutral-200 hover:text-white transition-all duration-300 group"
           >
-            ↗
-          </span>
-        </Link>
-      </div>
+            <ChevronLeft
+              size={24}
+              className="group-hover:-translate-x-1 transition-transform text-neutral-900"
+            />
+          </button>
+          <button
+            onClick={nextSlide}
+            className="w-14 h-14 rounded-full border border-neutral-900 flex items-center justify-center hover:bg-neutral-200 hover:text-white transition-all duration-300 group"
+          >
+            <ChevronRight
+              size={24}
+              className="group-hover:translate-x-1 transition-transform text-neutral-900"
+            />
+          </button>
+        </div>
+
+        {/* Mobile CTA */}
+        <div className="md:hidden">
+          <Link
+            href="/products"
+            className="px-8 py-3 bg-black text-white rounded-full text-xs font-bold tracking-[0.2em] uppercase"
+          >
+            View All Series
+          </Link>
+        </div>
+      </footer>
+
+      {/* Font style (Playfair Display) */}
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400&display=swap');
+            .font-serif { font-family: 'Playfair Display', serif; }
+          `,
+        }}
+      />
     </section>
   );
 }

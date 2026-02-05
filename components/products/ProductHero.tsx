@@ -3,7 +3,7 @@
 
 interface ProductHeroProps {
   preTitle?: string;
-  title: string[];
+  title?: string[];
   ctaText?: string;
   ctaLink?: string;
   backgroundImage?: string;
@@ -18,17 +18,17 @@ export default function ProductHero({
 }: ProductHeroProps) {
   // Ensure title is always an array
   const safeTitle = Array.isArray(title) ? title : [];
-  
+
   return (
     <div className="relative h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-hidden">
       {/* Background Image/Texture */}
       {backgroundImage && (
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ backgroundImage: `url(${backgroundImage})` }}
         />
       )}
-      
+
       {/* Gradient Overlay */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-3/4 bg-gradient-to-l from-gray-700 to-transparent"></div>

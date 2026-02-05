@@ -28,7 +28,7 @@
 //       <head>
 //         {/* Add any browser extension blocking scripts here if needed */}
 //       </head>
-//       <body 
+//       <body
 //         className={`${playfair.className} antialiased bg-[#e8e8e8]`}
 //         suppressHydrationWarning
 //       >
@@ -67,21 +67,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
+      {/* <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300;400;600;700&display=swap"
           rel="stylesheet"
         />
-      </head>
-      <body 
+      </head> */}
+      <body
         className={`${playfair.className} antialiased bg-[#e8e8e8]`}
-        suppressHydrationWarning
       >
-        <GSAPProvider>
-          <Navbar />
-          {children}
-          <Footer />
-        </GSAPProvider>
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );
