@@ -1,8 +1,8 @@
-// components/ProductGrid.tsx
 "use client";
 
 import { useState } from 'react';
 import { Product } from '@/types/Product';
+import Image from 'next/image';
 
 interface ProductGridProps {
   products: Product[];
@@ -10,96 +10,99 @@ interface ProductGridProps {
 }
 
 export default function ProductGrid({ products, columns = 3 }: ProductGridProps) {
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 9;
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const displayedProducts = products.slice(startIndex, startIndex + itemsPerPage);
+  const [displayLimit, setDisplayLimit] = useState(8);
+  const displayedProducts = products.slice(0, displayLimit);
+  const hasMore = displayLimit < products.length;
 
   return (
-    <div className="w-full px-3 sm:px-4 md:px-6 lg:px-8">
-      {/* Product Grid */}
+    <div className="w-full bg-[#e8e8e8] py-10 md:py-20 px-4 sm:px-8 lg:px-16 text-black antialiased">
+      
+      {/* ── GRID HEADER: Bolder & Larger ── */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 border-b-2 border-zinc-900 pb-8 gap-6">
+        <div>
+          <span className="text-[11px] md:text-[12px] uppercase tracking-[0.5em] text-zinc-400 block mb-3 font-bold">
+            The Selection
+          </span>
+          <h2 className="text-lg md:text-2xl uppercase tracking-[0.2em] font-black text-zinc-900">
+            Current Collection <span className="text-zinc-400 ml-2 font-light">({products.length})</span>
+          </h2>
+        </div>
+        
+        <div className="flex gap-8 text-[11px] md:text-[13px] uppercase tracking-[0.25em] font-black">
+          <button className="text-black border-b-2 border-black pb-2 transition-all">All Items</button>
+          <button className="text-zinc-400 hover:text-black transition-colors pb-2">Filter & Sort</button>
+        </div>
+      </div>
+
+      {/* ── PRODUCT GRID ── */}
       <div 
-        className={`grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 
-          grid-cols-1 
-          sm:grid-cols-2 
+        className={`grid gap-x-6 gap-y-16 sm:gap-x-10 sm:gap-y-24 
+          grid-cols-1                
+          sm:grid-cols-2             
           ${columns === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-4'}
-          ${columns === 3 ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'}
         `}
       >
         {displayedProducts.map((product) => (
-          <div key={product.id} className="group cursor-pointer">
-            <div className="bg-[#e8e8e8] aspect-[3/4] relative overflow-hidden mb-2 sm:mb-3 md:mb-4">
-              <img
+          <div key={product.id} className="group cursor-pointer flex flex-col">
+            
+            {/* Image Container */}
+            <div className="bg-[#F9F9F9] aspect-[3/4] relative overflow-hidden mb-6 md:mb-8 transition-colors duration-700 ease-in-out group-hover:bg-[#F2F2F2]">
+              <Image
                 src={product.images.hero}
                 alt={product.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                fill
+                className="object-contain p-8 md:p-12 transition-transform duration-[2s] ease-out group-hover:scale-110"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
+              
+              {/* Quick View Button: Bolder */}
+              <div className="hidden lg:flex absolute inset-0 bg-black/5 items-end justify-center pb-12 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                <span className="bg-zinc-900 text-white text-[11px] font-bold uppercase tracking-[0.4em] px-10 py-5 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                  Quick View
+                </span>
+              </div>
             </div>
-            <div className="flex justify-between items-start sm:items-center gap-2">
-              <h3 className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold tracking-wider uppercase text-black leading-tight line-clamp-2">
+
+            {/* Product Info: Increased Size & Weight */}
+            <div className="flex flex-col items-center text-center space-y-3 px-4">
+              <span className="text-[10px] md:text-[11px] uppercase tracking-[0.4em] text-zinc-500 font-bold">
+                {product.category || "New Arrival"}
+              </span>
+              <h3 className="text-[13px] md:text-[16px] font-black tracking-[0.1em] uppercase text-zinc-900 leading-[1.3] line-clamp-2 min-h-[2.6em]">
                 {product.name}
               </h3>
-              <span className="text-xs sm:text-sm md:text-base text-black px-1.5 sm:px-2 py-0.5 sm:py-1 font-bold flex-shrink-0">
+              <p className="text-[14px] md:text-[18px] font-medium tracking-[0.1em] text-zinc-900">
                 {product.price}
-              </span>
+              </p>
             </div>
-            <div className="mt-1.5 sm:mt-2 md:mt-3">
-              <div className="flex gap-1">
-                {product.colors.slice(0, 3).map((color) => (
-                  <div
-                    key={color.hex}
-                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 rounded-full border border-gray-300"
-                    style={{ backgroundColor: color.hex }}
-                    title={color.label}
-                  />
-                ))}
-                {product.colors.length > 3 && (
-                  <div className="text-[10px] sm:text-xs text-gray-500 flex items-center">
-                    +{product.colors.length - 3}
-                  </div>
-                )}
-              </div>
+
+            {/* Color Swatches: Slightly Larger */}
+            <div className="mt-6 flex justify-center gap-3 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-500">
+              {product.colors.slice(0, 4).map((color) => (
+                <div
+                  key={color.hex}
+                  className="w-3.5 h-3.5 md:w-4 md:h-4 rounded-full ring-1 ring-offset-4 ring-transparent group-hover:ring-zinc-900 shadow-sm"
+                  style={{ backgroundColor: color.hex }}
+                />
+              ))}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Pagination */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-1.5 sm:gap-2 md:gap-3 mt-6 sm:mt-8 md:mt-10">
+      {/* ── BOLD PAGINATION ── */}
+      {hasMore && (
+        <div className="flex flex-col items-center mt-20 md:mt-32 space-y-8">
+          <div className="w-[2px] h-20 bg-zinc-900" />
           <button
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-            disabled={currentPage === 1}
-            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center text-sm sm:text-base md:text-lg disabled:opacity-30 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Previous page"
+            onClick={() => setDisplayLimit(prev => prev + 4)}
+            className="text-[12px] md:text-[14px] uppercase tracking-[0.5em] font-black border-2 border-zinc-900 px-16 py-6 md:px-20 md:py-8 hover:bg-zinc-900 hover:text-white transition-all duration-500 active:scale-95 shadow-lg"
           >
-            ◀
+            Load More
           </button>
-          <div className="flex gap-0.5 sm:gap-1 md:gap-1.5">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
-              <button
-                key={num}
-                onClick={() => setCurrentPage(num)}
-                className={`w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center text-xs sm:text-sm font-medium transition-colors rounded ${
-                  currentPage === num
-                    ? 'bg-black text-white'
-                    : 'bg-gray-100 text-black hover:bg-gray-200'
-                }`}
-              >
-                {num}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-            disabled={currentPage === totalPages}
-            className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 flex items-center justify-center text-sm sm:text-base md:text-lg disabled:opacity-30 hover:bg-gray-100 rounded transition-colors"
-            aria-label="Next page"
-          >
-            ▶
-          </button>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-400 font-bold">
+            Showing {displayedProducts.length} of {products.length} Items
+          </p>
         </div>
       )}
     </div>
