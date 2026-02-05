@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, ArrowUpRight, Play, Volume2 } from "lucide-react";
+import React, { useState } from "react";
+import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -10,18 +10,16 @@ interface Product {
   name: string;
   price: string;
   modelImage: string;
-  modelVideo: string;
   productImage: string;
 }
 
-/* ─────────────────────────── data (YOUR LOCAL ASSETS) ──────────────────────────── */
+/* ─────────────────────────── data ──────────────────────────── */
 const products: Product[] = [
   {
     id: 1,
     name: "MAASAI HERITAGE WRAP PASHMINA",
     price: "Ksh 8,500",
     modelImage: "/assets/1.jpg",
-    modelVideo: "/assets/afro-dress.mp4",
     productImage: "/assets/1.12.png",
   },
   {
@@ -29,7 +27,6 @@ const products: Product[] = [
     name: "SHIELD EMBLEM OVERSIZED HOODIE",
     price: "Ksh 7,200",
     modelImage: "/assets/2.webp",
-    modelVideo: "/assets/afro_man.mp4",
     productImage: "/assets/2.12.png",
   },
   {
@@ -37,7 +34,6 @@ const products: Product[] = [
     name: "RUNWAY POPLIN SHIRT & SHORT SET",
     price: "Ksh 12,500",
     modelImage: "/assets/3.jpg",
-    modelVideo: "/assets/afro_dress_2.mp4",
     productImage: "/assets/3.32.png",
   },
   {
@@ -45,7 +41,6 @@ const products: Product[] = [
     name: "STRIPED NATIONAL BUTTON-DOWN",
     price: "Ksh 6,800",
     modelImage: "/assets/4.jpg",
-    modelVideo: "/assets/afro-dress.mp4",
     productImage: "/assets/4.42.png",
   },
   {
@@ -53,7 +48,6 @@ const products: Product[] = [
     name: "HERITAGE STRIPE KAFTAN GOWN",
     price: "Ksh 11,500",
     modelImage: "/assets/9.jpg",
-    modelVideo: "/assets/afro_man.mp4",
     productImage: "/assets/9.92.png",
   },
   {
@@ -61,23 +55,18 @@ const products: Product[] = [
     name: "NATIONAL PRIDE STRIPE SHIRT",
     price: "Ksh 5,800",
     modelImage: "/assets/14.jpg",
-    modelVideo: "/assets/afro_dress_2.mp4",
     productImage: "/assets/14.142.png",
   },
 ];
 
-const ProductCard = ({ product, isActive }: { product: Product; isActive: boolean }) => {
+const ProductCard = ({
+  product,
+  isActive,
+}: {
+  product: Product;
+  isActive: boolean;
+}) => {
   const [isHovered, setIsHovered] = useState(false);
-  const videoRef = useRef<HTMLVideoElement | null>(null);
-
-  useEffect(() => {
-    if (isHovered && videoRef.current) {
-      videoRef.current.play().catch(() => { });
-    } else if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  }, [isHovered]);
 
   return (
     <div
@@ -89,24 +78,12 @@ const ProductCard = ({ product, isActive }: { product: Product; isActive: boolea
       <div className="relative w-full h-full overflow-hidden rounded-[2px] bg-neutral-100 shadow-2xl">
         {/* Model Media */}
         <div className="absolute inset-0 z-0">
-          {/* Static Image */}
           <Image
             src={product.modelImage}
             alt={product.name}
             fill
             className={`object-cover object-top transition-transform duration-1000 ease-in-out
                        ${isHovered ? "scale-110" : "scale-100"}`}
-          />
-
-          {/* Video Layer */}
-          <video
-            ref={videoRef}
-            src={product.modelVideo}
-            muted
-            loop
-            playsInline
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500
-                       ${isHovered ? "opacity-100" : "opacity-0"}`}
           />
         </div>
 
@@ -132,12 +109,16 @@ const ProductCard = ({ product, isActive }: { product: Product; isActive: boolea
                         ${isActive ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
         >
           <div className="flex flex-col gap-2">
-            <span className="text-white/70 text-xs tracking-[0.3em] font-light">LIMITED RELEASE</span>
+            <span className="text-white/70 text-xs tracking-[0.3em] font-light">
+              LIMITED RELEASE
+            </span>
             <h3 className="text-white text-2xl md:text-4xl font-serif tracking-tight leading-tight uppercase max-w-[80%]">
               {product.name}
             </h3>
             <div className="flex items-center gap-4 mt-2">
-              <span className="text-white font-medium text-lg">{product.price}</span>
+              <span className="text-white font-medium text-lg">
+                {product.price}
+              </span>
               <div className="h-[1px] w-12 bg-white/30" />
               <button className="flex items-center gap-2 text-white text-xs tracking-widest uppercase hover:text-neutral-300 transition-colors">
                 SHOP NOW <ArrowUpRight size={14} />
@@ -173,9 +154,13 @@ export default function NewArrivals() {
       {/* Header */}
       <header className="relative z-10 pt-12 pb-8 px-6 md:px-12 flex justify-between items-end">
         <div className="flex flex-col">
-          <span className="text-neutral-900 text-xs tracking-[0.5em] mb-2">CURATED COLLECTION</span>
+          <span className="text-neutral-900 text-xs tracking-[0.5em] mb-2">
+            CURATED COLLECTION
+          </span>
           <h2 className="text-neutral-900 text-5xl md:text-7xl font-serif font-black tracking-tighter leading-none">
-            NEW<br />ARRIVALS
+            NEW
+            <br />
+            ARRIVALS
           </h2>
         </div>
 
@@ -208,21 +193,25 @@ export default function NewArrivals() {
 
       {/* Controls & Navigation */}
       <footer className="relative z-10 px-6 md:px-12 pb-12 flex flex-col md:flex-row justify-between items-center gap-8">
-        {/* Progress bar and counter */}
         <div className="flex items-center gap-8 w-full md:w-auto">
           <div className="flex items-center gap-4">
-            <span className="font-serif text-2xl text-neutral-900">0{currentIndex + 1}</span>
+            <span className="font-serif text-2xl text-neutral-900">
+              0{currentIndex + 1}
+            </span>
             <div className="w-48 h-[2px] bg-neutral-100 relative overflow-hidden">
               <div
                 className="absolute inset-y-0 left-0 bg-black transition-all duration-700 ease-out"
-                style={{ width: `${((currentIndex + 1) / products.length) * 100}%` }}
+                style={{
+                  width: `${((currentIndex + 1) / products.length) * 100}%`,
+                }}
               />
             </div>
-            <span className="font-serif text-2xl text-neutral-900">0{products.length}</span>
+            <span className="font-serif text-2xl text-neutral-900">
+              0{products.length}
+            </span>
           </div>
         </div>
 
-        {/* Directional buttons */}
         <div className="flex gap-4">
           <button
             onClick={prevSlide}
@@ -244,7 +233,6 @@ export default function NewArrivals() {
           </button>
         </div>
 
-        {/* Mobile CTA */}
         <div className="md:hidden">
           <Link
             href="/products"
@@ -255,7 +243,6 @@ export default function NewArrivals() {
         </div>
       </footer>
 
-      {/* Font style (Playfair Display) */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
