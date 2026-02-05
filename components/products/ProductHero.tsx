@@ -1,4 +1,3 @@
-// components/ProductHero.tsx
 "use client";
 
 interface ProductHeroProps {
@@ -6,70 +5,85 @@ interface ProductHeroProps {
   title?: string[];
   ctaText?: string;
   ctaLink?: string;
-  backgroundImage?: string;
 }
 
 export default function ProductHero({
   preTitle = 'COLLECTION 2026',
-  title = [], // Provide default empty array
-  ctaText = 'SHOP NOW →',
+  title = ["THE SPIRIT", "OF KENYA"], 
+  ctaText = 'DISCOVER THE SELECTION',
   ctaLink = '#',
-  backgroundImage
 }: ProductHeroProps) {
-  // Ensure title is always an array
   const safeTitle = Array.isArray(title) ? title : [];
 
   return (
-    <div className="relative h-screen bg-gradient-to-b from-gray-900 to-black text-white overflow-hidden">
-      {/* Background Image/Texture */}
-      {backgroundImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30"
-          style={{ backgroundImage: `url(${backgroundImage})` }}
-        />
-      )}
-
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-3/4 bg-gradient-to-l from-gray-700 to-transparent"></div>
+    <div className="relative h-screen w-full overflow-hidden bg-black text-white">
+      {/* ── CINEMATIC VIDEO BACKGROUND ── */}
+      <div className="absolute inset-0 z-0">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="h-full w-full object-cover opacity-60 grayscale-[20%] brightness-[0.7]"
+        >
+          {/* Using a high-quality external source for the Kenyan Flag */}
+          <source 
+            src="https://assets.mixkit.co/videos/preview/mixkit-kenyan-flag-waving-in-the-wind-31518-large.mp4" 
+            type="video/mp4" 
+          />
+          Your browser does not support the video tag.
+        </video>
+        
+        {/* Luxury Vignette Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
       </div>
 
-      {/* Content */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="max-w-4xl px-8 text-center">
-          {/* Pre-title */}
+      {/* ── CONTENT ── */}
+      <div className="relative z-10 flex h-full items-center justify-center">
+        <div className="max-w-5xl px-6 text-center">
+          
+          {/* Animated Pre-title */}
           {preTitle && (
-            <div className="mb-8">
-              <p className="text-xs md:text-sm tracking-[0.3em] mb-4 opacity-60 uppercase">
+            <div className="mb-6 overflow-hidden">
+              <p className="animate-reveal text-[11px] md:text-[13px] font-bold tracking-[0.6em] uppercase text-zinc-300">
                 {preTitle}
               </p>
             </div>
           )}
 
-          {/* Main Title - Safe rendering */}
-          <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 tracking-tight uppercase">
+          {/* Bold Luxury Title */}
+          <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase italic">
             {safeTitle.length > 0 ? (
               safeTitle.map((line, index) => (
-                <span key={index}>
+                <span key={index} className="block last:text-transparent last:stroke-white last:[-webkit-text-stroke:1px_white]">
                   {line}
-                  {index < safeTitle.length - 1 && <br />}
                 </span>
               ))
             ) : (
-              <span>COLLECTION</span> // Fallback if no title provided
+              <span>KENYA</span>
             )}
           </h1>
 
-          {/* CTA Button */}
+          {/* CTA: Large & Bold */}
           {ctaText && (
-            <a
-              href={ctaLink}
-              className="inline-block mt-8 bg-white text-black px-8 py-3 font-bold tracking-wider text-sm hover:bg-gray-200 transition-colors uppercase"
-            >
-              {ctaText}
-            </a>
+            <div className="mt-12 flex flex-col items-center gap-6">
+              <div className="h-16 w-px bg-white/50 mb-4 animate-bounce" />
+              <a
+                href={ctaLink}
+                className="group relative overflow-hidden border-2 border-white bg-white px-12 py-5 text-[12px] font-black tracking-[0.4em] text-black transition-all hover:bg-transparent hover:text-white"
+              >
+                <span className="relative z-10">{ctaText}</span>
+              </a>
+            </div>
           )}
         </div>
+      </div>
+
+      {/* ── BOTTOM DECORATION ── */}
+      <div className="absolute bottom-10 left-10 hidden lg:block">
+        <span className="text-[10px] tracking-[0.5em] font-light opacity-50 uppercase">
+          Maison Kenya &copy; 2026
+        </span>
       </div>
     </div>
   );
