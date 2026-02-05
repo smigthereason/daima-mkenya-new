@@ -1,52 +1,19 @@
 // components/landing-page/Footer.tsx
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Instagram, Facebook, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { HeroImage2 } from '@/public/assets';
 import { FaXTwitter } from 'react-icons/fa6';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 const Footer = () => {
-  const footerRef = useRef<HTMLElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      gsap.registerPlugin(ScrollTrigger);
-    }
-
-    // Initial animation for footer content
-    if (contentRef.current) {
-      gsap.from(contentRef.current.children, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: contentRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        }
-      });
-    }
-
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    };
-  }, []);
-
   return (
     <footer 
-      ref={footerRef}
-      className="footer-section text-white p-6 md:p-12 min-h-screen flex opacity-0"
+      className="footer-section text-white p-6 md:p-12 min-h-screen flex"
       id="footer-section"
     >
       <div 
-        ref={contentRef}
         className="footer-content bg-neutral-900 w-full grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch border border-zinc-800 rounded-[40px] overflow-hidden p-4 md:p-8"
       >
         {/* Left Section: Information */}

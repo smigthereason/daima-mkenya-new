@@ -9,17 +9,14 @@ export default function Home() {
       <Hero />
       <NewArrivals />
 
-      {/* Africa Map Section */}
-      <section className="africa-map-wrapper bg-transparent z-20">
-        <div className="py-20">
+  
           <AfricaDottedMap />
-        </div>
-      </section>
+      
+    
 
-      {/* SDG Commitment Section */}
-      <section className="sdg-section-wrapper z-30">
+      
         <SdgCommitment />
-      </section>
+      
     </main>
   );
 }
