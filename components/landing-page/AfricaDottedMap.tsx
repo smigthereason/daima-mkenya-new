@@ -18,7 +18,7 @@ export default function AfricaDottedMap() {
       map.addPin({
          lat: -1.286389,
          lng: 36.817223,
-         svgOptions: { 
+         svgOptions: {
             color: "#000000",
             radius: 0.8
          }
@@ -26,19 +26,19 @@ export default function AfricaDottedMap() {
 
       return map.getSVG({
          radius: 0.18,
-         color: "#262626", 
+         color: "#262626",
          shape: "circle",
-         backgroundColor: "transparent", 
+         backgroundColor: "transparent",
       });
    }, []);
 
    return (
       <section className="relative py-40 overflow-hidden flex flex-col items-center min-h-screen justify-center bg-gradient-to-r from-[#BB0000] via-white to-[#008000]">
-         
-         
+
+
 
          {/* 2. Scattered Luxury Text Elements (Distributed Layout) */}
-         
+
          {/* Top-Left: Origin Details */}
          <div className="absolute top-24 left-10 md:left-24 z-10">
             <span className="text-[10px] tracking-[0.6em] text-neutral-400 uppercase block mb-2">The Source</span>
@@ -55,7 +55,7 @@ export default function AfricaDottedMap() {
          {/* Center: Main Branding */}
          <div className="text-center mb-16 z-10 px-6 relative">
             <h2 className="text-5xl md:text-8xl font-serif tracking-tighter text-neutral-600 uppercase leading-[0.85] mb-6">
-               Unity in Every <br /> <span className="italic font-light">Every </span>
+               Unity in Every <br /> <span className="italic font-light">Thread </span>
             </h2>
             <div className="h-20 w-px bg-neutral-200 mx-auto" />
          </div>
@@ -67,7 +67,7 @@ export default function AfricaDottedMap() {
                alt="Dotted map of Africa"
                className="w-[90%] md:w-[70%] h-auto select-none pointer-events-none drop-shadow-2xl"
             />
-            
+
             {/* Nairobi Marker with Text Overlay */}
             <div className="absolute top-[52%] left-[63%] flex items-center gap-6">
                <div className="relative">
@@ -82,7 +82,7 @@ export default function AfricaDottedMap() {
          </div>
 
          {/* 4. Bottom Elements: Philosophy & Coordinates */}
-         
+
          {/* Bottom-Left: Philosophy */}
          <div className="absolute bottom-24 left-10 md:left-24 z-10 max-w-lg hidden lg:block">
             <p className="text-[20px] leading-relaxed text-neutral-300 tracking-wide uppercase italic">
@@ -101,7 +101,7 @@ export default function AfricaDottedMap() {
             </p>
          </div>
 
-       
+
       </section>
    );
 }
