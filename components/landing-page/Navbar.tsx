@@ -1,59 +1,72 @@
-// components/landing-page/Navbar.tsx
 "use client";
 import React, { useState, useRef, useEffect } from 'react'
-import { Menu, X, Heart, User, ShoppingBag, ChevronRight } from 'lucide-react'
+import { X, Heart, User, ShoppingBag, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image';
-import { HeroImage2 } from '@/public/assets';
+import { HeroImage2, Logo } from '@/public/assets';
 import gsap from 'gsap';
-import path from 'path';
 
 const Navbar = () => {
    const [isOpen, setIsOpen] = useState(false)
    const menuRef = useRef<HTMLDivElement>(null)
 
    useEffect(() => {
-      if (isOpen) {
-         gsap.to(menuRef.current, {
-            x: 0,
-            duration: 0.7,
-            ease: "power3.out"
-         });
+      // Initial state: Off-screen and hidden
+      if (menuRef.current) {
+         gsap.set(menuRef.current, { x: "-100%", display: "none" });
+      }
+   }, []);
 
-         // Animate menu items
-         gsap.from(".menu-item", {
-            x: -30,
-            opacity: 0,
-            stagger: 0.1,
-            duration: 0.5,
-            ease: "power3.out"
-         });
+   useEffect(() => {
+      if (!menuRef.current) return;
+
+      if (isOpen) {
+         const tl = gsap.timeline();
+         
+         tl.set(menuRef.current, { display: "block" })
+           .to(menuRef.current, {
+              x: 0,
+              duration: 0.7,
+              ease: "power3.out"
+           })
+           .fromTo(".menu-item", 
+              { x: -30, opacity: 0 },
+              { 
+                 x: 0, 
+                 opacity: 1, 
+                 stagger: 0.1, 
+                 duration: 0.5, 
+                 ease: "power3.out" 
+              }, 
+              "-=0.3"
+           );
       } else {
          gsap.to(menuRef.current, {
             x: "-100%",
             duration: 0.7,
-            ease: "power3.in"
+            ease: "power3.in",
+            onComplete: () => gsap.set(menuRef.current, { display: "none" })
          });
       }
    }, [isOpen]);
 
-   const navLinks: any = [
+   const navLinks = [
       { name: 'Men', badge: null, path: '#' },
       { name: 'Women', badge: null, path: '#' },
-      { name: 'Kids', badge: 'SALE', path: '#' },
+      { name: 'Kids', badge: null, path: '#' },
       { name: 'All Products', badge: null, path: '/products' },
       { name: 'About Us', badge: null, path: '/about' },
    ]
 
    return (
-      <nav className="absolute top-0 w-full z-50 bg-transparent px-6 lg:px-12 py-5">
-         {/* Grid Container for Perfect Centering */}
-         <div className="grid grid-cols-3 items-center w-full">
+      <nav className="absolute top-0 w-full z-[60] bg-transparent px-6 lg:px-12 py-8">
+         <div className="grid grid-cols-3 items-center w-full max-w-[1800px] mx-auto">
+            
             {/* 1. Left Section: Menu Toggle */}
             <div className="flex justify-start">
                <button
                   onClick={() => setIsOpen(true)}
-                  className="flex items-center gap-3 group focus:outline-none"
+                  className="flex items-center gap-3 group focus:outline-none z-[70]"
                >
                   <div className="relative w-6 h-5 flex flex-col justify-between">
                      <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-1/2"></span>
@@ -65,19 +78,25 @@ const Navbar = () => {
             </div>
 
             {/* 2. Center Section: Logo */}
-            <div className="flex justify-center text-black">
-               <Link href="/" className="text-2xl font-bold tracking-[0.3em] pl-[0.3em]">
-                  DMA
+            <div className="flex justify-center">
+               <Link href="/" className="relative w-32 h-12 lg:w-48 lg:h-16 block">
+                  <Image
+                     src={Logo}
+                     alt="DMA"
+                     fill
+                     className="object-contain" 
+                     priority
+                  />
                </Link>
             </div>
 
             {/* 3. Right Section: Icons */}
             <div className="flex justify-end items-center gap-6">
-               <Heart size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" color='#a1a1a1' />
-               <User size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px]" color='#a1a1a1' />
+               <Heart size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700" />
+               <User size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700" />
                <div className="relative cursor-pointer hover:scale-110 transition-transform">
-                  <ShoppingBag size={20} className="stroke-[1.5px]" color='#a1a1a1' />
-                  <span className="absolute -top-2 -right-2 bg-black text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  <ShoppingBag size={20} className="stroke-[1.5px] text-neutral-700" />
+                  <span className="absolute -top-2 -right-2 bg-[#be1e2d] text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
                      3
                   </span>
                </div>
@@ -87,7 +106,7 @@ const Navbar = () => {
          {/* Full-Screen Luxury Menu Overlay */}
          <div
             ref={menuRef}
-            className="fixed inset-0 bg-[#e8e8e8] z-[100] -translate-x-full"
+            className="fixed inset-0 bg-[#f8f8f8] z-100"
          >
             <div className="p-8 md:p-16 flex flex-col h-full max-w-7xl mx-auto text-black">
                <div className="flex justify-between items-center">
@@ -101,19 +120,19 @@ const Navbar = () => {
                   </button>
                </div>
 
-               <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-10">
+               <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-10 ">
                   <div className="flex flex-col gap-4">
-                     {navLinks.map((link: any, index: any) => (
+                     {navLinks.map((link, index) => (
                         <Link
                            key={index}
                            href={link.path}
                            onClick={() => setIsOpen(false)}
-                           className={`menu-item group flex items-center justify-between text-4xl md:text-7xl font-light text-black`}
+                           className="menu-item group flex items-center justify-between text-4xl md:text-7xl font-light text-black border-b border-transparent  py-2 transition-all"
                         >
-                           <span className="relative overflow-hidden">
+                           <span className="relative">
                               {link.name}
                               {link.badge && (
-                                 <span className="absolute top-0 -right-8 text-[10px] text-red-500 font-bold tracking-tighter uppercase">
+                                 <span className="absolute -top-2 -right-10 text-[10px] text-[#be1e2d] font-bold tracking-tighter uppercase">
                                     {link.badge}
                                  </span>
                               )}
@@ -123,24 +142,23 @@ const Navbar = () => {
                      ))}
                   </div>
 
-                  {/* Aesthetic Menu Side-Content */}
                   <div className="hidden md:flex flex-col justify-center border-l border-gray-100 pl-20">
-                     <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">Featured</p>
-                     <div className="aspect-square bg-gray-50 w-64 relative overflow-hidden rounded-sm">
+                     <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">Featured Collection</p>
+                     <div className="aspect-[3/4] w-72 relative overflow-hidden rounded-sm shadow-2xl">
                         <Image
                            src={HeroImage2}
-                           alt='Featured Image'
+                           alt='Featured'
                            fill
-                           objectFit='cover'
+                           className="object-cover"
                         />
                      </div>
                   </div>
                </div>
 
-               <div className="mt-auto flex justify-between items-end border-t border-gray-100 pt-8 text-black text-[10px] tracking-[0.2em] uppercase">
+               <div className="mt-auto flex justify-between items-end border-t border-gray-100 pt-8 text-[10px] tracking-[0.2em] uppercase">
                   <div className="flex gap-8">
-                     <span className="hover:underline cursor-pointer">Instagram</span>
-                     <span className="hover:underline cursor-pointer">Facebook</span>
+                     <span className="hover:text-[#be1e2d] cursor-pointer transition-colors">Instagram</span>
+                     <span className="hover:text-[#be1e2d] cursor-pointer transition-colors">Facebook</span>
                   </div>
                   <span className="text-gray-400">© {new Date().getFullYear()} DMA Studio</span>
                </div>

@@ -57,7 +57,7 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
   const titleLine2 = titleParts.slice(2).join(" ");
 
   return (
-    <div className="flex flex-col lg:flex-row w-full bg-white relative min-h-screen text-black antialiased overflow-x-hidden">
+    <div className="flex flex-col lg:flex-row w-full mt-32 border-t border-black/10 bg-white relative min-h-screen text-black antialiased overflow-x-hidden">
       
       {/* ── LUXURY FLOATING NAV ── */}
       <div className="absolute top-6 right-6 lg:top-10 lg:right-12 z-30 flex items-center gap-8">

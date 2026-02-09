@@ -1,127 +1,258 @@
 "use client";
 
-import { HeroImage3 } from "@/public/assets";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import {
+  WomanHero,
+  ManHero,
+  Stripes,
+  Hero22,
+  Hero33,
+  Hero44,
+  Hero77,
+} from "@/public/assets";
+import gsap from "gsap";
 
 export default function Hero() {
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
+  const manRef = useRef(null);
+  const womanRef = useRef(null);
+  const innerLeftRef = useRef(null);
+  const innerRightRef = useRef(null);
+  const outerLeftReplaceRef = useRef(null);
+  const outerRightReplaceRef = useRef(null);
+
+  const bgBlackRef = useRef(null);
+  const bgGreenRef = useRef(null);
 
   useEffect(() => {
-    const checkScreenSize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width < 768);
-      setIsTablet(width >= 768 && width < 1024);
-    };
+    let ctx = gsap.context(() => {
+      const tl = gsap.timeline({
+        repeat: -1,
+        delay: 2,
+        repeatDelay: 2,
+      });
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
+      // 1. PUSH MODELS & SIDE BARS OUT
+      tl.to(manRef.current, { x: "-100%", duration: 1.5, ease: "expo.inOut" })
+        .to(
+          womanRef.current,
+          { x: "100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
+        .to(
+          bgBlackRef.current,
+          { x: "-100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
+        .to(
+          bgGreenRef.current,
+          { x: "100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
 
-    return () => window.removeEventListener("resize", checkScreenSize);
+        // 2. INNER REPLACEMENTS SLIDE IN (Visual "Miniature" Slideshow)
+        .fromTo(
+          [innerLeftRef.current, innerRightRef.current],
+          { y: (i) => (i === 0 ? "-100%" : "100%"), opacity: 0 },
+          { y: "0%", opacity: 1, duration: 1.5, ease: "expo.out" },
+          "-=0.7",
+        )
+
+        // 3. SECONDARY SWAP
+        .to(
+          [manRef.current, womanRef.current],
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.2,
+            ease: "expo.in",
+          },
+          "+=1",
+        )
+        .fromTo(
+          [outerLeftReplaceRef.current, outerRightReplaceRef.current],
+          { y: (i) => (i === 0 ? "-100%" : "100%"), opacity: 0 },
+          { y: "0%", opacity: 1, duration: 1.2, ease: "expo.out" },
+          "<",
+        )
+
+        // 4. RESET TO ORIGINAL
+        .to(
+          [innerLeftRef.current, innerRightRef.current],
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "+=1",
+        )
+        .to(
+          [manRef.current, womanRef.current],
+          {
+            x: "0%",
+            y: "0%",
+            opacity: 1,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "<",
+        )
+        .to(
+          [outerLeftReplaceRef.current, outerRightReplaceRef.current],
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "<",
+        )
+        .to(
+          [bgBlackRef.current, bgGreenRef.current],
+          {
+            x: "0%",
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "<",
+        );
+    });
+
+    return () => ctx.revert();
   }, []);
 
   return (
     <section
-      className={` min-h-screen relative overflow-hidden ${isMobile ? "min-h-[85vh]" : ""
-        }`}
-      style={{
-        fontFamily: "'Playfair Display', serif",
-      }}
+      className="relative min-h-screen w-full mt-20 md:mt-32 overflow-hidden bg-white flex flex-col items-center justify-center"
       id="hero-section"
     >
-      {/* Left background (light on top on mobile, half-left on desktop) */}
-      <div
-        className="bg-left absolute inset-0 z-0 bg-[#e8e8e8]"
-        style={{
-          clipPath: isMobile
-            ? "polygon(0 0, 100% 0, 100% 50%, 0 50%)" // top half light on mobile
-            : isTablet
-              ? "polygon(0 0, 55% 0, 55% 100%, 0 100%)" // left half on tablet
-              : "polygon(0 0, 52% 0, 52% 100%, 0 100%)", // left half on desktop
-        }}
-      />
+      {/* ── BACKGROUND GRID (Adaptive Column Layout) ── */}
+      <div className="absolute inset-0 flex w-full h-full z-0">
+        {/* Left Panel: Black on Desktop & Mobile */}
+        <div ref={bgBlackRef} className="flex-1 h-full bg-black" />
 
-      {/* Right background (dark on bottom on mobile, half-right on desktop/tablet) */}
-      <div
-        className="bg-right absolute inset-0 z-0 bg-[#171717]"
-        style={{
-          clipPath: isMobile
-            ? "polygon(0 50%, 100% 50%, 100% 100%, 0 100%)" // bottom half dark on mobile
-            : isTablet
-              ? "polygon(55% 0, 100% 0, 100% 100%, 55% 100%)"
-              : "polygon(52% 0, 100% 0, 100% 100%, 52% 100%)",
-        }}
-      />
+        {/* Desktop Only Columns (Hidden on Mobile) */}
+        <div className="hidden md:block flex-1 h-full bg-white" />
+        <div className="hidden md:block flex-1 h-full bg-[#991b1b]" />
+        <div className="hidden md:block flex-1 h-full bg-white" />
 
-      {/* Daima / Mkenya text titles (always unskewed) */}
-      <div
-        className={`absolute ${isMobile
-          ? "top-[28%] left-1/2 transform -translate-x-1/2 w-full px-4 text-center"
-          : "top-[40%] left-0 right-0 flex justify-between px-4 sm:px-6 md:px-8 lg:px-10"
-          } z-10 pointer-events-none`}
-      >
-        {isMobile ? (
-          <div className="flex flex-col items-center">
-            <span className="text-[clamp(60px,12vw,90px)] font-black leading-[0.85] text-[#2c2c2c]">
-              Daima
-            </span>
-            <span className="text-[clamp(60px,12vw,90px)] font-black leading-[0.85] text-white mt-2">
-              Mkenya
-            </span>
-          </div>
-        ) : (
-          <>
-            <span className="text-[clamp(60px,10vw,180px)] md:text-[clamp(80px,14vw,180px)] lg:text-[clamp(100px,18vw,180px)] font-black leading-[0.85] tracking-[-2px] md:tracking-[-3px] lg:tracking-[-4px] text-[#2c2c2c]">
-              Daima
-            </span>
-            <span className="text-[clamp(60px,10vw,180px)] md:text-[clamp(80px,14vw,180px)] lg:text-[clamp(100px,18vw,180px)] font-black leading-[0.85] tracking-[-2px] md:tracking-[-3px] lg:tracking-[-4px] text-white">
-              Mkenya
-            </span>
-          </>
-        )}
+        {/* Right Panel: Green on Desktop & Mobile */}
+        <div ref={bgGreenRef} className="flex-1 h-full bg-[#346511]" />
       </div>
 
-      {/* Model Image - Centered, hidden on mobile */}
-      <div
-        className="absolute hidden md:block top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 w-full h-full max-w-[90vw] sm:max-w-[85vw] md:max-w-200 lg:max-w-250 xl:max-w-300 overflow-hidden"
-      >
-        <Image
-          src={HeroImage3}
-          alt="model"
-          fill
-          className="object-contain"
-          quality={100}
-          priority
-          sizes="(max-width: 768px) 85vw, (max-width: 1024px) 800px, (max-width: 1280px) 1000px, 1200px"
-        />
+      {/* ── MODELS / IMAGE SLIDESHOW LAYER ── */}
+      <div className="absolute inset-0 z-20 w-full h-full">
+        {/* ORIGINAL PAIR: Positions adapted for 2-col on mobile, 5-col on desktop */}
+        <div
+          ref={manRef}
+          className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full z-20"
+        >
+          <Image
+            src={ManHero}
+            alt="Man"
+            fill
+            className="object-cover "
+            priority
+          />
+        </div>
+        <div
+          ref={womanRef}
+          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full z-20"
+        >
+          <Image
+            src={WomanHero}
+            alt="Woman"
+            fill
+            className="object-cover "
+            priority
+          />
+        </div>
+
+        {/* INNER REPLACEMENTS (The Slideshow Images) */}
+        <div
+          ref={innerLeftRef}
+          className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full bottom-0 opacity-0 pointer-events-none"
+        >
+          <Image src={Hero22} alt="Inner Left" fill className="object-cover" />
+        </div>
+        <div
+          ref={innerRightRef}
+          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none"
+        >
+          <Image src={Hero33} alt="Inner Right" fill className="object-cover" />
+        </div>
+
+        {/* OUTER EDGE REPLACEMENTS (Secondary Slide) */}
+        <div
+          ref={outerLeftReplaceRef}
+          className="absolute left-0 md:left-[0%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
+        >
+          <Image src={Hero77} alt="Outer Left" fill className="object-cover" />
+        </div>
+        <div
+          ref={outerRightReplaceRef}
+          className="absolute left-1/2 md:left-[80%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
+        >
+          <Image src={Hero44} alt="Outer Right" fill className="object-cover" />
+        </div>
       </div>
 
-      {/* Body copy + Shop Now button (on the left side) */}
+      {/* Scrim for text readability */}
+      <div className="absolute inset-0 z-25 bg-black/30 md:bg-black/20 pointer-events-none" />
+
+      {/* ── CENTERED CONTENT ── */}
       <div
-        className={`absolute ${isMobile
-          ? "top-[54%] left-1/2 transform -translate-x-1/2 w-[85%] max-w-[300px] text-center"
-          : "top-[60%] left-4 sm:left-6 md:left-8 lg:left-12 w-[220px] sm:w-[240px] md:w-1/4 "
-          } z-25`}
+        className="relative z-30 flex flex-col items-center text-center w-[90%] md:w-full max-w-[500px] md:max-w-none 
+                      bg-[#171717]/10 md:bg-transparent 
+                      border border-white md:border-none 
+                      p-8 md:p-0 
+                       md:rounded-none 
+                      pointer-events-none 
+                      backdrop-blur-sm md:backdrop-blur-none"
       >
-        <p className="w-full text-[14px] sm:text-[14px] md:text-[16px] leading-[1.5] sm:leading-[1.6] md:leading-[1.65] text-neutral-100 md:text-[#3a3a3a] mb-4 sm:mb-5 md:mb-6 lg:mb-7">
-          Discover a world of effortless style where modern fashion meets timeless elegance. Our collection is
-          thoughtfully designed for confident girls who love to express themselves through clothing that feels as good as
-          it looks.
+        {/* Content goes here */}
+
+        <div className="relative w-40 h-20 md:w-64 md:h-32 lg:w-160 lg:h-100 mb-2 md:mb-6">
+          <Image
+            src={Stripes}
+            alt="Logo"
+            fill
+            className="object-contain brightness-200 md:brightness-100 md:mix-blend-multiply"
+          />
+        </div>
+
+        <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-[7rem] font-serif mb-4 md:mb-6 tracking-tighter text-white">
+          <span className="flex flex-wrap justify-center items-baseline gap-x-1 md:gap-x-2">
+            <span className="text-[#be1e2d] drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]">
+              D
+            </span>
+            <span>a</span>
+            <span className="text-white md:text-black">i</span>
+            <span>m</span>
+            <span className="text-[#006241]">a</span>
+            <span className="ml-2 md:ml-0 text-white md:text-black drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]">
+              M
+            </span>
+            <span>K</span>
+            <span className="text-[#006241]">e</span>
+            <span>n</span>
+            <span className="text-[#be1e2d]">y</span>
+            <span>a</span>
+          </span>
+        </h1>
+
+        <p className="text-white/90 text-[10px] md:text-[12px] uppercase tracking-[0.4em] md:tracking-[0.8em] mb-8 md:mb-12">
+          Unity in Every Thread
         </p>
-        <button className=" bg-[#1e1e1e] text-white border-none py-3 px-8 text-[13px] sm:text-[13px] md:text-[14px] tracking-[0.4px] sm:tracking-[0.4px] md:tracking-[0.5px] cursor-pointer hover:bg-[#2a2a2a] transition-colors duration-300 block">
-          Shop Now
+
+        <button className="pointer-events-auto relative group bg-white text-black px-10 py-4 md:px-16 md:py-6 overflow-hidden transition-all shadow-2xl uppercase tracking-[0.3em] font-bold text-[10px] md:text-[12px]">
+          <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+            Shop now
+          </span>
+          <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
         </button>
       </div>
-
-      {/* Optional: custom styling for mobile height */}
-      {isMobile && (
-        <style jsx global>{`
-          .hero-section {
-            min-height: 85vh;
-          }
-        `}</style>
-      )}
     </section>
   );
 }

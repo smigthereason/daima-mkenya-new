@@ -9,14 +9,9 @@ export default function Home() {
       <Hero />
       <NewArrivals />
 
-  
-          <AfricaDottedMap />
-      
-    
+      <AfricaDottedMap />
 
-      
-        <SdgCommitment />
-      
+      <SdgCommitment />
     </main>
   );
 }

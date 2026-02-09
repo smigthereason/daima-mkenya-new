@@ -6,6 +6,17 @@ import HeroImage4 from './lady-white.png';
 import HeroNew from './hero_new_image.png';
 import Pattern from './pattern.svg';
 import WomanHeadband from './woman_headband.png';
+import ManHero from './d-man.png';
+import WomanHero from './d-woman.png';
+import Logo from './Logo_no-bg.png';
+import Stripes from './Logo_Stripes.png';
+import Hero22 from './Hero22.png';
+import Hero33 from './Hero33.png';
+import Hero44 from './Hero44.png';
+import Hero55 from './Hero55.png';
+import Hero66 from './Hero66.jpg';
+import Hero77 from './Hero77.png';
+
 
 // Collection Model Images (JPG/WebP)
 import Model1 from './1.jpg';
@@ -18,7 +29,7 @@ import Model7 from './7.jpg';
 import Model8 from './8.jpg';
 import Model9 from './9.jpg';
 import Model10 from './10.jpg';
-import Model11 from './11.jpg';
+import Model11 from './11.png';
 import Model12 from './12.jpg';
 import Model13 from './13.jpg';
 import Model14 from './14.jpg';
@@ -56,6 +67,16 @@ export {
    HeroNew,
    Pattern,
    WomanHeadband,
+   ManHero,
+   WomanHero,
+   Logo,
+   Stripes,
+   Hero22,
+   Hero33,
+   Hero44,
+   Hero55,
+   Hero66,
+   Hero77,
 
    // Models
    Model1, Model2, Model3, Model4, Model5,
