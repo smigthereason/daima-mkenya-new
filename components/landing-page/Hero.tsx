@@ -25,7 +25,7 @@ export default function Hero() {
   const bgGreenRef = useRef(null);
 
   useEffect(() => {
-    let ctx = gsap.context(() => {
+    const ctx = gsap.context(() => {
       const tl = gsap.timeline({
         repeat: -1,
         delay: 2,
@@ -203,10 +203,10 @@ export default function Hero() {
 
       {/* ── CENTERED CONTENT ── */}
       <div
-        className="relative z-30 flex flex-col items-center text-center w-[90%] md:w-full max-w-[500px] md:max-w-none 
+        className="relative z-30 flex flex-col items-center text-center w-[90%] md:w-full max-w-125 md:max-w-none 
                       bg-[#171717]/10 md:bg-transparent 
                       border border-white md:border-none 
-                      p-8 md:p-0 
+                      p-8 md:p-8 
                        md:rounded-none 
                       pointer-events-none 
                       backdrop-blur-sm md:backdrop-blur-none"

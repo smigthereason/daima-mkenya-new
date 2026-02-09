@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -17,14 +17,14 @@ const ProductCard = ({
 
   return (
     <div
-      className={`relative transition-all duration-700 ease-out h-[60vh] md:h-[70vh] flex-shrink-0
+      className={`relative transition-all duration-700 ease-out h-[60vh] md:h-[70vh] shrink-0
                  ${isActive 
                     ? "w-[75vw] md:w-[40vw] scale-100 z-10" 
                     : "w-[15vw] md:w-[10vw] grayscale opacity-30 scale-90"}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative w-full h-full overflow-hidden rounded-[2px] bg-neutral-100 shadow-2xl">
+      <div className="relative w-full h-full overflow-hidden rounded-2 bg-neutral-100 shadow-2xl">
         {/* Model Image - Using first thumbnail from Product.ts */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -37,11 +37,11 @@ const ProductCard = ({
           />
         </div>
 
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 opacity-90" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/80 opacity-90" />
 
         {/* Floating Flat Lay */}
         <div
-          className={`absolute top-4 right-4 md:top-6 md:right-6 z-20 w-20 md:w-32 aspect-[3/4] bg-white p-1 rounded-sm shadow-xl transition-all duration-500 delay-100
+          className={`absolute top-4 right-4 md:top-6 md:right-6 z-20 w-20 md:w-32 aspect-3/4 bg-white p-1 rounded-sm shadow-xl transition-all duration-500 delay-100
                         ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
         >
           <Image
@@ -68,7 +68,7 @@ const ProductCard = ({
               <span className="text-white font-medium text-lg">
                 {product.price}
               </span>
-              <div className="h-[1px] w-8 md:w-12 bg-white/30" />
+              <div className="h-px w-8 md:w-12 bg-white/30" />
               <Link href={`/product/${product.id}`} className="flex items-center gap-2 text-white text-[10px] md:text-xs tracking-widest uppercase hover:text-neutral-300 transition-colors">
                 SHOP NOW <ArrowUpRight size={14} />
               </Link>
@@ -169,7 +169,7 @@ export default function NewArrivals() {
       <footer className="relative z-10 px-6 md:px-12 pb-12 flex flex-col md:flex-row justify-between items-center gap-8">
         <div className="flex items-center gap-6">
           <span className="font-serif text-2xl">0{currentIndex + 1}</span>
-          <div className="w-32 md:w-48 h-[2px] bg-neutral-100 relative">
+          <div className="w-32 md:w-48 h-0.5 bg-neutral-100 relative">
             <div 
               className="absolute inset-y-0 left-0 bg-black transition-all duration-700"
               style={{ width: `${((currentIndex + 1) / allProducts.length) * 100}%` }}

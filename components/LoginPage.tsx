@@ -1,136 +1,8 @@
-// "use client";
-
-// import React, { useState, useRef } from 'react';
-// import { Mail, Lock, User, Github } from 'lucide-react';
-// import { FaXTwitter, FaFacebook } from 'react-icons/fa6';
-// import Image from 'next/image';
-// import { Logo, HeroImage2 } from '@/public/assets';
-
-// const Login = () => {
-//   const [isSignUp, setIsSignUp] = useState(false);
-//   const containerRef = useRef<HTMLDivElement>(null);
-
-//   const toggleForm = () => {
-//     setIsSignUp(!isSignUp);
-//   };
-
-//   return (
-//     <div className="min-h-screen bg-[#f8f8f8] flex items-center justify-center p-4 md:p-8 font-sans">
-//       {/* Main Container */}
-//       <div
-//         ref={containerRef}
-//         className="relative w-full max-w-[1000px] h-[650px] bg-white shadow-2xl overflow-hidden flex border border-zinc-100 "
-//       >
-
-//         {/* Animated Overlay Panel */}
-//         <div
-//           className={`absolute inset-y-0 w-full md:w-1/2 transition-all duration-700 ease-in-out z-30 flex flex-col justify-center items-center text-white px-12 text-center
-//             ${isSignUp ? 'md:left-0' : 'md:left-1/2'}
-//           `}
-//           style={{
-//             background: `linear-gradient(135deg, #000000 0%, #be1e2d 50%, #006241 100%)`
-//           }}
-//         >
-//           <div className="relative z-10">
-//             <h2 className="text-4xl font-serif font-black tracking-tighter mb-4 uppercase italic">
-//               {isSignUp ? "Welcome Back" : "Join the Legacy"}
-//             </h2>
-//             <p className="text-white/80 text-sm tracking-widest mb-8 leading-relaxed uppercase">
-//               {isSignUp
-//                 ? "To stay connected with the heritage, please login with your personal info."
-//                 : "Enter your personal details and start your journey with Daima Mkenya Africa."}
-//             </p>
-//             <button
-//               onClick={toggleForm}
-//               className="px-10 py-3 border border-white/40  hover:bg-white hover:text-black transition-all duration-500 uppercase text-[10px] font-bold tracking-[0.3em]"
-//             >
-//               {isSignUp ? "Sign In" : "Sign Up"}
-//             </button>
-//           </div>
-
-//           {/* Brand Background Pattern */}
-//           <div className="absolute inset-0 opacity-10 pointer-events-none">
-//              <Image src={HeroImage2} alt="Pattern" fill className="object-cover grayscale" />
-//           </div>
-//         </div>
-
-//         {/* Form Sections Container */}
-//         <div className="flex w-full h-full relative">
-
-//           {/* Sign In Form (Positioned Right when Overlay is Left) */}
-//           <div className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 absolute left-0 h-full
-//             ${isSignUp ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
-//             <form className="w-full max-w-sm flex flex-col items-center">
-//               <Image src={Logo} alt="DMA" width={120} height={40} className="mb-8" />
-//               <h1 className="text-3xl font-serif font-bold mb-6 text-black tracking-tighter uppercase">Sign In</h1>
-
-//               <div className="flex gap-4 mb-8">
-//                 {[FaFacebook, FaXTwitter, Github].map((Icon, i) => (
-//                   <button key={i} type="button" className="p-3 border border-zinc-200 rounded-full hover:border-black transition-colors">
-//                     <Icon size={18} />
-//                   </button>
-//                 ))}
-//               </div>
-
-//               <div className="w-full space-y-4">
-//                 <div className="relative">
-//                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-//                   <input type="email" placeholder="Email" className="w-full bg-zinc-100 border-none  py-4 pl-12 pr-4 focus:ring-2 focus:ring-black outline-none transition-all text-black" />
-//                 </div>
-//                 <div className="relative">
-//                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-//                   <input type="password" placeholder="Password" className="w-full bg-zinc-100 border-none  py-4 pl-12 pr-4 focus:ring-2 focus:ring-black outline-none transition-all text-black" />
-//                 </div>
-//               </div>
-
-//               <a href="#" className="text-xs text-zinc-400 mt-4 hover:text-black transition-colors uppercase tracking-widest">Forgot Password?</a>
-
-//               <button type="submit" className="mt-8 bg-black text-white px-12 py-4  font-bold uppercase text-[10px] tracking-[0.3em] hover:scale-105 transition-transform">
-//                 Sign In
-//               </button>
-//             </form>
-//           </div>
-
-//           {/* Sign Up Form (Positioned Left when Overlay is Right) */}
-//           <div className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 absolute right-0 h-full
-//             ${!isSignUp ? 'opacity-0 invisible' : 'opacity-100 visible'}`}>
-//             <form className="w-full max-w-sm flex flex-col items-center">
-//               <h1 className="text-3xl font-serif font-bold mb-6 text-black tracking-tighter uppercase">Create Account</h1>
-
-//               <div className="w-full space-y-4">
-//                 <div className="relative">
-//                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-//                   <input type="text" placeholder="Full Name" className="w-full bg-zinc-100 border-none  py-4 pl-12 pr-4 focus:ring-2 focus:ring-[#006241] outline-none transition-all text-black" />
-//                 </div>
-//                 <div className="relative">
-//                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-//                   <input type="email" placeholder="Email" className="w-full bg-zinc-100 border-none  py-4 pl-12 pr-4 focus:ring-2 focus:ring-[#006241] outline-none transition-all text-black" />
-//                 </div>
-//                 <div className="relative">
-//                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
-//                   <input type="password" placeholder="Password" className="w-full bg-zinc-100 border-none py-4 pl-12 pr-4 focus:ring-2 focus:ring-[#006241] outline-none transition-all text-black" />
-//                 </div>
-//               </div>
-
-//               <button type="submit" className="mt-10 bg-[#006241] text-white px-12 py-4  font-bold uppercase text-[10px] tracking-[0.3em] hover:scale-105 transition-transform">
-//                 Sign Up
-//               </button>
-//             </form>
-//           </div>
-
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Login;
-
 "use client";
 
 import React, { useState, useRef } from "react";
 import { Mail, Lock, User } from "lucide-react";
-import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa6";
+import { FaFacebook, FaApple } from "react-icons/fa6";
 import Image from "next/image";
 import { Logo, HeroImage2 } from "@/public/assets";
 
@@ -147,7 +19,7 @@ const Login = () => {
       {/* Main Container */}
       <div
         ref={containerRef}
-        className="relative w-full max-w-[1000px] mt-20 md:mt-0 min-h-screen md:min-h-0 md:h-[650px] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"
+        className="relative w-full max-w-250 mt-20 md:mt-0 min-h-screen md:min-h-0 md:h-162.5 bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"
       >
         {/* Animated Overlay Panel */}
         <div
@@ -163,7 +35,7 @@ const Login = () => {
             <h2 className="text-3xl md:text-4xl font-serif font-black tracking-tighter mb-4 uppercase italic">
               {isSignUp ? "Welcome Back" : "Join the Legacy"}
             </h2>
-            <p className="text-white/80 text-xs md:text-sm tracking-widest mb-8 leading-relaxed uppercase max-w-[300px]">
+            <p className="text-white/80 text-xs md:text-sm tracking-widest mb-8 leading-relaxed uppercase max-w-75">
               {isSignUp
                 ? "To stay connected with the heritage, please login with your personal info."
                 : "Enter your personal details and start your journey with Daima Mkenya Africa."}
@@ -187,7 +59,7 @@ const Login = () => {
         </div>
 
         {/* Form Sections Container */}
-        <div className="flex-grow md:flex-none md:w-full h-full relative bg-white">
+        <div className="grow md:flex-none md:w-full h-full relative bg-white">
           {/* Sign In Form */}
           <div
             className={`

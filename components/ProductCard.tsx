@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Product, sampleProduct, getAllProducts } from "@/types/Product";
 
@@ -89,11 +89,11 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
             <button
               key={i}
               onClick={() => handleThumbChange(i)}
-              className={`relative flex-shrink-0 transition-all duration-700 ease-in-out group ${
+              className={`relative shrink-0 transition-all duration-700 ease-in-out group ${
                 i === activeThumb ? "opacity-100 scale-100" : "opacity-30 hover:opacity-60 scale-[0.96]"
               }`}
             >
-              <div className="w-[180px] h-[240px] lg:w-[200px] lg:h-[260px] bg-[#fcfcfc] relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
+              <div className="w-45 h-60 lg:w-50 lg:h-65 bg-[#fcfcfc] relative overflow-hidden shadow-sm group-hover:shadow-md transition-shadow">
                 <Image 
                   src={src} 
                   alt="" 
@@ -103,7 +103,7 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
                 />
               </div>
               {i === activeThumb && (
-                <div className="absolute -bottom-3 left-0 w-full h-[2px] bg-black animate-in fade-in slide-in-from-left-4 duration-500" />
+                <div className="absolute -bottom-3 left-0 w-full h-0.5 bg-black animate-in fade-in slide-in-from-left-4 duration-500" />
               )}
             </button>
           ))}
@@ -118,7 +118,7 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
                 {descOpen ? "—" : "+"}
               </span>
             </button>
-            <div className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${descOpen ? "max-h-[500px] pb-12" : "max-h-0"}`}>
+            <div className={`overflow-hidden transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)] ${descOpen ? "max-h-125 pb-12" : "max-h-0"}`}>
               <p className="text-[16px] leading-[1.8] text-gray-900 font-medium tracking-wide ">
                 {activeProduct.description}
               </p>
@@ -153,7 +153,7 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
             Identification No. {activeProduct.id.toString().padStart(6, '0')}
           </span>
           
-          <h1 className="text-4xl lg:text-[3.2rem] font-light tracking-tighter leading-[1] mb-6 uppercase">
+          <h1 className="text-4xl lg:text-[3.2rem] font-light tracking-tighter leading-none mb-6 uppercase">
             {titleLine1} <br />
             <span className="font-black text-zinc-900">{titleLine2}</span>
           </h1>
