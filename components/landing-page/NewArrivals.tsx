@@ -1,63 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-
-/* ─────────────────────────── types ─────────────────────────── */
-interface Product {
-  id: number;
-  name: string;
-  price: string;
-  modelImage: string;
-  productImage: string;
-}
-
-/* ─────────────────────────── data ──────────────────────────── */
-const products: Product[] = [
-  {
-    id: 1,
-    name: "MAASAI HERITAGE WRAP PASHMINA",
-    price: "Ksh 8,500",
-    modelImage: "/assets/1.jpg",
-    productImage: "/assets/1.12.png",
-  },
-  {
-    id: 2,
-    name: "SHIELD EMBLEM OVERSIZED HOODIE",
-    price: "Ksh 7,200",
-    modelImage: "/assets/2.webp",
-    productImage: "/assets/2.12.png",
-  },
-  {
-    id: 3,
-    name: "RUNWAY POPLIN SHIRT & SHORT SET",
-    price: "Ksh 12,500",
-    modelImage: "/assets/3.jpg",
-    productImage: "/assets/3.32.png",
-  },
-  {
-    id: 4,
-    name: "STRIPED NATIONAL BUTTON-DOWN",
-    price: "Ksh 6,800",
-    modelImage: "/assets/4.jpg",
-    productImage: "/assets/4.42.png",
-  },
-  {
-    id: 9,
-    name: "HERITAGE STRIPE KAFTAN GOWN",
-    price: "Ksh 11,500",
-    modelImage: "/assets/9.jpg",
-    productImage: "/assets/9.92.png",
-  },
-  {
-    id: 14,
-    name: "NATIONAL PRIDE STRIPE SHIRT",
-    price: "Ksh 5,800",
-    modelImage: "/assets/14.jpg",
-    productImage: "/assets/14.142.png",
-  },
-];
+// Importing from your Product.ts
+import { getAllProducts, Product } from "@/types/Product"; 
 
 const ProductCard = ({
   product,
@@ -70,33 +17,35 @@ const ProductCard = ({
 
   return (
     <div
-      className={`relative transition-all duration-700 ease-out h-[65vh] md:h-[75vh]
-                 ${isActive ? "w-[70vw] md:w-[45vw] scale-100" : "w-[15vw] md:w-[10vw] grayscale opacity-40 scale-95"}`}
+      className={`relative transition-all duration-700 ease-out h-[60vh] md:h-[70vh] flex-shrink-0
+                 ${isActive 
+                    ? "w-[75vw] md:w-[40vw] scale-100 z-10" 
+                    : "w-[15vw] md:w-[10vw] grayscale opacity-30 scale-90"}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative w-full h-full overflow-hidden rounded-[2px] bg-neutral-100 shadow-2xl">
-        {/* Model Media */}
+        {/* Model Image - Using first thumbnail from Product.ts */}
         <div className="absolute inset-0 z-0">
           <Image
-            src={product.modelImage}
+            src={product.images.thumbnails[0]} 
             alt={product.name}
             fill
+            priority={isActive}
             className={`object-cover object-top transition-transform duration-1000 ease-in-out
                        ${isHovered ? "scale-110" : "scale-100"}`}
           />
         </div>
 
-        {/* Overlay Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/80 opacity-90" />
 
-        {/* Floating Product Flat Lay (Revealed on Hover) */}
+        {/* Floating Flat Lay */}
         <div
-          className={`absolute top-6 right-6 z-20 w-24 md:w-32 aspect-[3/4] bg-white p-1 rounded-sm shadow-xl transition-all duration-500 delay-100
+          className={`absolute top-4 right-4 md:top-6 md:right-6 z-20 w-20 md:w-32 aspect-[3/4] bg-white p-1 rounded-sm shadow-xl transition-all duration-500 delay-100
                         ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
         >
           <Image
-            src={product.productImage}
+            src={product.images.hero}
             alt="product flat"
             fill
             className="object-cover"
@@ -108,21 +57,21 @@ const ProductCard = ({
           className={`absolute bottom-0 left-0 right-0 p-6 md:p-10 transition-all duration-500
                         ${isActive ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
         >
-          <div className="flex flex-col gap-2">
-            <span className="text-white/70 text-xs tracking-[0.3em] font-light">
-              LIMITED RELEASE
+          <div className="flex flex-col gap-1 md:gap-2">
+            <span className="text-white/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
+              {product.category?.toUpperCase() || "NEW ARRIVAL"}
             </span>
-            <h3 className="text-white text-2xl md:text-4xl font-serif tracking-tight leading-tight uppercase max-w-[80%]">
+            <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight uppercase">
               {product.name}
             </h3>
-            <div className="flex items-center gap-4 mt-2">
+            <div className="flex items-center gap-3 mt-2">
               <span className="text-white font-medium text-lg">
                 {product.price}
               </span>
-              <div className="h-[1px] w-12 bg-white/30" />
-              <button className="flex items-center gap-2 text-white text-xs tracking-widest uppercase hover:text-neutral-300 transition-colors">
+              <div className="h-[1px] w-8 md:w-12 bg-white/30" />
+              <Link href={`/product/${product.id}`} className="flex items-center gap-2 text-white text-[10px] md:text-xs tracking-widest uppercase hover:text-neutral-300 transition-colors">
                 SHOP NOW <ArrowUpRight size={14} />
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -132,56 +81,81 @@ const ProductCard = ({
 };
 
 export default function NewArrivals() {
+  const allProducts = getAllProducts(); // Using data from Product.ts
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % products.length);
-  };
+  const nextSlide = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % allProducts.length);
+  }, [allProducts.length]);
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+    setCurrentIndex((prev) => (prev - 1 + allProducts.length) % allProducts.length);
+  };
+
+  // 5-Second Infinite Loop Logic
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(nextSlide, 5000);
+    return () => clearInterval(interval);
+  }, [nextSlide, isPaused]);
+
+  /**
+   * Center Calculation Logic:
+   * We calculate the offset to put the center of the active card 
+   * exactly at the center of the screen.
+   */
+  const getTransformStyle = () => {
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+    
+    // Widths matching our Tailwind classes
+    const activeWidth = isMobile ? 75 : 40; // vw
+    const inactiveWidth = isMobile ? 15 : 10; // vw
+    const gap = isMobile ? 3 : 5; // vw (match the gap-3 / gap-8)
+
+    // Calculate how far the previous items push the current item
+    const offset = (currentIndex * (inactiveWidth + gap));
+    
+    // Center the active item: (Half screen) - (Half of active item width) - (Items before it)
+    return {
+      transform: `translateX(calc(50vw - (${activeWidth / 2}vw) - ${offset}vw))`,
+    };
   };
 
   return (
-    <section className="relative min-h-screen bg-white overflow-hidden flex flex-col">
-      {/* Background Large Text Decor */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none select-none overflow-hidden whitespace-nowrap opacity-[0.03] z-0">
-        <h1 className="text-[25vw] font-black tracking-tighter leading-none italic uppercase">
+    <section 
+      className="relative min-h-screen bg-white overflow-hidden flex flex-col"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+    >
+      {/* Background Decor */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none select-none opacity-[0.03] z-0">
+        <h1 className="text-[25vw] font-black tracking-tighter italic uppercase text-center">
           Arrivals
         </h1>
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 pt-12 pb-8 px-6 md:px-12 flex justify-between items-end">
+      <header className="relative z-10 pt-12 px-6 md:px-12 flex justify-between items-end">
         <div className="flex flex-col">
-          <span className="text-neutral-900 text-xs tracking-[0.5em] mb-2">
-            CURATED COLLECTION
-          </span>
+          <span className="text-neutral-900 text-[10px] md:text-xs tracking-[0.5em] mb-2">CURATED COLLECTION</span>
           <h2 className="text-neutral-900 text-5xl md:text-7xl font-serif font-black tracking-tighter leading-none">
-            NEW
-            <br />
-            ARRIVALS
+            NEW<br />ARRIVALS
           </h2>
         </div>
-
-        <div className="hidden md:flex flex-col items-end text-right">
-          <p className="max-w-[300px] text-neutral-700 text-sm leading-relaxed mb-4">
-            A fusion of traditional heritage and modern luxury silhouettes.
-            Crafted for the bold, designed for the legacy.
-          </p>
-          <a
-            href="/products"
-            className="group flex items-center gap-4 border-b border-black pb-1 text-sm font-bold tracking-widest transition-all hover:gap-6 text-neutral-900"
-          >
+        <div className="hidden md:block text-right">
+          <Link href="/products" className="group flex items-center gap-4 border-b border-black pb-1 text-sm font-bold tracking-widest text-neutral-900">
             EXPLORE ALL <ArrowUpRight size={18} />
-          </a>
+          </Link>
         </div>
       </header>
 
-      {/* Main Slider Container */}
-      <div className="relative flex-1 flex items-center justify-center py-10">
-        <div className="flex items-center gap-4 md:gap-8 px-4 overflow-visible">
-          {products.map((product, index) => (
+      {/* Centered Slider Container */}
+      <div className="relative flex-1 flex items-center overflow-visible">
+        <div 
+          className="flex items-center gap-3 md:gap-12 transition-transform duration-1000 cubic-bezier(0.4, 0, 0.2, 1)"
+          style={getTransformStyle()}
+        >
+          {allProducts.map((product, index) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -191,66 +165,30 @@ export default function NewArrivals() {
         </div>
       </div>
 
-      {/* Controls & Navigation */}
+      {/* Footer Navigation */}
       <footer className="relative z-10 px-6 md:px-12 pb-12 flex flex-col md:flex-row justify-between items-center gap-8">
-        <div className="flex items-center gap-8 w-full md:w-auto">
-          <div className="flex items-center gap-4">
-            <span className="font-serif text-2xl text-neutral-900">
-              0{currentIndex + 1}
-            </span>
-            <div className="w-48 h-[2px] bg-neutral-100 relative overflow-hidden">
-              <div
-                className="absolute inset-y-0 left-0 bg-black transition-all duration-700 ease-out"
-                style={{
-                  width: `${((currentIndex + 1) / products.length) * 100}%`,
-                }}
-              />
-            </div>
-            <span className="font-serif text-2xl text-neutral-900">
-              0{products.length}
-            </span>
+        <div className="flex items-center gap-6">
+          <span className="font-serif text-2xl">0{currentIndex + 1}</span>
+          <div className="w-32 md:w-48 h-[2px] bg-neutral-100 relative">
+            <div 
+              className="absolute inset-y-0 left-0 bg-black transition-all duration-700"
+              style={{ width: `${((currentIndex + 1) / allProducts.length) * 100}%` }}
+            />
           </div>
+          <span className="font-serif text-2xl">0{allProducts.length}</span>
         </div>
 
         <div className="flex gap-4">
-          <button
-            onClick={prevSlide}
-            className="w-14 h-14 rounded-full border border-neutral-900 flex items-center justify-center hover:bg-neutral-200 hover:text-white transition-all duration-300 group"
-          >
-            <ChevronLeft
-              size={24}
-              className="group-hover:-translate-x-1 transition-transform text-neutral-900"
-            />
+          <button onClick={prevSlide} className="w-14 h-14 rounded-full border border-black flex items-center justify-center hover:bg-black hover:text-white transition-all">
+            <ChevronLeft size={24} />
           </button>
-          <button
-            onClick={nextSlide}
-            className="w-14 h-14 rounded-full border border-neutral-900 flex items-center justify-center hover:bg-neutral-200 hover:text-white transition-all duration-300 group"
-          >
-            <ChevronRight
-              size={24}
-              className="group-hover:translate-x-1 transition-transform text-neutral-900"
-            />
+          <button onClick={nextSlide} className="w-14 h-14 rounded-full border border-black flex items-center justify-center hover:bg-black hover:text-white transition-all">
+            <ChevronRight size={24} />
           </button>
-        </div>
-
-        <div className="md:hidden">
-          <Link
-            href="/products"
-            className="px-8 py-3 bg-black text-white rounded-full text-xs font-bold tracking-[0.2em] uppercase"
-          >
-            View All Series
-          </Link>
         </div>
       </footer>
 
-      <style
-        dangerouslySetInnerHTML={{
-          __html: `
-            @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,900;1,400&display=swap');
-            .font-serif { font-family: 'Playfair Display', serif; }
-          `,
-        }}
-      />
+      
     </section>
   );
 }
