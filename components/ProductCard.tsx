@@ -1,20 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Product, sampleProduct, getAllProducts } from "@/types/Product";
 
-export default function ProductCard({ initialProductId = 1 }: { initialProductId?: number }) {
+export default function ProductCard({ productId = 1 }: { productId?: number }) {
   const allProducts = getAllProducts();
-  const initialProduct = allProducts.find(p => p.id === initialProductId) || sampleProduct;
-
-  const [activeProduct, setActiveProduct] = useState<Product>(initialProduct);
-  const [currentProductIndex, setCurrentProductIndex] = useState(
-    allProducts.findIndex(p => p.id === initialProductId)
-  );
+  
+  const [activeProduct, setActiveProduct] = useState<Product>(() => {
+    const initialProduct = allProducts.find(p => p.id === productId) || sampleProduct;
+    return initialProduct;
+  });
+  
+  const [currentProductIndex, setCurrentProductIndex] = useState(() => {
+    return allProducts.findIndex(p => p.id === productId);
+  });
 
   const [activeThumb, setActiveThumb] = useState(0);
   const [isFading, setIsFading] = useState(false);
+
+  // Update product when productId prop changes
+  useEffect(() => {
+    const newProduct = allProducts.find(p => p.id === productId) || sampleProduct;
+    const newIndex = allProducts.findIndex(p => p.id === productId);
+    
+    triggerFade(() => {
+      setActiveProduct(newProduct);
+      setCurrentProductIndex(newIndex);
+      setActiveThumb(0);
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]);
 
   // Transition handler for both thumb clicks and product changes
   const triggerFade = (callback: () => void) => {
@@ -27,18 +43,20 @@ export default function ProductCard({ initialProductId = 1 }: { initialProductId
 
   const goToNextProduct = () => {
     const nextIndex = (currentProductIndex + 1) % allProducts.length;
+    const nextProduct = allProducts[nextIndex];
     triggerFade(() => {
       setCurrentProductIndex(nextIndex);
-      setActiveProduct(allProducts[nextIndex]);
+      setActiveProduct(nextProduct);
       setActiveThumb(0);
     });
   };
 
   const goToPrevProduct = () => {
     const prevIndex = currentProductIndex === 0 ? allProducts.length - 1 : currentProductIndex - 1;
+    const prevProduct = allProducts[prevIndex];
     triggerFade(() => {
       setCurrentProductIndex(prevIndex);
-      setActiveProduct(allProducts[prevIndex]);
+      setActiveProduct(prevProduct);
       setActiveThumb(0);
     });
   };
