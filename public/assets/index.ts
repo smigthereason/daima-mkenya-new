@@ -16,6 +16,7 @@ import Hero44 from './Hero44.png';
 import Hero55 from './Hero55.png';
 import Hero66 from './Hero66.jpg';
 import Hero77 from './Hero77.png';
+import SDG1 from './SDG1.png';
 
 
 // Collection Model Images (JPG/WebP)
@@ -50,12 +51,6 @@ import Product13 from './13.132.png';
 import Product14 from './14.142.png';
 import Product15 from './15.152.png';
 
-// Afro Series Specifics
-import AfroDress from './afro_dress.png';
-import AfroDress1 from './afro_dress_1.png';
-import AfroDress2 from './afro_dress_2.png';
-import AfroMan from './afro_man.png';
-import AfroMan1 from './afro_man_1.png';
 
 
 export {
@@ -78,6 +73,9 @@ export {
    Hero66,
    Hero77,
 
+   // SDG Grid
+   SDG1,
+
    // Models
    Model1, Model2, Model3, Model4, Model5,
    Model6, Model7, Model8, Model9, Model10,
@@ -86,9 +84,5 @@ export {
    // Products
    Product1, Product2, Product3, Product4,
    Product6, Product7, Product8, Product9,
-   Product10, Product12, Product13, Product14, Product15,
-
-   // Afro Series
-   AfroDress, AfroDress1, AfroDress2,
-   AfroMan, AfroMan1
+   Product10, Product12, Product13, Product14, Product15
 };
