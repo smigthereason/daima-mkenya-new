@@ -2,9 +2,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/landing-page/Navbar";
+// Remove the 'dynamic' import line entirely
+import Navbar from "@/components/landing-page/Navbar"; // Keep only this one
 import Footer from "@/components/landing-page/Footer";
-// import GSAPProvider from "@/app/providers/GSAPProvider";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -25,15 +25,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* <head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@300;400;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head> */}
-      <body
-        className={`${playfair.className} antialiased bg-[#e8e8e8]`}
-      >
+      <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}>
         <Navbar />
         {children}
         <Footer />
