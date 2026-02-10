@@ -40,8 +40,6 @@ export default function ProductGrid({
             </span>
           </h2>
         </div>
-
-       
       </div>
 
       {/* ── PRODUCT GRID ── */}
@@ -66,12 +64,19 @@ export default function ProductGrid({
               />
 
               {/* Quick View Button: Bolder */}
+              {/* Replace the button in ProductGrid.tsx around line 74 */}
               <div className="hidden lg:flex absolute inset-0 bg-black/5 items-end justify-center pb-12 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                <button 
+                <button
                   onClick={() => handleQuickViewClick(product.id)}
-                  className="bg-zinc-900 text-white text-[11px] font-bold uppercase tracking-[0.4em] px-10 py-5 shadow-2xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 hover:bg-zinc-800"
+                  className="group relative overflow-hidden border-2 border-zinc-900 bg-zinc-900 px-10 py-5 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl transition-colors duration-300"
                 >
-                  Quick View
+                  {/* Sliding Background */}
+                  <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-out group-hover:translate-y-0" />
+
+                  {/* Text Layer */}
+                  <span className="relative z-10 text-white transition-colors duration-500 group-hover:text-zinc-900">
+                    Quick View
+                  </span>
                 </button>
               </div>
             </div>
@@ -109,9 +114,12 @@ export default function ProductGrid({
           <div className="w-0.5 h-20 bg-zinc-900" />
           <button
             onClick={() => setDisplayLimit((prev) => prev + 4)}
-            className="text-[12px] md:text-[14px] uppercase tracking-[0.5em] font-black border-2 border-zinc-900 px-16 py-6 md:px-20 md:py-8 hover:bg-zinc-900 hover:text-white transition-all duration-500 active:scale-95 shadow-lg"
+            className="group relative overflow-hidden border-2 border-zinc-900 bg-zinc-900 px-16 py-6 text-[14px] font-black tracking-[0.5em] uppercase text-white transition-colors duration-500"
           >
-            Load More
+            <span className="relative z-10 group-hover:text-zinc-900 transition-colors duration-500">
+              Load More
+            </span>
+            <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
           </button>
           <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-400 font-bold">
             Showing {displayedProducts.length} of {products.length} Items

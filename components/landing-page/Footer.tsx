@@ -87,12 +87,11 @@ const Footer = () => {
                   placeholder="Email address"
                   className="w-full bg-transparent border-b border-zinc-700 pb-2 mb-4 focus:outline-none focus:border-white transition-colors duration-300"
                 />
-                <button className="group relative overflow-hidden bg-zinc-900 border border-zinc-800 px-8 py-2 text-sm text-white transition-all duration-300 hover:scale-105 hover:border-zinc-500">
-                  {/* The Grow Background Layer */}
-                  <span className="absolute inset-0 z-0 scale-x-0 bg-zinc-800 transition-transform duration-500 ease-out origin-center group-hover:scale-x-100" />
-
-                  {/* The Text Layer */}
-                  <span className="relative z-10">Subscribe</span>
+                <button className="group relative overflow-hidden border-2 border-white bg-white px-8 py-3 text-[11px] font-black tracking-[0.4em] uppercase text-black transition-colors duration-300">
+                  <span className="absolute inset-0 z-0 translate-y-full bg-neutral-900 transition-transform duration-500 ease-out group-hover:translate-y-0" />
+                  <span className="relative z-10 group-hover:text-white">
+                    Subscribe
+                  </span>
                 </button>
               </div>
             </div>

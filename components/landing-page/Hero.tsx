@@ -12,6 +12,7 @@ import {
   Hero77,
 } from "@/public/assets";
 import gsap from "gsap";
+import Link from "next/link";
 
 export default function Hero() {
   const manRef = useRef(null);
@@ -151,7 +152,7 @@ export default function Hero() {
           <Image
             src={ManHero}
             alt="Man"
-            fill 
+            fill
             className="object-cover "
             priority
           />
@@ -163,7 +164,7 @@ export default function Hero() {
           <Image
             src={WomanHero}
             alt="Woman"
-            fill 
+            fill
             className="object-cover "
             priority
           />
@@ -174,13 +175,25 @@ export default function Hero() {
           ref={innerLeftRef}
           className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full bottom-0 opacity-0 pointer-events-none"
         >
-          <Image src={Hero22} alt="Inner Left" fill priority className="object-cover" />
+          <Image
+            src={Hero22}
+            alt="Inner Left"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
         <div
           ref={innerRightRef}
           className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none"
         >
-          <Image src={Hero33} alt="Inner Right" fill priority className="object-cover" />
+          <Image
+            src={Hero33}
+            alt="Inner Right"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
 
         {/* OUTER EDGE REPLACEMENTS (Secondary Slide) */}
@@ -188,13 +201,25 @@ export default function Hero() {
           ref={outerLeftReplaceRef}
           className="absolute left-0 md:left-[0%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
         >
-          <Image src={Hero77} alt="Outer Left" fill priority className="object-cover" />
+          <Image
+            src={Hero77}
+            alt="Outer Left"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
         <div
           ref={outerRightReplaceRef}
           className="absolute left-1/2 md:left-[80%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
         >
-          <Image src={Hero44} alt="Outer Right" fill priority className="object-cover" />
+          <Image
+            src={Hero44}
+            alt="Outer Right"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
       </div>
 
@@ -218,7 +243,7 @@ export default function Hero() {
             src={Stripes}
             alt="Logo"
             priority
-            fill 
+            fill
             className="object-contain brightness-200 md:brightness-100 md:mix-blend-multiply"
           />
         </div>
@@ -246,13 +271,17 @@ export default function Hero() {
         <p className="text-white/90 text-[10px] md:text-[12px] uppercase tracking-[0.4em] md:tracking-[0.8em] mb-8 md:mb-12">
           Unity in Every Thread
         </p>
+        <Link href="/products" className="pointer-events-auto">
+          <button className="group relative overflow-hidden cursor-pointer border-2 border-white bg-white px-12 py-5 text-[12px] font-black tracking-[0.4em] uppercase text-black transition-colors duration-300">
+            {/* The "Grow" Background Layer */}
+            <span className="absolute inset-0 z-0 translate-y-full bg-black transition-transform duration-500 ease-out group-hover:translate-y-0" />
 
-        <button className="pointer-events-auto relative group bg-white text-black px-10 py-4 md:px-16 md:py-6 overflow-hidden transition-all shadow-2xl uppercase tracking-[0.3em] font-bold text-[10px] md:text-[12px]">
-          <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-            Shop now
-          </span>
-          <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-        </button>
+            {/* The Text Layer */}
+            <span className="relative z-10 transition-colors duration-500 group-hover:text-white">
+              Shop now
+            </span>
+          </button>
+        </Link>
       </div>
     </section>
   );
