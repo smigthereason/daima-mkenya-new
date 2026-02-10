@@ -151,7 +151,7 @@ export default function Hero() {
           <Image
             src={ManHero}
             alt="Man"
-            fill
+            fill 
             className="object-cover "
             priority
           />
@@ -163,7 +163,7 @@ export default function Hero() {
           <Image
             src={WomanHero}
             alt="Woman"
-            fill
+            fill 
             className="object-cover "
             priority
           />
@@ -174,13 +174,13 @@ export default function Hero() {
           ref={innerLeftRef}
           className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full bottom-0 opacity-0 pointer-events-none"
         >
-          <Image src={Hero22} alt="Inner Left" fill className="object-cover" />
+          <Image src={Hero22} alt="Inner Left" fill priority className="object-cover" />
         </div>
         <div
           ref={innerRightRef}
           className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none"
         >
-          <Image src={Hero33} alt="Inner Right" fill className="object-cover" />
+          <Image src={Hero33} alt="Inner Right" fill priority className="object-cover" />
         </div>
 
         {/* OUTER EDGE REPLACEMENTS (Secondary Slide) */}
@@ -188,13 +188,13 @@ export default function Hero() {
           ref={outerLeftReplaceRef}
           className="absolute left-0 md:left-[0%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
         >
-          <Image src={Hero77} alt="Outer Left" fill className="object-cover" />
+          <Image src={Hero77} alt="Outer Left" fill priority className="object-cover" />
         </div>
         <div
           ref={outerRightReplaceRef}
           className="absolute left-1/2 md:left-[80%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
         >
-          <Image src={Hero44} alt="Outer Right" fill className="object-cover" />
+          <Image src={Hero44} alt="Outer Right" fill priority className="object-cover" />
         </div>
       </div>
 
@@ -217,7 +217,8 @@ export default function Hero() {
           <Image
             src={Stripes}
             alt="Logo"
-            fill
+            priority
+            fill 
             className="object-contain brightness-200 md:brightness-100 md:mix-blend-multiply"
           />
         </div>
