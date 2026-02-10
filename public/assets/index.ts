@@ -10,6 +10,7 @@ import ManHero from './d-man.png';
 import WomanHero from './d-woman.png';
 import Logo from './Logo_no-bg.png';
 import Stripes from './Logo_Stripes.png';
+import SideStripe from './SideStripe.png'
 import Hero22 from './Hero22.png';
 import Hero33 from './Hero33.png';
 import Hero44 from './Hero44.png';
@@ -66,6 +67,7 @@ export {
    WomanHero,
    Logo,
    Stripes,
+   SideStripe,
    Hero22,
    Hero33,
    Hero44,

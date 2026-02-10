@@ -1,22 +1,23 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import { X, Heart, User, ShoppingBag, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { HeroImage2, Logo } from "@/public/assets";
+import { HeroImage2, Logo ,SideStripe } from "@/public/assets";
 import gsap from "gsap";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
+  // Handle initial mount
   useEffect(() => {
-    // Initial state: Off-screen and hidden
-    if (menuRef.current) {
-      gsap.set(menuRef.current, { x: "-100%", display: "none" });
-    }
+    setIsMounted(true);
   }, []);
 
+  // Handle GSAP Animations
   useEffect(() => {
     if (!menuRef.current) return;
 
@@ -24,11 +25,15 @@ const Navbar = () => {
       const tl = gsap.timeline();
 
       tl.set(menuRef.current, { display: "block" })
-        .to(menuRef.current, {
-          x: 0,
-          duration: 0.7,
-          ease: "power3.out",
-        })
+        .fromTo(
+          menuRef.current,
+          { x: "-100%" },
+          {
+            x: 0,
+            duration: 0.8,
+            ease: "expo.out",
+          },
+        )
         .fromTo(
           ".menu-item",
           { x: -30, opacity: 0 },
@@ -39,14 +44,14 @@ const Navbar = () => {
             duration: 0.5,
             ease: "power3.out",
           },
-          "-=0.3",
+          "-=0.4",
         );
     } else {
+      // Only animate out if it's already open
       gsap.to(menuRef.current, {
         x: "-100%",
-        duration: 0.7,
-        ease: "power3.in",
-        // Use curly braces to prevent implicit return
+        duration: 0.6,
+        ease: "expo.in",
         onComplete: () => {
           gsap.set(menuRef.current, { display: "none" });
         },
@@ -69,7 +74,7 @@ const Navbar = () => {
         <div className="flex justify-start">
           <button
             onClick={() => setIsOpen(true)}
-            className="flex items-center gap-3 group focus:outline-none z-70"
+            className="flex items-center gap-3 group focus:outline-none z-70 cursor-pointer"
           >
             <div className="relative w-6 h-5 flex flex-col justify-between">
               <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-1/2"></span>
@@ -84,17 +89,39 @@ const Navbar = () => {
 
         {/* 2. Center Section: Logo */}
         <div className="flex justify-center">
-          <Link href="/" className="relative  block ">
-            <Image
-              src={Logo}
-              alt="DMA"
-              height={120}
-              width={120}
-              quality={100}
-              draggable={false}
-              className=""
-              priority
-            />
+          <Link href="/" className="relative block">
+            {/* Mobile Logo: Shown on small screens, hidden on md and up */}
+            <div className="block md:hidden">
+              <Image
+                src={SideStripe} // Your mobile-specific image
+                alt="DMA Mobile"
+                height={60} // Smaller height for mobile
+                width={60} // Smaller width for mobile
+                quality={100}
+                draggable={false}
+                priority
+              />
+
+            </div>
+            {/* Mobile Logo: Shown on small screens, hidden on md and up */}
+            {/* <div className="block md:hidden">
+              <span className="text-4xl font-black  tracking-tighter select-none bg-linear-to-r from-black via-[#be1e2d] to-[#006241] bg-clip-text text-transparent">
+                DMA
+              </span>
+            </div> */}
+
+            {/* Desktop Logo: Hidden on mobile, shown on md and up */}
+            <div className="hidden md:block">
+              <Image
+                src={Logo} // Your original desktop logo
+                alt="DMA"
+                height={120}
+                width={120}
+                quality={100}
+                draggable={false}
+                priority
+              />
+            </div>
           </Link>
         </div>
 
@@ -122,8 +149,15 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Full-Screen Luxury Menu Overlay */}
-      <div ref={menuRef} className="fixed inset-0 bg-[#f8f8f8] z-100">
+      {/* Full-Screen Luxury Menu Overlay 
+          - Added initial style display: none to prevent flash
+          - Added fixed inset-0 to ensure it covers screen correctly
+      */}
+      <div
+        ref={menuRef}
+        className="fixed inset-0 bg-[#f8f8f8] z-100 overflow-hidden"
+        style={{ display: "none", transform: "translateX(-100%)" }}
+      >
         <div className="p-8 md:p-16 flex flex-col h-full max-w-7xl mx-auto text-black">
           <div className="flex justify-between items-center">
             <span className="text-sm tracking-[0.4em] font-light">
@@ -131,7 +165,7 @@ const Navbar = () => {
             </span>
             <button
               onClick={() => setIsOpen(false)}
-              className="group p-4 flex items-center gap-2 hover:opacity-60 transition-opacity"
+              className="group p-4 flex items-center gap-2 hover:opacity-60 transition-opacity cursor-pointer"
             >
               <span className="text-[10px] uppercase tracking-widest">
                 Close
@@ -147,7 +181,7 @@ const Navbar = () => {
                   key={index}
                   href={link.path}
                   onClick={() => setIsOpen(false)}
-                  className="menu-item group flex items-center justify-between text-4xl md:text-7xl font-light text-black border-b border-transparent  py-2 transition-all"
+                  className="menu-item group flex items-center justify-between text-4xl md:text-7xl font-light text-black border-b border-transparent py-2 transition-all"
                 >
                   <span className="relative">
                     {link.name}
@@ -169,13 +203,15 @@ const Navbar = () => {
               <p className="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4">
                 Featured Collection
               </p>
-              <div className="aspect-3/4 w-72 relative overflow-hidden rounded-sm shadow-2xl">
-                <Image
-                  src={HeroImage2}
-                  alt="Featured"
-                  fill
-                  className="object-cover"
-                />
+              <div className="aspect-3/4 w-72 relative overflow-hidden shadow-2xl">
+                {isMounted && (
+                  <Image
+                    src={HeroImage2}
+                    alt="Featured"
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
             </div>
           </div>
