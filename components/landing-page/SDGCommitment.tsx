@@ -1,13 +1,14 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 import React from 'react';
 import Image from 'next/image';
 // Importing assets from the centralized index
 import { 
-  Model5, 
-  Model7, 
-  Model8, 
-  Model10, 
-  Model13, 
+  SDG1, 
+  Hero33, 
+  Hero77, 
+  Hero55, 
+  Model12, 
   Model15, 
   HeroImage4 
 } from '@/public/assets';
@@ -18,36 +19,36 @@ const SdgCommitment = () => {
       title: "ELEGANT", 
       subtitle: "SDG 8", 
       color: "#000000", 
-      bgImage: Model5 
+      bgImage: SDG1, 
     },
     { 
       title: "INNOVATIVE", 
       subtitle: "SDG 9", 
       color: "#BB0000", 
-      bgImage: Model7 
+      bgImage: Hero33 
     },
     { 
       title: "DELUXE", 
       subtitle: "SDG 12", 
       color: "#008000", 
-      bgImage: Model8 
+      bgImage: Hero77 
     },
     { 
       title: "ACTIVE", 
       subtitle: "SDG 13", 
-      color: "#FFD700", 
-      bgImage: Model10 
+      color: "#E8E8E8", 
+      bgImage: Hero55
     },
   ];
 
   const secondaryGallery = [
-    { src: Model13, alt: "Heritage Collection Model 13" }, 
+    { src: Model12, alt: "Heritage Collection Model 13" }, 
     { src: Model15, alt: "Heritage Collection Model 15" }, 
     { src: HeroImage4, alt: "Heritage Collection Lady White" }
   ];
 
   return (
-    <section className="bg-[#e8e8e8] py-24 overflow-hidden">
+    <section className="bg-[#e8e8e8] py-24 overflow-hidden border-b border-neutral-300">
       {/* Luxury Minimalist Header */}
       <div className="max-w-7xl mx-auto px-6 mb-24 text-center">
         <span className="text-[10px] tracking-[0.5em] text-neutral-400 uppercase block mb-4">The Commitment</span>
@@ -57,17 +58,17 @@ const SdgCommitment = () => {
       </div>
 
       {/* Large Grid Cards with Background Images */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-neutral-100 border-y border-neutral-100 mb-32">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 bg-neutral-100 border-y border-neutral-200 mb-32 ">
         {essentials.map((item, idx) => (
-          <div key={idx} className="relative aspect-[16/10] md:aspect-square lg:aspect-[16/10] bg-neutral-900 flex flex-col justify-center items-center group overflow-hidden">
+          <div key={idx} className="group relative aspect-16/10 md:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center group overflow-hidden">
              {/* Background Image with Next Image */}
              <div className="absolute inset-0 z-0 overflow-hidden">
                <Image
                  src={typeof item.bgImage === 'string' ? item.bgImage : item.bgImage.src}
                  alt={item.title}
                  fill
-                 sizes="(max-width: 768px) 100vw, 50vw"
-                 className="object-cover transition-all duration-1000 group-hover:scale-105 opacity-60 group-hover:opacity-40"
+                 sizes="(max-width: 768px) 100vw, (max-width:1200px) 50vw, 25vw"
+                 className="object-cover transition-all duration-1000 group-hover:scale-105 opacity-60 group-hover:opacity-80"
                  priority={idx < 2} // Prioritize loading first 2 images
                />
              </div>

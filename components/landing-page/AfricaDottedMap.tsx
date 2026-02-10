@@ -56,7 +56,7 @@ export default function AfricaDottedMap() {
 
          {/* Center: Main Branding */}
          <div className="text-center mb-16 z-10 px-6 relative">
-            <h2 className="text-5xl md:text-8xl font-serif tracking-tighter text-neutral-600 uppercase leading-[0.85] mb-6">
+            <h2 className="text-5xl md:text-8xl font-serif tracking-tighter text-neutral-500 uppercase leading-[0.85] mb-6">
                Unity in Every <br /> <span className="italic font-light">Stitch</span>
             </h2>
             <div className="h-20 w-px bg-neutral-900 mx-auto" />
@@ -115,7 +115,7 @@ export default function AfricaDottedMap() {
             >
                <div className="flex flex-col bg-linear-to-r from-[#BB0000] via-white/10 to-[#008000] backdrop-blur-md px-4 py-2 rounded-sm border border-white/20">
                   <span className="text-[10px] tracking-[0.4em] font-bold text-white uppercase">Daima Mkenya HQ</span>
-                  <span className="text-[9px] text-neutral-500 font-mono tracking-tighter">1.2921° S, 36.8219° E</span>
+                  <span className="text-[9px] text-neutral-900 font-mono tracking-tighter">1.2921° S, 36.8219° E</span>
                </div>
             </div>
          </div>

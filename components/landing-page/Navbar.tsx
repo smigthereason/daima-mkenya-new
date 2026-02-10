@@ -84,12 +84,15 @@ const Navbar = () => {
 
         {/* 2. Center Section: Logo */}
         <div className="flex justify-center">
-          <Link href="/" className="relative w-32 h-12 lg:w-48 lg:h-16 block">
+          <Link href="/" className="relative  block ">
             <Image
               src={Logo}
               alt="DMA"
-              fill
-              className="object-contain"
+              height={120}
+              width={120}
+              quality={100}
+              draggable={false}
+              className=""
               priority
             />
           </Link>
