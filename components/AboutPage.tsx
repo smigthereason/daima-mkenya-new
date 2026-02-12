@@ -6,8 +6,6 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  ManHero,
-  WomanHero,
   Hero77,
   Stripes,
   Hero33,
@@ -41,6 +39,7 @@ export default function RedesignedAboutPage() {
       });
 
       // Parallax for high-fashion "Editorial" impact
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       gsap.utils.toArray(".parallax-img").forEach((img: any) => {
         gsap.to(img, {
           y: -80,
@@ -223,7 +222,7 @@ export default function RedesignedAboutPage() {
             </div>
 
             <div className="space-y-8 group">
-              <div className="relative aspect-[3/4] overflow-hidden bg-white border border-neutral-200">
+              <div className="relative aspect-3/4 overflow-hidden bg-white border border-neutral-200">
                 <Image
                   src={Model5}
                   alt="Detail"
@@ -247,41 +246,60 @@ export default function RedesignedAboutPage() {
         </div>
       </section>
 
-      {/* ── SECTION 4: THE RED GALLERY (UNIFORM EDITORIAL GRID) ── */}
-      {/* Added 'group' here so the text responds when any part of the section is hovered */}
-      <section className="group relative h-[60vh] md:h-[80vh] bg-[#47393a] mt-24 overflow-hidden">
-        <div className="absolute inset-0 grid grid-cols-2 md:grid-cols-4">
-          {[Hero33, Hero22, Hero77, Hero44].map((img, i) => (
-            <div
-              key={i}
-              className="relative h-full border-r border-white/10 grayscale hover:grayscale-0 opacity-50 hover:opacity-100 transition-all duration-1000 ease-in-out"
-            >
-              <Image
-                src={img}
-                alt={`Gallery Image ${i}`}
-                fill
-                className="object-cover transition-transform duration-[2000ms] hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-[#be1e2d]/10 transition-colors duration-700 hover:bg-transparent" />
+      {/* ── SECTION 4: THE RED GALLERY (REFINED EDITORIAL GRID) ── */}
+      <section className="relative py-24 bg-white overflow-hidden">
+        {/* Section Header */}
+        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 flex flex-col justify-center items-center gap-6">
+          <div className="overflow-hidden text-center">
+            <h2 className="text-6xl md:text-8xl lg:text-9xl font-serif tracking-tighter uppercase leading-none">
+              Aes
+              <span className="italic text-transparent bg-clip-text bg-linear-to-r from-black via-[#be1e2d] to-[#006241]">
+                the
+              </span>
+              tic
+            </h2>
+          </div>
+
+        
+        </div>
+
+        {/* Interactive Gallery Grid */}
+        <div className="group relative h-[70vh] md:h-[80vh] bg-neutral-900 overflow-hidden">
+          <div className="absolute inset-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
+            {[Hero33, Hero22, Hero77, Hero44].map((img, i) => (
+              <div
+                key={i}
+                className={`relative h-full border-b md:border-b-0 md:border-r border-white/5 
+                           grayscale hover:grayscale-0 opacity-60 hover:opacity-100 
+                           transition-all duration-1000 ease-in-out overflow-hidden
+                           ${i > 1 ? "hidden sm:block" : ""} ${i > 2 ? "hidden md:block" : ""}`}
+              >
+                <Image
+                  src={img}
+                  alt={`Editorial Gallery ${i}`}
+                  fill
+                  className="object-cover transition-transform duration-3000 ease-out hover:scale-110"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                />
+
+                {/* Luxury Hover Overlay */}
+                <div className="absolute inset-0 bg-[#be1e2d]/5 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+              </div>
+            ))}
+          </div>
+
+          {/* Floating Collection Tag (Luxury Detail) */}
+          <div className="absolute bottom-10 right-10 z-20 hidden lg:block">
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4">
+              <span className="text-white text-[10px] tracking-[0.8em] uppercase font-light">
+                Curated Vol. 04
+              </span>
             </div>
-          ))}
+          </div>
         </div>
 
-        {/* Central Brand Statement */}
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
-          <h2
-            className="text-white text-[12vw] font-serif tracking-tighter uppercase leading-none transition-all duration-700
-                         mix-blend-difference
-                         group-hover:mix-blend-normal
-                         group-hover:text-transparent group-hover:bg-clip-text 
-                         group-hover:bg-gradient-to-r group-hover:from-black group-hover:via-[#be1e2d] group-hover:to-[#006241]"
-          >
-            Aesthetic
-          </h2>
-        </div>
-
-        {/* Kenyan Flag Accent Thread */}
-        <div className="absolute bottom-0 left-0 w-full h-1.5 flex">
+        {/* Kenyan Flag Accent Thread - Now positioned under the grid */}
+        <div className="w-full h-1 flex">
           <div className="flex-1 bg-black" />
           <div className="flex-1 bg-[#be1e2d]" />
           <div className="flex-1 bg-[#006241]" />
@@ -319,11 +337,11 @@ export default function RedesignedAboutPage() {
           alt="Logo"
           width={180}
           height={90}
-          className="w-32 md:w-[180px] object-contain opacity-15 mx-auto mb-10 md:mb-12"
+          className="w-32 md:w-45 object-contain opacity-15 mx-auto mb-10 md:mb-12"
         />
 
         {/* Background Text: Adjusted font size and leading for mobile/tablet */}
-        <h3 className="text-[18vw] md:text-[14vw] lg:text-[12vw] font-serif uppercase tracking-tighter text-black/5 leading-[0.8] mb-12 select-none pointer-events-none break-words">
+        <h3 className="text-[18vw] md:text-[14vw] lg:text-[12vw] font-serif uppercase tracking-tighter text-black/5 leading-[0.8] mb-12 select-none pointer-events-none wrap-break-word">
           Daima <br className="md:hidden" /> Mkenya
         </h3>
 
