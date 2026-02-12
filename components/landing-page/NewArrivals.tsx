@@ -87,7 +87,7 @@ export default function NewArrivals() {
 
   useEffect(() => {
     if (isPaused) return;
-    const interval = setInterval(() => rotate('next'), 5000);
+    const interval = setInterval(() => rotate('next'), 3000);
     return () => clearInterval(interval);
   }, [rotate, isPaused]);
 
