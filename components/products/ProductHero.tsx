@@ -47,7 +47,7 @@ export default function ProductHero({
           )}
 
           {/* Bold Luxury Title */}
-          <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase italic">
+          <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase ">
             {safeTitle.length > 0 ? (
               safeTitle.map((line, index) => (
                 <span
