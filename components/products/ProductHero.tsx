@@ -45,14 +45,18 @@ export default function ProductHero({
               </p>
             </div>
           )}
-
+          
           {/* Bold Luxury Title */}
-          <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase ">
+          <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase">
             {safeTitle.length > 0 ? (
               safeTitle.map((line, index) => (
                 <span
                   key={index}
-                  className="block last:text-transparent last:stroke-white last:[-webkit-text-stroke:1px_white]"
+                  className={`block ${
+                    index === 0
+                      ? "text-transparent stroke-white [-webkit-text-stroke:1px_white]"
+                      : "text-white"
+                  }`}
                 >
                   {line}
                 </span>
