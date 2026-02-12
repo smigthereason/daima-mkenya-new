@@ -70,7 +70,7 @@ export default function RedesignedAboutPage() {
       className="bg-white text-black overflow-hidden font-sans mt-32"
     >
       {/* ── SECTION 1: THE MANIFESTO (EDITORIAL COVER) ── */}
-      <section className="relative min-h-[100svh] flex items-center px-6 md:px-12 lg:px-20 pt-24 pb-12 overflow-hidden">
+      <section className="relative min-h-svh flex items-center px-6 md:px-12 lg:px-20 pt-24 pb-12 overflow-hidden">
         {/* Background Monogram Accent - Adaptive width */}
         <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-[#f8f8f8] -z-10" />
 
@@ -83,10 +83,10 @@ export default function RedesignedAboutPage() {
 
         <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
           {/* Image Column: HIDDEN ON MOBILE (hidden), VISIBLE ON IPAD/DESKTOP (lg:block) */}
-          <div className="hidden lg:block lg:col-span-5 order-1 lg:order-2 w-full max-w-[450px] md:max-w-[600px] lg:max-w-none mx-auto">
+          <div className="hidden lg:block lg:col-span-5 order-1 lg:order-2 w-full max-w-112.5 md:max-w-150 lg:max-w-none mx-auto">
             <div className="relative lg:h-[80vh] w-full group">
               {/* Frame */}
-              <div className="absolute inset-0 border-[12px] md:border-[16px] lg:border-[24px] border-white z-20 shadow-2xl" />
+              <div className="absolute inset-0 border-12 md:border-16 lg:border-24 border-white z-20 shadow-2xl" />
 
               <Image
                 src={Hero44}
@@ -117,7 +117,7 @@ export default function RedesignedAboutPage() {
 
             <h1 className="text-[15vw] sm:text-7xl md:text-8xl lg:text-[8.5rem] xl:text-[10rem] font-serif leading-[0.85] lg:leading-[0.8] tracking-tighter uppercase mb-6">
               Legacy <br />
-              <span className="italic text-transparent bg-clip-text bg-gradient-to-r from-black via-[#006241] to-black">
+              <span className="italic text-transparent bg-clip-text bg-linear-to-r from-black via-[#006241] to-black">
                 Woven.
               </span>
             </h1>
@@ -149,8 +149,8 @@ export default function RedesignedAboutPage() {
         </div>
 
         {/* Luxury Borders */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-black via-[#be1e2d] to-[#006241]" />
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#006241] via-[#be1e2d] to-black" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-black via-[#be1e2d] to-[#006241]" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-[#006241] via-[#be1e2d] to-black" />
 
         <div className="relative z-10 text-center px-4 luxury-header">
           <h2 className="text-white text-[12vw] md:text-[8rem] font-serif uppercase tracking-[-0.05em] leading-[0.8] mb-6">
@@ -178,7 +178,7 @@ export default function RedesignedAboutPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
             <div className="space-y-8 group">
-              <div className="relative aspect-[3/4] overflow-hidden bg-white border border-neutral-200">
+              <div className="relative aspect-3/4 overflow-hidden bg-white border border-neutral-200">
                 <Image
                   src={Model4}
                   alt="Detail"
@@ -312,33 +312,50 @@ export default function RedesignedAboutPage() {
       </section>
 
       {/* ── FOOTER: TRICOLOR SIGNATURE ── */}
-      <footer className="py-24 bg-[#e8e8e8] border-t border-black/5 text-center">
+      <footer className="py-20 md:py-32 bg-[#e8e8e8] border-t border-black/5 text-center px-6 overflow-hidden">
+        {/* Logo: Scaled down slightly for mobile */}
         <Image
           src={Stripes}
           alt="Logo"
           width={180}
           height={90}
-          className="object-contain opacity-10 mx-auto mb-12"
+          className="w-32 md:w-[180px] object-contain opacity-15 mx-auto mb-10 md:mb-12"
         />
-        <h3 className="text-[12vw] font-serif uppercase tracking-tighter text-black/5 leading-none mb-12 select-none">
-          Daima Mkenya
+
+        {/* Background Text: Adjusted font size and leading for mobile/tablet */}
+        <h3 className="text-[18vw] md:text-[14vw] lg:text-[12vw] font-serif uppercase tracking-tighter text-black/5 leading-[0.8] mb-12 select-none pointer-events-none break-words">
+          Daima <br className="md:hidden" /> Mkenya
         </h3>
-        <div className="flex justify-center items-center gap-8 md:gap-16 text-[10px] uppercase tracking-[0.6em] font-black text-neutral-400">
+
+        {/* Motto: Flex-col on mobile to prevent overflow, Flex-row on Tablet/iPad Pro */}
+        <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 lg:gap-16 text-[9px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] font-black text-neutral-400">
           <span className="hover:text-black cursor-crosshair transition-colors">
             Always
           </span>
-          <span className="text-[#be1e2d] text-lg">●</span>
+
+          {/* Dots: Hidden on mobile to keep the stack clean */}
+          <span className="hidden md:block text-[#be1e2d] text-lg">●</span>
+
           <span className="hover:text-black cursor-crosshair transition-colors">
             Kenyan
           </span>
-          <span className="text-[#006241] text-lg">●</span>
+
+          <span className="hidden md:block text-[#006241] text-lg">●</span>
+
           <span className="hover:text-black cursor-crosshair transition-colors">
             Forever
           </span>
         </div>
-        <p className="mt-20 text-[9px] tracking-[0.3em] text-neutral-300 uppercase">
-          Nairobi HQ • 1.2921° S, 36.8219° E
-        </p>
+
+        {/* Coordinates: Responsive margin and font scaling */}
+        <div className="mt-16 md:mt-24 space-y-2">
+          <p className="text-[8px] md:text-[9px] tracking-[0.3em] text-neutral-400 uppercase">
+            © 2024 Daima Mkenya Ltd.
+          </p>
+          <p className="text-[8px] md:text-[9px] tracking-[0.3em] text-neutral-300 uppercase">
+            Nairobi HQ • 1.2921° S, 36.8219° E
+          </p>
+        </div>
       </footer>
     </div>
   );
