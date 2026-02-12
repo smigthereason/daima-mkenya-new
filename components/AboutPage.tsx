@@ -152,12 +152,12 @@ export default function RedesignedAboutPage() {
         <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-[#006241] via-[#be1e2d] to-black" />
 
         <div className="relative z-10 text-center px-4 luxury-header">
-          <h2 className="text-white text-[12vw] md:text-[8rem] font-serif uppercase tracking-[-0.05em] leading-[0.8] mb-6">
-            Sovereign <br />{" "}
-            <span className="text-[#be1e2d] italic">Style.</span>
+          <h2 className=" text-xl md:text-7xl font-serif  tracking-[-0.05em] leading-[1.2] text-white  mb-6">
+            Threads of Identity, Culture, Pride and Heritage.
+    
           </h2>
-          <p className="text-white text-[10px] md:text-xs tracking-[1em] uppercase opacity-60">
-            • Nairobi •
+          <p className="text-white text-[14px] md:text-xl tracking-[1.5em] uppercase opacity-60">
+            • DMA •
           </p>
         </div>
       </section>
