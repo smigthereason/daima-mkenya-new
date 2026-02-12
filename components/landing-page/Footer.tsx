@@ -19,7 +19,7 @@ const Footer = () => {
           <div>
             <nav className="flex space-x-6 text-sm font-medium mb-16 text-zinc-300">
               <a
-                href="#"
+                href="/products"
                 className="inline-block transition-all duration-500 ease-out hover:text-white hover:scale-110 active:scale-95"
               >
                 Products
