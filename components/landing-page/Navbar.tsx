@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { X, Heart, User, ShoppingBag, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { HeroImage2, Logo ,SideStripe } from "@/public/assets";
+import { HeroImage2, Logo, SideStripe } from "@/public/assets";
 import gsap from "gsap";
 
 const Navbar = () => {
@@ -101,7 +101,6 @@ const Navbar = () => {
                 draggable={false}
                 priority
               />
-
             </div>
             {/* Mobile Logo: Shown on small screens, hidden on md and up */}
             {/* <div className="block md:hidden">
@@ -126,17 +125,23 @@ const Navbar = () => {
         </div>
 
         {/* 3. Right Section: Icons */}
-        <div className="flex justify-end items-center gap-6">
+        {/* 3. Right Section: Icons */}
+        <div className="flex justify-end items-center gap-4 md:gap-6">
+          {/* Heart remains hidden on mobile to avoid clutter, but you can remove 'hidden sm:block' if you want it too */}
           <Heart
             size={20}
             className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700"
           />
+
+          {/* Login/User Icon - Now visible on mobile */}
           <Link href="/login">
             <User
               size={20}
-              className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700"
+              className="cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700"
             />
           </Link>
+
+          {/* Shopping Bag - Always visible */}
           <div className="relative cursor-pointer hover:scale-110 transition-transform">
             <ShoppingBag
               size={20}
