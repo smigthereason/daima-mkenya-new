@@ -1,4 +1,4 @@
-"use client"; // Change to client component to manage view state
+"use client"; 
 
 import { useState } from "react";
 import ProductCard from "@/components/ProductCard";
