@@ -5,376 +5,302 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowDown } from "lucide-react";
 import {
   Hero77,
-  Stripes,
-  Hero33,
+  Model5,
+  Model9,
   Hero44,
   Hero22,
   Hero66,
   Model4,
-  Model5,
+  SideStripe,
+  HeroImage,
 } from "@/public/assets";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function RedesignedAboutPage() {
+export default function AboutPage() {
   const containerRef = useRef(null);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // High-fashion reveal: Large text sliding up
-      gsap.from(".reveal-up", {
-        y: 100,
+      // Clean architectural reveal - mobile optimized
+      gsap.from(".reveal", {
+        y: 30,
         opacity: 0,
-        duration: 1.5,
-        ease: "expo.out",
-        stagger: 0.2,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
         scrollTrigger: {
-          trigger: ".reveal-up",
+          trigger: ".reveal",
           start: "top 90%",
         },
       });
 
-      // Parallax for high-fashion "Editorial" impact
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      gsap.utils.toArray(".parallax-img").forEach((img: any) => {
-        gsap.to(img, {
-          y: -80,
+      // Parallax for the overlapping image containers - disabled on mobile for performance
+      gsap.utils.toArray(".parallax-box").forEach((box: any) => {
+        gsap.to(box.querySelector("img"), {
+          yPercent: 10,
+          ease: "none",
           scrollTrigger: {
-            trigger: img,
+            trigger: box,
             scrub: true,
             start: "top bottom",
             end: "bottom top",
           },
         });
       });
-
-      // Versace-style Scale Entrance
-      gsap.from(".luxury-header", {
-        scale: 1.05,
-        opacity: 0,
-        duration: 2.5,
-        ease: "power4.out",
-      });
     }, containerRef);
     return () => ctx.revert();
   }, []);
 
+  // Typography strictly using Playfair variations for consistency
+  const serifDisplay = "font-serif tracking-tighter leading-[0.85]";
+  const serifSubheader =
+    "font-serif font-black uppercase tracking-[0.2em] text-[12px]";
+  const serifBody =
+    "font-serif font-normal tracking-tight leading-relaxed text-neutral-600";
+
   return (
     <div
       ref={containerRef}
-      className="bg-white text-black overflow-hidden font-sans mt-32"
+      className="bg-white text-[#1d1d1d] selection:bg-[#be1e2d] selection:text-white mt-16 md:mt-20 lg:mt-24 xl:mt-32"
     >
-      {/* ── SECTION 1: THE MANIFESTO (EDITORIAL COVER) ── */}
-      <section className="relative min-h-svh flex items-center px-6 md:px-12 lg:px-20 pt-24 pb-12 overflow-hidden">
-        {/* Background Monogram Accent - Adaptive width */}
-        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full bg-[#f8f8f8] -z-10" />
-
-        {/* Watermark: Centered on mobile since image is hidden */}
-        <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 opacity-[0.03] select-none pointer-events-none">
-          <h1 className="text-[28vw] md:text-[22vw] lg:text-[25vw] font-black leading-none uppercase tracking-tighter text-center lg:text-left lg:ml-[-2vw]">
-            Kenya
-          </h1>
-        </div>
-
-        <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center">
-          {/* Image Column: HIDDEN ON MOBILE (hidden), VISIBLE ON IPAD/DESKTOP (lg:block) */}
-          <div className="hidden lg:block lg:col-span-5 order-1 lg:order-2 w-full max-w-112.5 md:max-w-150 lg:max-w-none mx-auto">
-            <div className="relative lg:h-[80vh] w-full group">
-              {/* Frame */}
-              <div className="absolute inset-0 border-12 md:border-16 lg:border-24 border-white z-20 shadow-2xl" />
-
-              <Image
-                src={Hero44}
-                alt="Editorial"
-                fill
-                className="object-cover transition-all duration-1000 group-hover:scale-105"
-                priority
-                sizes="(max-width: 1366px) 50vw, 33vw"
-              />
-
-              {/* Tricolor Tagging */}
-              <div className="absolute -bottom-4 -left-4 z-30 flex flex-col shadow-xl scale-90 lg:scale-110 origin-bottom-left">
-                <div className="w-14 md:w-16 h-14 md:h-16 bg-black flex items-center justify-center text-white text-[9px] md:text-[10px] font-bold tracking-widest">
-                  2024
-                </div>
-                <div className="w-14 md:w-16 h-1 bg-[#be1e2d]" />
-                <div className="w-14 md:w-16 h-1 bg-white" />
-                <div className="w-14 md:w-16 h-1 bg-[#006241]" />
-              </div>
-            </div>
+      {/* ── SECTION 1: HERO & IDENTITY ── */}
+      <section className="relative min-h-[70vh] md:min-h-[60vh] lg:min-h-[70vh] xl:min-h-screen flex flex-col justify-center px-4 md:px-8 lg:px-12 xl:px-16 pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-12 md:pb-16 lg:pb-20">
+        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-12 items-center">
+          <div className="lg:col-span-7 space-y-4 md:space-y-6 lg:space-y-8 xl:space-y-10">
+            <h1 className={`${serifDisplay} text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[10vw] reveal`}>
+              Daima <br /> Mkenya
+            </h1>
+            <p
+              className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal italic`}
+            >
+              Daima Mkenya is a celebration of identity, crafted with intention.
+              Our approach is deliberate: Meaningful color, Uncompromising
+              quality, Considered design.
+            </p>
           </div>
 
-          {/* Text Content: Takes full width on mobile when image is hidden */}
-          <div className="lg:col-span-7 z-10 text-center lg:text-left order-2 lg:order-1">
-            <span className="text-[10px] md:text-xs tracking-[0.8em] text-[#be1e2d] uppercase font-bold mb-4 md:mb-6 block">
-              The Sovereign Collection
-            </span>
+          <div className="lg:col-span-5 relative mt-6 md:mt-8 lg:mt-0">
+            <div className="parallax-box aspect-[3/4] md:aspect-[4/5] lg:aspect-[3/4] xl:aspect-4/5 relative overflow-hidden rounded-sm shadow-2xl z-10 max-w-md lg:max-w-lg mx-auto lg:mx-0">
+              <Image
+                src={Hero44}
+                alt="Identity"
+                fill
+                className="object-cover scale-110"
+                priority
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 40vw, 35vw"
+              />
+            </div>
+            {/* Architectural Overlap Box - hidden on mobile/tablet, visible on desktop only */}
+            <div className="absolute -bottom-8 md:-bottom-10 xl:-bottom-10 -left-6 md:-left-8 xl:-left-10 w-2/3 aspect-square border-4 md:border-8 xl:border-10 border-white shadow-xl z-20 hidden xl:block overflow-hidden">
+              <Image 
+                src={Hero22} 
+                alt="Color" 
+                fill 
+                className="object-cover"
+                sizes="(max-width: 1366px) 20vw, 15vw"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <h1 className="text-[15vw] sm:text-7xl md:text-8xl lg:text-[8.5rem] xl:text-[10rem] font-serif leading-[0.85] lg:leading-[0.8] tracking-tighter uppercase mb-6">
-              Legacy <br />
-              <span className="italic text-transparent bg-clip-text bg-linear-to-r from-black via-[#006241] to-black">
-                Woven.
-              </span>
-            </h1>
+      {/* ── SECTION 2: MEANINGFUL COLOR ── */}
+      <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 bg-[#F9F9F9]">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 xl:gap-20 items-center">
+          <div className="space-y-4 md:space-y-6 lg:space-y-8 reveal order-2 lg:order-1">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-black" />
+              <h2 className={serifSubheader}>Meaningful Color</h2>
+            </div>
+            <p className={`${serifBody} text-sm md:text-base lg:text-lg xl:text-xl`}>
+              Our color palette draws inspiration from the colors of the Kenyan
+              flag - our symbol of unity and pride. Its colours are rich with
+              meaning: <span className="text-black font-black">black</span>{" "}
+              represents the people,{" "}
+              <span className="text-[#be1e2d] font-black">red</span> symbolizes
+              the struggle for freedom,
+              <span className="text-[#006241] font-black"> green</span>{" "}
+              celebrates our land and natural wealth, and{" "}
+              <span className="italic font-bold">white</span> stands for peace
+              and unity. Together, they reflect the spirit and pride of Kenya.
+            </p>
+          </div>
+          <div className="parallax-box aspect-[4/3] md:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[16/10] relative overflow-hidden rounded-sm shadow-lg order-1 lg:order-2 max-w-lg lg:max-w-xl mx-auto lg:mx-0">
+            <Image
+              src={SideStripe}
+              alt="Spirit of Kenya"
+              fill
+              priority
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 45vw, 40vw"
+            />
+          </div>
+        </div>
+      </section>
 
-            <p className="max-w-md mx-auto lg:mx-0 text-sm md:text-lg lg:text-xl font-light leading-relaxed text-neutral-600 px-4 md:px-0">
-              Where the ancestral pulse of the Rift Valley meets the sharp
-              precision of modern couture. We write history in silk and thread.
+      {/* ── SECTION 3: UNCOMPROMISING QUALITY ── */}
+      <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-16 items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <div className="parallax-box aspect-[3/4] md:aspect-[4/5] lg:aspect-[4/5] xl:aspect-3/4 relative overflow-hidden shadow-2xl max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0">
+              <Image 
+                src={Model5} 
+                alt="Quality" 
+                fill 
+                priority 
+                className="object-contain"
+                sizes="(max-width: 768px) 80vw, (max-width: 1024px) 60vw, (max-width: 1366px) 35vw, 30vw"
+              />
+            </div>
+          </div>
+          <div className="lg:col-span-7 order-1 lg:order-2 space-y-4 md:space-y-6 lg:space-y-8 reveal">
+            <h2
+              className={`${serifDisplay} text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl italic font-black`}
+            >
+              Uncompromising <br /> Quality
+            </h2>
+            <p className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl text-[#1d1d1d]`}>
+              We work exclusively with sustainable natural fibres, honoring the
+              purity of material and the integrity of craft, where texture,
+              color, and meaning come together to create pieces that are worn
+              with comfort and quiet confidence.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ── SECTION 2: THE GRAND ENTRANCE (VERSACE VIBE) ── */}
-      <section className="relative h-screen flex items-center justify-center bg-black overflow-hidden mt-20">
+      {/* ── SECTION 4: CONSIDERED DESIGN ── */}
+      <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 bg-[#1d1d1d] text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 xl:gap-24 items-start">
+          <div className="space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12 reveal order-2 lg:order-1">
+            <h2
+              className={`${serifDisplay} text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl text-white italic`}
+            >
+              Considered <br /> Design
+            </h2>
+            <div className="space-y-4 md:space-y-5 lg:space-y-6 xl:space-y-8">
+              <p className="font-serif font-light text-base md:text-lg lg:text-xl xl:text-2xl text-neutral-400">
+                At Daima Mkenya, we believe that identity is a story best worn.
+                Born in Kenya, yet destined for the world, our collection carry
+                pride, passion, and timeless elegance that transcend borders.
+              </p>
+              <p className="font-serif font-light text-base md:text-lg lg:text-xl text-neutral-400 italic border-l-2 border-[#be1e2d] pl-3 md:pl-4 lg:pl-5 xl:pl-6">
+                Each design is thoughtfully conceived, drawing inspiration from
+                the stories they carry, while balancing heritage with
+                contemporary sophistication.
+              </p>
+              <p className="font-serif font-black text-xs md:text-sm lg:text-base xl:text-lg tracking-widest uppercase text-white/90">
+                We invite you to wear more than a design. Wear a connection, a
+                legacy, a statement that is meaningful, considered, and
+                enduring.
+              </p>
+            </div>
+          </div>
+          <div className="parallax-box h-[35vh] md:h-[40vh] lg:h-[45vh] xl:h-[60vh] relative overflow-hidden bg-white/10 transition-all duration-1000 border border-white/10 order-1 lg:order-2">
+            <Image
+              src={HeroImage}
+              alt="Heritage"
+              fill
+              priority
+              className="object-contain scale-110"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 45vw, 40vw"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ── SECTION 6: THE GRAND ENTRANCE (VERSACE VIBE) ── */}
+      <section className="relative h-[60vh] md:h-[50vh] lg:h-[60vh] xl:h-screen flex items-center justify-center bg-black overflow-hidden font-serif">
         <div className="absolute inset-0 opacity-40">
           <video
             autoPlay
             loop
             muted
             playsInline
-            preload="auto" // Forces the browser to start downloading immediately
+            preload="auto"
             className="h-full w-full object-cover opacity-100 grayscale-20% brightness-[0.7]"
           >
             <source src="/assets/Kenya_Flag.mp4" type="video/mp4" />
           </video>
-
-          {/* Luxury Vignette Overlay */}
-          <div className="absolute inset-0 bg-linear-to-b from-black/60 via-transparent to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80" />
         </div>
 
-        {/* Luxury Borders */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-black via-[#be1e2d] to-[#006241]" />
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-linear-to-r from-[#006241] via-[#be1e2d] to-black" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-black via-[#be1e2d] to-[#006241]" />
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#006241] via-[#be1e2d] to-black" />
 
-        <div className="relative z-10 text-center px-4 luxury-header">
-          <h2 className=" text-xl md:text-7xl font-serif  tracking-[-0.05em] leading-[1.2] text-white  mb-6">
-            Threads of Identity, Culture, Pride and Heritage.
-    
+        <div className="relative z-10 text-center px-4 max-w-4xl lg:max-w-5xl mx-auto">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-5xl 2xl:text-7xl font-serif tracking-[-0.05em] leading-[1.4] text-white mb-3 md:mb-4 lg:mb-5 xl:mb-6">
+            Born from the colors of our nation, Daima Mkenya weaves identity,
+            unity, and pride into every thread.
           </h2>
-          <p className="text-white text-[14px] md:text-xl tracking-[1.5em] uppercase opacity-60">
-            • DMA •
+          <p className="text-white text-[10px] md:text-xs lg:text-sm xl:text-base tracking-[0.3em] md:tracking-[0.4em] lg:tracking-[0.5em] xl:tracking-[1em] uppercase opacity-70 font-bold">
+            • Born Here • <br className="block sm:hidden" />• Worn Everywhere •
           </p>
         </div>
       </section>
 
-      {/* ── SECTION 3: THE ANATOMY OF UNITY (LV TRUNK STYLE) ── */}
-      <section className="py-32 md:py-48 bg-white text-black">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-24 gap-8">
-            {/* Header: Centered on mobile, Left-aligned on desktop */}
-            <h2 className="text-6xl md:text-8xl font-serif tracking-tighter reveal-up uppercase text-center md:text-left">
-              Our <span className="text-[#006241]">Ethos</span>
-            </h2>
+      {/* ── SECTION 5: FINAL STATEMENT (THE HEARTBEAT) ── */}
+      <section className="py-16 md:py-20 lg:py-24 xl:py-40 px-4 text-center bg-white relative overflow-hidden">
+        {/* Subtle background pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, #000 1px, transparent 0)`,
+            backgroundSize: "40px 40px",
+          }}
+        />
 
-            {/* Decorative Line: Centered on mobile, Right-aligned on desktop */}
-            <div className="h-px w-full md:w-1/3 bg-black/10 mb-4 mx-auto md:mx-0" />
-          </div>
+        {/* Decorative top line */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-12 md:h-14 lg:h-16 xl:h-20 bg-gradient-to-b from-transparent via-neutral-300 to-black" />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 md:gap-12">
-            <div className="space-y-8 group">
-              <div className="relative aspect-3/4 overflow-hidden bg-white border border-neutral-200">
-                <Image
-                  src={Model4}
-                  alt="Detail"
-                  fill
-                  priority
-                  className="object-contain transition-transform duration-1000 scale-110 group-hover:scale-125"
-                />
-                <div className="absolute top-4 right-4 text-[10px] font-mono opacity-40">
-                  01 / Materiality
-                </div>
-              </div>
-              <h4 className="text-xs tracking-[0.6em] uppercase font-bold text-[#be1e2d]">
-                Sustainable Luxury
-              </h4>
-              <p className="text-neutral-500 font-light leading-loose text-sm italic font-serif">
-                "Fibers sourced from the heart of the Rift Valley, treated with
-                the reverence of high-luxury craftsmanship."
-              </p>
-            </div>
-
-            <div className="space-y-8 group md:translate-y-24">
-              <div className="relative aspect-3/4 overflow-hidden bg-white border-x-4 border-[#006241]">
-                <Image
-                  src={Hero66}
-                  alt="Detail"
-                  fill
-                  priority
-                  quality={100}
-                  className="object-cover transition-transform duration-1000 group-hover:scale-110"
-                />
-                <div className="absolute top-4 right-4 text-[10px] font-mono opacity-40">
-                  02 / Identity
-                </div>
-              </div>
-              <h4 className="text-xs tracking-[0.6em] uppercase font-bold">
-                Maasai Geometry
-              </h4>
-              <p className="text-neutral-500 font-light leading-loose text-sm">
-                Every silhouette is a dialogue. We incorporate Maasai geometric
-                principles into European structural tailoring.
-              </p>
-            </div>
-
-            <div className="space-y-8 group">
-              <div className="relative aspect-3/4 overflow-hidden bg-white border border-neutral-200">
-                <Image
-                  src={Model5}
-                  alt="Detail"
-                  fill
-                  priority
-                  className="object-contain scale-110 transition-transform duration-1000 group-hover:scale-125"
-                />
-                <div className="absolute top-4 right-4 text-[10px] font-mono opacity-40">
-                  03 / Integrity
-                </div>
-              </div>
-              <h4 className="text-xs tracking-[0.6em] uppercase font-bold text-[#006241]">
-                Forever Kenyan
-              </h4>
-              <p className="text-neutral-500 font-light leading-loose text-sm">
-                Produced in limited runs. We reject the fast-fashion cycle in
-                favor of the 'Forever Kenyan' philosophy.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── SECTION 4: THE RED GALLERY (REFINED EDITORIAL GRID) ── */}
-      <section className="relative py-24 bg-white overflow-hidden">
-        {/* Section Header */}
-        <div className="max-w-7xl mx-auto px-6 md:px-12 mb-12 flex flex-col justify-center items-center gap-6">
-          <div className="overflow-hidden text-center">
-            <h2 className="text-6xl md:text-8xl lg:text-9xl font-serif tracking-tighter uppercase leading-none">
-              Aes
-              <span className="italic text-transparent bg-clip-text bg-linear-to-r from-black via-[#be1e2d] to-[#006241]">
-                the
-              </span>
-              tic
-            </h2>
-          </div>
-
-        
-        </div>
-
-        {/* Interactive Gallery Grid */}
-        <div className="group relative h-[70vh] md:h-[80vh] bg-neutral-900 overflow-hidden">
-          <div className="absolute inset-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-            {[Hero33, Hero22, Hero77, Hero44].map((img, i) => (
-              <div
-                key={i}
-                className={`relative h-full border-b md:border-b-0 md:border-r border-white/5 
-                           grayscale hover:grayscale-0 opacity-60 hover:opacity-100 
-                           transition-all duration-1000 ease-in-out overflow-hidden
-                           ${i > 1 ? "hidden sm:block" : ""} ${i > 2 ? "hidden md:block" : ""}`}
-              >
-                <Image
-                  src={img}
-                  alt={`Editorial Gallery ${i}`}
-                  fill
-                  className="object-cover transition-transform duration-3000 ease-out hover:scale-110"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                />
-
-                {/* Luxury Hover Overlay */}
-                <div className="absolute inset-0 bg-[#be1e2d]/5 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-              </div>
-            ))}
-          </div>
-
-          {/* Floating Collection Tag (Luxury Detail) */}
-          <div className="absolute bottom-10 right-10 z-20 hidden lg:block">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-4">
-              <span className="text-white text-[10px] tracking-[0.8em] uppercase font-light">
-                Curated Vol. 04
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Kenyan Flag Accent Thread - Now positioned under the grid */}
-        <div className="w-full h-1 flex">
-          <div className="flex-1 bg-black" />
-          <div className="flex-1 bg-[#be1e2d]" />
-          <div className="flex-1 bg-[#006241]" />
-        </div>
-      </section>
-
-      {/* ── SECTION 5: THE ATELIER CALL ── */}
-      <section className="py-48 bg-white text-black text-center relative">
-        <div className="max-w-4xl mx-auto px-6 reveal-up">
-          <span className="text-[10px] tracking-[1em] uppercase mb-12 block text-neutral-400 font-bold">
-            Join the Legacy
+        {/* Brand Statement */}
+        <div className="max-w-3xl mx-auto text-center px-4 relative z-10">
+          {/* Opening quote mark */}
+          <span className="block text-4xl md:text-5xl lg:text-6xl text-red-500 font-serif mb-3 md:mb-4 lg:mb-5 xl:mb-6">
+            "
           </span>
-          <h2 className="text-5xl md:text-8xl font-serif mb-20 leading-[0.9] tracking-tighter">
-            Crafted for those who <br />{" "}
-            <span className="italic ">lead the world.</span>
-          </h2>
 
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl text-neutral-800 font-light leading-relaxed font-serif">
+            Each piece is our heartbeat worn proudly,
+            <span className="block mt-1 md:mt-2 text-neutral-900 font-medium">
+              carrying Kenya's spirit wherever it goes.
+            </span>
+          </p>
+
+          {/* Closing quote mark */}
+          <span className="block text-4xl md:text-5xl lg:text-6xl text-green-600 font-serif mt-3 md:mt-4 lg:mt-5 xl:mt-6 rotate-180">
+            "
+          </span>
+
+          {/* Decorative divider */}
+          <div className="mt-12 md:mt-14 lg:mt-16 xl:mt-20 flex items-center justify-center gap-2 md:gap-2 lg:gap-2 xl:gap-3">
+            <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-neutral-400" />
+            <div className="w-1 md:w-1.5 lg:w-1.5 xl:w-2 h-1 md:h-1.5 lg:h-1.5 xl:h-2 rounded-full bg-neutral-500" />
+            <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-neutral-400" />
+          </div>
+
+          {/* Optional: Small brand signature */}
+          <p className="mt-4 md:mt-5 lg:mt-6 xl:mt-8 text-[9px] md:text-[10px] lg:text-[11px] xl:text-xs uppercase tracking-[0.15em] md:tracking-[0.2em] lg:tracking-[0.25em] xl:tracking-[0.3em] text-neutral-400 font-light">
+            — Daima MKenya —
+          </p>
+          
           <Link
             href="/products"
-            className="group relative inline-flex items-center gap-8 py-8 px-16 border border-black/10 overflow-hidden transition-all hover:border-black"
+            className="group relative inline-flex items-center gap-3 md:gap-4 lg:gap-6 xl:gap-8 py-4 md:py-5 lg:py-6 xl:py-8 px-8 md:px-10 lg:px-12 xl:px-16 border border-black/10 overflow-hidden transition-all hover:border-black mt-6 md:mt-7 lg:mt-8 xl:mt-10"
           >
-            <span className="relative z-10 text-[11px] font-bold uppercase tracking-[0.8em] group-hover:text-white transition-colors duration-500">
+            <span className="relative z-10 text-[9px] md:text-[10px] lg:text-[11px] xl:text-[11px] font-bold uppercase tracking-[0.3em] md:tracking-[0.4em] lg:tracking-[0.5em] xl:tracking-[0.8em] group-hover:text-white transition-colors duration-500">
               Enter The Atelier
             </span>
             <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]" />
           </Link>
         </div>
       </section>
-
-      {/* ── FOOTER: TRICOLOR SIGNATURE ── */}
-      <footer className="py-20 md:py-32 bg-[#e8e8e8] border-t border-black/5 text-center px-6 overflow-hidden">
-        {/* Logo: Scaled down slightly for mobile */}
-        <Image
-          src={Stripes}
-          alt="Logo"
-          width={180}
-          height={90}
-          className="w-32 md:w-45 object-contain opacity-15 mx-auto mb-10 md:mb-12"
-        />
-
-        {/* Background Text: Adjusted font size and leading for mobile/tablet */}
-        <h3 className="text-[18vw] md:text-[14vw] lg:text-[12vw] font-serif uppercase tracking-tighter text-black/5 leading-[0.8] mb-12 select-none pointer-events-none wrap-break-word">
-          Daima <br className="md:hidden" /> Mkenya
-        </h3>
-
-        {/* Motto: Flex-col on mobile to prevent overflow, Flex-row on Tablet/iPad Pro */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-8 lg:gap-16 text-[9px] md:text-[10px] uppercase tracking-[0.4em] md:tracking-[0.6em] font-black text-neutral-400">
-          <span className="hover:text-black cursor-crosshair transition-colors">
-            Always
-          </span>
-
-          {/* Dots: Hidden on mobile to keep the stack clean */}
-          <span className="hidden md:block text-[#be1e2d] text-lg">●</span>
-
-          <span className="hover:text-black cursor-crosshair transition-colors">
-            Kenyan
-          </span>
-
-          <span className="hidden md:block text-[#006241] text-lg">●</span>
-
-          <span className="hover:text-black cursor-crosshair transition-colors">
-            Forever
-          </span>
-        </div>
-
-        {/* Coordinates: Responsive margin and font scaling */}
-        <div className="mt-16 md:mt-24 space-y-2">
-          <p className="text-[8px] md:text-[9px] tracking-[0.3em] text-neutral-400 uppercase">
-            © 2024 Daima Mkenya Ltd.
-          </p>
-          <p className="text-[8px] md:text-[9px] tracking-[0.3em] text-neutral-300 uppercase">
-            Nairobi HQ • 1.2921° S, 36.8219° E
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }
