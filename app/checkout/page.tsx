@@ -1,33 +1,39 @@
-"use client"; 
+"use client";
 
-import { useState } from "react";
-import ProductCard from "@/components/ProductCard";
 import CheckOutPage from "@/components/CheckOutPage";
-import { getAllProducts, Product } from "@/types/Product";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
 
-export default function Page() {
-  const [view, setView] = useState<"product" | "checkout">("product");
-  const [orderData, setOrderData] = useState<{
-    product: Product;
-    size: string;
-    color: { name: string; hex: string };
-  } | null>(null);
+export default function CheckoutRoute() {
+  const router = useRouter();
+  const { cartItems } = useCart();
+  
+  // We still check for an empty cart to show the empty state UI
+  const hasItems = cartItems.length > 0;
 
-  const handlePurchase = (product: Product, size: string, color: { name: string; hex: string }) => {
-    setOrderData({ product, size, color });
-    setView("checkout");
-  };
-
-  if (view === "checkout" && orderData) {
+  if (!hasItems) {
     return (
-      <CheckOutPage
-        product={orderData.product}
-        selectedSize={orderData.size}
-        selectedColor={orderData.color}
-        onBack={() => setView("product")}
-      />
+      <div className="min-h-screen flex flex-col items-center justify-center uppercase tracking-[0.5em] text-gray-400">
+        Your bag is empty
+        <button 
+          onClick={() => router.push("/products")} 
+          className="mt-10 text-black font-bold border-b border-black"
+        >
+          Continue Shopping
+        </button>
+      </div>
     );
   }
 
-  return <ProductCard onPurchase={handlePurchase} />;
+  return (
+    <main>
+      {/* FIX: Removed product, selectedSize, and selectedColor props.
+        The CheckOutPage component now retrieves all cart data 
+        internally using the useCart hook.
+      */}
+      <CheckOutPage 
+        onBack={() => router.back()} 
+      />
+    </main>
+  );
 }
