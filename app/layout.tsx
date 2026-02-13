@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/landing-page/Navbar";
+import Footer from "@/components/landing-page/Footer"
 import { CartProvider } from "@/context/CartContext";
 
 const playfair = Playfair_Display({
@@ -29,6 +30,7 @@ export default function RootLayout({
         <CartProvider>
           <Navbar />
           {children}
+          <Footer/>
         </CartProvider>
       </body>
     </html>
