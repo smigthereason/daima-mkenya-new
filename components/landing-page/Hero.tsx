@@ -5,7 +5,7 @@ import Image from "next/image";
 import {
   WomanHero,
   ManHero,
-  Stripes,
+  HeroStripe,
   Hero22,
   Hero33,
   Hero44,
@@ -34,9 +34,21 @@ export default function Hero() {
       });
 
       tl.to(manRef.current, { x: "-100%", duration: 1.5, ease: "expo.inOut" })
-        .to(womanRef.current, { x: "100%", duration: 1.5, ease: "expo.inOut" }, "<")
-        .to(bgBlackRef.current, { x: "-100%", duration: 1.5, ease: "expo.inOut" }, "<")
-        .to(bgGreenRef.current, { x: "100%", duration: 1.5, ease: "expo.inOut" }, "<")
+        .to(
+          womanRef.current,
+          { x: "100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
+        .to(
+          bgBlackRef.current,
+          { x: "-100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
+        .to(
+          bgGreenRef.current,
+          { x: "100%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
         .fromTo(
           [innerLeftRef.current, innerRightRef.current],
           { y: (i) => (i === 0 ? "-100%" : "100%"), opacity: 0 },
@@ -45,7 +57,12 @@ export default function Hero() {
         )
         .to(
           [manRef.current, womanRef.current],
-          { y: (i) => (i === 0 ? "100%" : "-100%"), opacity: 0, duration: 1.2, ease: "expo.in" },
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.2,
+            ease: "expo.in",
+          },
           "+=1",
         )
         .fromTo(
@@ -56,12 +73,34 @@ export default function Hero() {
         )
         .to(
           [innerLeftRef.current, innerRightRef.current],
-          { y: (i) => (i === 0 ? "100%" : "-100%"), opacity: 0, duration: 1.5, ease: "expo.inOut" },
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
           "+=1",
         )
-        .to([manRef.current, womanRef.current], { x: "0%", y: "0%", opacity: 1, duration: 1.5, ease: "expo.inOut" }, "<")
-        .to([outerLeftReplaceRef.current, outerRightReplaceRef.current], { y: (i) => (i === 0 ? "100%" : "-100%"), opacity: 0, duration: 1.5, ease: "expo.inOut" }, "<")
-        .to([bgBlackRef.current, bgGreenRef.current], { x: "0%", duration: 1.5, ease: "expo.inOut" }, "<");
+        .to(
+          [manRef.current, womanRef.current],
+          { x: "0%", y: "0%", opacity: 1, duration: 1.5, ease: "expo.inOut" },
+          "<",
+        )
+        .to(
+          [outerLeftReplaceRef.current, outerRightReplaceRef.current],
+          {
+            y: (i) => (i === 0 ? "100%" : "-100%"),
+            opacity: 0,
+            duration: 1.5,
+            ease: "expo.inOut",
+          },
+          "<",
+        )
+        .to(
+          [bgBlackRef.current, bgGreenRef.current],
+          { x: "0%", duration: 1.5, ease: "expo.inOut" },
+          "<",
+        );
     });
 
     return () => ctx.revert();
@@ -83,25 +122,79 @@ export default function Hero() {
 
       {/* ── MODELS / IMAGE SLIDESHOW LAYER ── */}
       <div className="absolute inset-0 z-20 w-full h-full">
-        <div ref={manRef} className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full z-20">
-          <Image src={ManHero} alt="Man" fill className="object-cover" priority />
+        <div
+          ref={manRef}
+          className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full z-20"
+        >
+          <Image
+            src={ManHero}
+            alt="Man"
+            fill
+            className="object-cover"
+            priority
+          />
         </div>
-        <div ref={womanRef} className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full z-20">
-          <Image src={WomanHero} alt="Woman" fill className="object-cover" priority />
+        <div
+          ref={womanRef}
+          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full z-20"
+        >
+          <Image
+            src={WomanHero}
+            alt="Woman"
+            fill
+            className="object-cover"
+            priority
+          />
         </div>
 
-        <div ref={innerLeftRef} className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full bottom-0 opacity-0 pointer-events-none">
-          <Image src={Hero22} alt="Inner Left" fill priority className="object-cover" />
+        <div
+          ref={innerLeftRef}
+          className="absolute left-0 md:left-[20%] w-1/2 md:w-[20%] h-full bottom-0 opacity-0 pointer-events-none"
+        >
+          <Image
+            src={Hero22}
+            alt="Inner Left"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
-        <div ref={innerRightRef} className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none">
-          <Image src={Hero33} alt="Inner Right" fill priority className="object-cover" />
+        <div
+          ref={innerRightRef}
+          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none"
+        >
+          <Image
+            src={Hero33}
+            alt="Inner Right"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
 
-        <div ref={outerLeftReplaceRef} className="absolute left-0 md:left-[0%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none">
-          <Image src={Hero77} alt="Outer Left" fill priority className="object-cover" />
+        <div
+          ref={outerLeftReplaceRef}
+          className="absolute left-0 md:left-[0%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
+        >
+          <Image
+            src={Hero77}
+            alt="Outer Left"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
-        <div ref={outerRightReplaceRef} className="absolute left-1/2 md:left-[80%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none">
-          <Image src={Hero44} alt="Outer Right" fill priority className="object-cover" />
+        <div
+          ref={outerRightReplaceRef}
+          className="absolute left-1/2 md:left-[80%] w-1/2 md:w-[20%] h-full opacity-0 pointer-events-none"
+        >
+          <Image
+            src={Hero44}
+            alt="Outer Right"
+            fill
+            priority
+            className="object-cover"
+          />
         </div>
       </div>
 
@@ -113,36 +206,23 @@ export default function Hero() {
 
       {/* ── CENTERED CONTENT ── */}
       <div className="relative z-30 flex flex-col items-center text-center w-[90%] md:w-full pointer-events-none">
-        
         {/* LOGO STRIPES: Added a strong drop shadow for mobile pop */}
         <div className="relative w-40 h-20 md:w-64 md:h-32 lg:w-160 lg:h-100 mb-2 md:mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
           <Image
-            src={Stripes}
+            src={HeroStripe}
             alt="Logo"
             priority
             fill
             className="object-contain brightness-200 md:brightness-100 md:mix-blend-multiply"
           />
         </div>
-        
+
         {/* 2. EDITORIAL TYPOGRAPHY:
             - Used a tighter tracking on mobile for that "Luxury Branding" feel.
             - Added 'drop-shadow-2xl' to ensure every letter is readable against the photos.
         */}
         <h1 className="text-[12vw] sm:text-5xl md:text-7xl lg:text-[7.5rem] font-serif mb-4 md:mb-6 tracking-[-0.02em] text-white drop-shadow-2xl">
-          <span className="flex justify-center items-baseline gap-x-0.5 md:gap-x-2 whitespace-nowrap">
-            <span className="text-[#be1e2d] md:drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]">D</span>
-            <span>a</span>
-            <span className="text-white md:text-black">i</span>
-            <span>m</span>
-            <span className="text-[#006241]">a</span>
-            <span className="ml-2 md:ml-4 text-white md:text-black md:drop-shadow-[0_2px_2px_rgba(255,255,255,0.2)]">M</span>
-            <span>K</span>
-            <span className="text-[#006241]">e</span>
-            <span>n</span>
-            <span className="text-[#be1e2d]">y</span>
-            <span>a</span>
-          </span>
+          Daima MKenya
         </h1>
 
         {/* 3. SUBTITLE: 

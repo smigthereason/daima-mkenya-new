@@ -11,6 +11,7 @@ import WomanHero from './d-woman.png';
 import Logo from './Logo_no-bg.png';
 import Stripes from './Logo_Stripes.png';
 import SideStripe from './SideStripe.png'
+import HeroStripe from './Stripe2.png';
 import Hero22 from './Hero22.png';
 import Hero33 from './Hero33.png';
 import Hero44 from './Hero44.png';
@@ -56,6 +57,7 @@ import Product15 from './15.152.png';
 
 export {
    // Hero
+   HeroStripe,
    HeroImage,
    HeroImage2,
    HeroImage3,
