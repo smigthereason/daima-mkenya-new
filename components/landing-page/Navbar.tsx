@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { X, Heart, User, ShoppingBag, ChevronRight } from "lucide-react";
+import { X, Search, User, ShoppingBag, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { HeroImage2, Logo, SideStripe } from "@/public/assets";
@@ -58,11 +58,12 @@ const Navbar = () => {
   }, [isOpen]);
 
   const navLinks = [
+    { name: "About Us", badge: null, path: "/about" },
+    { name: "Products", badge: null, path: "/products" },
+    { name: "Gallery", badge: null, path: "#" },
     { name: "Men", badge: null, path: "#" },
     { name: "Women", badge: null, path: "#" },
-    { name: "Kids", badge: null, path: "#" },
-    { name: "All Products", badge: null, path: "/products" },
-    { name: "About Us", badge: null, path: "/about" },
+    { name: "Kids", badge: "coming soon", path: "#" },
   ];
 
   return (
@@ -99,7 +100,7 @@ const Navbar = () => {
 
         {/* RIGHT: ICONS */}
         <div className="flex justify-end items-center gap-4 md:gap-6">
-          <Heart size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700" />
+          <Search size={20} className="hidden sm:block cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700" />
           <Link href="/login">
             <User size={20} className="cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700" />
           </Link>
@@ -146,7 +147,7 @@ const Navbar = () => {
                   <span className="relative">
                     {link.name}
                     {link.badge && (
-                      <span className="absolute -top-2 -right-10 text-[10px] text-[#be1e2d] font-bold tracking-tighter uppercase">
+                      <span className="absolute top-14 -right-22 text-[12px] text-[#be1e2d] font-bold tracking-tighter uppercase">
                         {link.badge}
                       </span>
                     )}
