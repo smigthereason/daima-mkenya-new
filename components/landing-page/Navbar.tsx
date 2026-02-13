@@ -135,8 +135,8 @@ const Navbar = () => {
           </div>
 
           {/* CONTENT */}
-          <div className="mt-20 grid grid-cols-1 md:grid-cols-2 gap-10 flex-1">
-            <div className="flex flex-col gap-4">
+          <div className="mt-12 md:mt-20 grid grid-cols-1 md:grid-cols-2 gap-10 flex-1 overflow-y-auto">
+            <div className="flex flex-col gap-2 md:gap-4">
               {navLinks.map((link, index) => (
                 <Link
                   key={index}
@@ -144,10 +144,10 @@ const Navbar = () => {
                   onClick={() => setIsOpen(false)}
                   className="menu-item group flex items-center justify-between text-4xl md:text-7xl font-light text-black border-b border-transparent py-2 transition-all"
                 >
-                  <span className="relative">
+                  <span className="relative flex items-baseline">
                     {link.name}
                     {link.badge && (
-                      <span className="absolute top-14 -right-22 text-[12px] text-[#be1e2d] font-bold tracking-tighter uppercase">
+                      <span className="ml-3 text-[9px] leading-none md:absolute md:ml-0 md:top-14 md:-right-22 md:text-[12px] text-[#be1e2d] font-bold tracking-tighter uppercase whitespace-nowrap">
                         {link.badge}
                       </span>
                     )}
@@ -172,7 +172,7 @@ const Navbar = () => {
           </div>
 
           {/* FOOTER */}
-          <div className="mt-auto flex justify-between items-end border-t border-gray-100 pt-8 text-[10px] tracking-[0.2em] uppercase">
+          <div className="mt-auto flex flex-col sm:flex-row justify-between items-center sm:items-end border-t border-gray-100 pt-8 pb-4 md:pb-0 text-[10px] tracking-[0.2em] uppercase gap-6">
             <div className="flex gap-8 font-bold">
               <span className="hover:text-[#be1e2d] cursor-pointer transition-colors">Instagram</span>
               <span className="hover:text-[#be1e2d] cursor-pointer transition-colors">Facebook</span>
