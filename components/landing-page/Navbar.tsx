@@ -60,7 +60,7 @@ const Navbar = () => {
   const navLinks = [
     { name: "About Us", badge: null, path: "/about" },
     { name: "Products", badge: null, path: "/products" },
-    { name: "Gallery", badge: null, path: "#" },
+    { name: "Gallery", badge: null, path: "/gallery" },
     { name: "Men", badge: null, path: "#" },
     { name: "Women", badge: null, path: "#" },
     { name: "Kids", badge: "coming soon", path: "#" },
