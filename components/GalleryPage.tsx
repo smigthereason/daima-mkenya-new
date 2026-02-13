@@ -102,7 +102,7 @@ const GalleryPage = () => {
                 width={800}
                 height={1000}
                 className="w-full h-auto object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
-                priority={index < 2}
+                priority
               />
               
               {/* Overlay Gradient (Desktop) */}
@@ -165,6 +165,7 @@ const GalleryPage = () => {
                 src={Assets.HeroImage || Assets.Model11} 
                 alt="editorial focus" 
                 fill
+                priority
                 sizes="(max-width: 1024px) 100vw, 40vw"
                 className="object-cover transition-all duration-1000 scale-105 group-hover:scale-100"
             />
@@ -202,7 +203,7 @@ const GalleryPage = () => {
       </section>
 
       <footer className="mt-24 md:mt-40 text-center">
-        <Image src={Assets.Logo} alt="Logo" width={60} height={60} className="mx-auto opacity-20" />
+        <Image src={Assets.Logo} alt="Logo" width={60} height={60} priority className="mx-auto opacity-20" />
         <p className="text-[8px] md:text-[9px] uppercase tracking-[0.4em] text-neutral-400 mt-6 md:mt-8 px-4">
           © {new Date().getFullYear()} DAIMA MKENYA AFRICA — ALL RIGHTS RESERVED
         </p>

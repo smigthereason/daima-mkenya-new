@@ -104,6 +104,7 @@ export default function AboutPage() {
                 src={Hero22}
                 alt="Color"
                 fill
+                priority
                 className="object-cover"
                 sizes="(max-width: 1366px) 20vw, 15vw"
               />
