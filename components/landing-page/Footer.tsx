@@ -45,7 +45,8 @@ const Footer = () => {
             </nav>
 
             <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl uppercase font-semibold tracking-tight leading-tight mb-8 md:mb-12 lg:mb-16">
-              UNITY IN <br className="block md:hidden" />EVERY THREAD
+              UNITY IN <br className="block md:hidden" />
+              EVERY THREAD
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8 mb-8 md:mb-12 lg:mb-16">
@@ -105,10 +106,10 @@ const Footer = () => {
                  hover:bg-zinc-900 hover:text-white hover:scale-110 
                  border border-transparent hover:border-zinc-400"
                 >
-                  <Icon 
-                    size={16} 
-                    className="md:w-5 md:h-5" 
-                    fill={idx === 1 ? "currentColor" : "none"} 
+                  <Icon
+                    size={16}
+                    className="md:w-5 md:h-5"
+                    fill={idx === 1 ? "currentColor" : "none"}
                   />
                 </a>
               ))}
@@ -117,7 +118,7 @@ const Footer = () => {
         </div>
 
         {/* Right Section: Visual / Product Card */}
-        <div className="relative group overflow-hidden flex md:hidden lg:flex product-visual min-h-[300px] md:min-h-[400px] lg:min-h-full">
+        <div className="relative group overflow-hidden flex md:hidden lg:flex product-visual min-h-[250px] sm:min-h-[300px] md:min-h-[350px] lg:min-h-full">
           <Image
             src={HeroImage2}
             alt="Person wearing Daima Mkenya"
@@ -126,24 +127,37 @@ const Footer = () => {
             draggable={false}
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 40vw"
           />
-          <div className="absolute top-4 md:top-6 lg:top-8 left-4 md:left-6 lg:left-8 text-white">
-            <h3 className="text-lg md:text-xl lg:text-2xl font-medium">Daima Mkenya Africa</h3>
-            <p className="text-zinc-300 text-xs md:text-sm">Premium Clothing Line</p>
+
+          {/* Text overlay - responsive positioning */}
+          <div className="absolute top-3 sm:top-4 md:top-6 lg:top-8 left-3 sm:left-4 md:left-6 lg:left-8 text-white max-w-[60%] sm:max-w-[70%]">
+            <h3 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium leading-tight">
+              Daima Mkenya <br className="hidden sm:block" />
+              Africa
+            </h3>
+            <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm mt-1">
+              Premium Clothing Line
+            </p>
           </div>
 
-          <div className="absolute bottom-4 md:bottom-6 lg:bottom-8 right-4 md:right-6 lg:right-8">
-            <button className="bg-white text-black p-4 md:p-5 lg:p-6 flex flex-col items-start gap-2 md:gap-3 lg:gap-4 hover:bg-zinc-100 transition-all duration-300 w-36 md:w-40 lg:w-48 shadow-2xl hover:shadow-xl hover:scale-105">
-              <div className="w-full flex justify-end">
+          {/* Responsive Button */}
+          <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 lg:bottom-8 right-3 sm:right-4 md:right-6 lg:right-8">
+            <button
+              className="group/btn bg-white text-black hover:bg-zinc-100 transition-all duration-300 shadow-2xl hover:shadow-xl hover:scale-105
+    p-3 sm:p-4 md:p-5 lg:p-6
+    w-28 sm:w-32 md:w-36 lg:w-40 xl:w-48
+  "
+            >
+              <div className="flex items-center justify-between w-full">
+                <span className="text-left font-semibold leading-tight text-[10px] sm:text-xs md:text-sm">
+                  See the <br className="block sm:hidden" />
+                  Product <br className="hidden sm:block" />
+                  Specification
+                </span>
                 <ArrowRight
-                  size={16}
-                  className="group-hover:translate-x-2 transition-transform duration-300"
+                  size={14}
+                  className="sm:w-4 sm:h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 sm:group-hover/btn:translate-x-2 transition-transform duration-300 flex-shrink-0 ml-1 sm:ml-2"
                 />
               </div>
-              <span className="text-left text-xs md:text-sm font-semibold leading-tight">
-                See the Product
-                <br />
-                Specification
-              </span>
             </button>
           </div>
         </div>
