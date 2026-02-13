@@ -1,34 +1,35 @@
 // app/layout.tsx
+
 import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-// Remove the 'dynamic' import line entirely
-import Navbar from "@/components/landing-page/Navbar"; // Keep only this one
-import Footer from "@/components/landing-page/Footer";
+import Navbar from "@/components/landing-page/Navbar";
+import { CartProvider } from "@/context/CartContext";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "700", "900"],
   style: ["normal", "italic"],
-  display: "swap"
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: 'Daima Mkenya Africa | Unity in Every Thread',
-  description: 'Kenyan Clothing Line',
+  title: "DMA Studio | Luxury Exotic Leather",
+  description: "Exquisite handmade exotic leather goods",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}>
-        <Navbar />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          {children}
+        </CartProvider>
       </body>
     </html>
   );
