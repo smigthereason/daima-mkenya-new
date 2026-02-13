@@ -98,31 +98,40 @@ export default function ProductCard({ productId = 1 }: { productId?: number }) {
     >
       
       {/* Navigation Arrows */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 xl:left-auto xl:translate-x-0 xl:top-10 xl:right-12 z-30 flex items-center gap-8">
-        <div className="flex items-center gap-8 bg-white/60 backdrop-blur-md px-6 py-3 rounded-full border border-gray-200/50 shadow-sm">
-          <button 
-            onClick={() => {
-              const prevIndex = currentProductIndex === 0 ? allProducts.length - 1 : currentProductIndex - 1;
-              handleProductTransition(prevIndex);
-            }} 
-            className="hover:opacity-30 p-1 cursor-pointer"
-          >
-            <ChevronLeft size={24} />
-          </button>
-          <span className="text-[14px] tracking-[0.5em] text-gray-500 font-light">
-            {String(currentProductIndex + 1).padStart(2, "0")} / {String(allProducts.length).padStart(2, "0")}
-          </span>
-          <button 
-            onClick={() => {
-              const nextIndex = (currentProductIndex + 1) % allProducts.length;
-              handleProductTransition(nextIndex);
-            }} 
-            className="hover:opacity-30 p-1 cursor-pointer"
-          >
-            <ChevronRight size={24} />
-          </button>
-        </div>
-      </div>
+   <div className="absolute top-92 md:top-10 left-1/2 -translate-x-1/2 xl:left-auto xl:translate-x-0 xl:top-10 xl:right-12 z-30 flex items-center gap-8">
+  <div className="flex items-left gap-8 bg-white/60 backdrop-blur-md px-6 py-3 rounded-full border border-gray-200/50 shadow-sm">
+    <button 
+      onClick={() => {
+        const prevIndex = currentProductIndex === 0 ? allProducts.length - 1 : currentProductIndex - 1;
+        handleProductTransition(prevIndex);
+      }} 
+      className="hover:opacity-30 p-1 cursor-pointer"
+    >
+      <ChevronLeft size={24} />
+    </button>
+
+    {/* 📱 Mobile version: no spaces, normal tracking */}
+    <span className="text-[14px] text-gray-500 font-light xl:hidden tracking-normal">
+      {String(currentProductIndex + 1).padStart(2, "0")}/
+      {String(allProducts.length).padStart(2, "0")}
+    </span>
+
+    {/* 🖥️ Desktop version: with spaces, wide tracking */}
+    <span className="text-[14px] text-gray-500 font-light hidden xl:inline tracking-[0.5em]">
+      {String(currentProductIndex + 1).padStart(2, "0")} / {String(allProducts.length).padStart(2, "0")}
+    </span>
+
+    <button 
+      onClick={() => {
+        const nextIndex = (currentProductIndex + 1) % allProducts.length;
+        handleProductTransition(nextIndex);
+      }} 
+      className="hover:opacity-30 p-1 cursor-pointer"
+    >
+      <ChevronRight size={24} />
+    </button>
+  </div>
+</div>
 
       {/* Left Panel */}
       <div className="order-2 xl:order-1 flex flex-col w-full xl:w-[32%] p-8 md:p-12 xl:p-16 border-r border-gray-50 bg-white">
