@@ -73,13 +73,15 @@ export default function AboutPage() {
       <section className="relative min-h-[70vh] md:min-h-[60vh] lg:min-h-[70vh] xl:min-h-screen flex flex-col justify-center px-4 md:px-8 lg:px-12 xl:px-16 pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-12 md:pb-16 lg:pb-20">
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-12 items-center">
           <div className="lg:col-span-7 space-y-4 md:space-y-6 lg:space-y-8 xl:space-y-10">
-            <h1 className={`${serifDisplay} text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[10vw] reveal`}>
-              Daima <br /> Mkenya
+            <h1
+              className={`${serifDisplay} text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[10vw] reveal`}
+            >
+              Daima <br /> Mkenya <br /> Africa
             </h1>
             <p
-              className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal italic`}
+              className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal `}
             >
-              Daima Mkenya is a celebration of identity, crafted with intention.
+              Daima Mkenya Africa is a celebration of identity, crafted with intention.
               Our approach is deliberate: Meaningful color, Uncompromising
               quality, Considered design.
             </p>
@@ -98,10 +100,10 @@ export default function AboutPage() {
             </div>
             {/* Architectural Overlap Box - hidden on mobile/tablet, visible on desktop only */}
             <div className="absolute -bottom-8 md:-bottom-10 xl:-bottom-10 -left-6 md:-left-8 xl:-left-10 w-2/3 aspect-square border-4 md:border-8 xl:border-10 border-white shadow-xl z-20 hidden xl:block overflow-hidden">
-              <Image 
-                src={Hero22} 
-                alt="Color" 
-                fill 
+              <Image
+                src={Hero22}
+                alt="Color"
+                fill
                 className="object-cover"
                 sizes="(max-width: 1366px) 20vw, 15vw"
               />
@@ -113,12 +115,15 @@ export default function AboutPage() {
       {/* ── SECTION 2: MEANINGFUL COLOR ── */}
       <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 bg-[#F9F9F9]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 xl:gap-20 items-center">
-          <div className="space-y-4 md:space-y-6 lg:space-y-8 reveal order-2 lg:order-1">
+          {/* Text - First on mobile, left on desktop */}
+          <div className="space-y-4 md:space-y-6 lg:space-y-8 reveal order-1 lg:order-1">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-black" />
               <h2 className={serifSubheader}>Meaningful Color</h2>
             </div>
-            <p className={`${serifBody} text-sm md:text-base lg:text-lg xl:text-xl`}>
+            <p
+              className={`${serifBody} text-sm md:text-base lg:text-lg xl:text-xl`}
+            >
               Our color palette draws inspiration from the colors of the Kenyan
               flag - our symbol of unity and pride. Its colours are rich with
               meaning: <span className="text-black font-black">black</span>{" "}
@@ -131,15 +136,20 @@ export default function AboutPage() {
               and unity. Together, they reflect the spirit and pride of Kenya.
             </p>
           </div>
-          <div className="parallax-box aspect-[4/3] md:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[16/10] relative overflow-hidden rounded-sm shadow-lg order-1 lg:order-2 max-w-lg lg:max-w-xl mx-auto lg:mx-0">
-            <Image
-              src={SideStripe}
-              alt="Spirit of Kenya"
-              fill
-              priority
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 45vw, 40vw"
-            />
+
+          {/* Image - Second on mobile, right on desktop - Improved fitting */}
+          <div className="parallax-box relative overflow-hidden rounded-sm shadow-lg order-2 lg:order-2 w-full flex items-center justify-center">
+            <div className="relative w-full aspect-[4/3] md:aspect-[16/10] lg:aspect-[4/3] xl:aspect-[16/10] max-h-[400px] md:max-h-[500px]">
+              <Image
+                src={SideStripe}
+                alt="Spirit of Kenya"
+                fill
+                priority
+                className="object-contain md:object-cover mix-blend-multiply"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 45vw, 40vw"
+                style={{ backgroundColor: "transparent" }}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -148,24 +158,26 @@ export default function AboutPage() {
       <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-16 items-center">
           <div className="lg:col-span-5 order-2 lg:order-1">
-            <div className="parallax-box aspect-[3/4] md:aspect-[4/5] lg:aspect-[4/5] xl:aspect-3/4 relative overflow-hidden shadow-2xl max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0">
-              <Image 
-                src={Model5} 
-                alt="Quality" 
-                fill 
-                priority 
-                className="object-contain"
+            <div className="parallax-box aspect-[3/4] md:aspect-[4/5] lg:aspect-[4/5] xl:aspect-3/4 relative overflow-hidden shadow-2xl max-w-sm md:max-w-md lg:max-w-lg mx-auto lg:mx-0 bg-transparent">
+              <Image
+                src={Model5}
+                alt="Quality"
+                fill
+                priority
+                quality={100}
+                className="object-cover"
                 sizes="(max-width: 768px) 80vw, (max-width: 1024px) 60vw, (max-width: 1366px) 35vw, 30vw"
               />
             </div>
           </div>
           <div className="lg:col-span-7 order-1 lg:order-2 space-y-4 md:space-y-6 lg:space-y-8 reveal">
-            <h2
-              className={`${serifDisplay} text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl italic font-black`}
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-black" />
+              <h2 className={serifSubheader}>Uncompromising Quality</h2>
+            </div>
+            <p
+              className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl text-[#1d1d1d]`}
             >
-              Uncompromising <br /> Quality
-            </h2>
-            <p className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl text-[#1d1d1d]`}>
               We work exclusively with sustainable natural fibres, honoring the
               purity of material and the integrity of craft, where texture,
               color, and meaning come together to create pieces that are worn
@@ -179,36 +191,132 @@ export default function AboutPage() {
       <section className="py-12 md:py-16 lg:py-20 xl:py-32 px-4 md:px-8 lg:px-12 xl:px-16 bg-[#1d1d1d] text-white overflow-hidden">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-10 lg:gap-12 xl:gap-24 items-start">
           <div className="space-y-6 md:space-y-8 lg:space-y-10 xl:space-y-12 reveal order-2 lg:order-1">
-            <h2
-              className={`${serifDisplay} text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl text-white italic`}
-            >
-              Considered <br /> Design
-            </h2>
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-white" />
+              <h2 className={serifSubheader}>Considered Design</h2>
+            </div>
             <div className="space-y-4 md:space-y-5 lg:space-y-6 xl:space-y-8">
               <p className="font-serif font-light text-base md:text-lg lg:text-xl xl:text-2xl text-neutral-400">
-                At Daima Mkenya, we believe that identity is a story best worn.
-                Born in Kenya, yet destined for the world, our collection carry
-                pride, passion, and timeless elegance that transcend borders.
+                At Daima Mkenya Africa, we believe that identity is a story best
+                worn. Born in Kenya, yet destined for the world, our collection
+                carry pride, passion, and timeless elegance that transcend
+                borders.
               </p>
               <p className="font-serif font-light text-base md:text-lg lg:text-xl text-neutral-400 italic border-l-2 border-[#be1e2d] pl-3 md:pl-4 lg:pl-5 xl:pl-6">
                 Each design is thoughtfully conceived, drawing inspiration from
                 the stories they carry, while balancing heritage with
                 contemporary sophistication.
               </p>
-              <p className="font-serif font-black text-xs md:text-sm lg:text-base xl:text-lg tracking-widest uppercase text-white/90">
+              <p className=" font-serif font-light text-base md:text-lg lg:text-xl xl:text-2xl text-neutral-400 ">
                 We invite you to wear more than a design. Wear a connection, a
                 legacy, a statement that is meaningful, considered, and
                 enduring.
               </p>
             </div>
           </div>
-          <div className="parallax-box h-[35vh] md:h-[40vh] lg:h-[45vh] xl:h-[60vh] relative overflow-hidden bg-white/10 transition-all duration-1000 border border-white/10 order-1 lg:order-2">
+          <div className="parallax-box h-[35vh] md:h-[40vh] lg:h-[45vh] xl:h-[60vh] relative overflow-hidden bg-white transition-all duration-1000 border border-white/10 order-1 lg:order-2">
+            {/* Paint Brush Strokes Background - Textured and Organic */}
+            <div className="absolute inset-0 opacity-40 md:opacity-50 mix-blend-multiply">
+              {/* Black strokes - thick, bold, textured */}
+              <div className="absolute top-5 right-10 w-72 h-32">
+                <div
+                  className="absolute inset-0 bg-black blur-md"
+                  style={{
+                    clipPath:
+                      "path('M10,30 Q40,10 80,20 Q120,30 160,15 Q200,0 240,20 Q280,40 300,30 L290,70 Q250,90 200,75 Q150,60 100,80 Q50,100 20,70 Z')",
+                    transform: "rotate(5deg)",
+                  }}
+                />
+              </div>
+
+              <div className="absolute bottom-20 left-5 w-96 h-40">
+                <div
+                  className="absolute inset-0 bg-black blur-md"
+                  style={{
+                    clipPath:
+                      "path('M20,50 Q60,20 120,30 Q180,40 240,20 Q300,0 340,30 Q360,50 340,80 Q300,110 240,100 Q180,90 120,110 Q60,130 30,90 Z')",
+                    transform: "rotate(-8deg)",
+                  }}
+                />
+              </div>
+
+              {/* Red strokes - dynamic, sweeping like real brush marks */}
+              <div className="absolute top-1/3 left-10 w-80 h-24">
+                <div
+                  className="absolute inset-0 bg-[#be1e2d] blur-md"
+                  style={{
+                    clipPath:
+                      "path('M5,40 Q30,10 80,20 Q130,30 180,10 Q230,-10 280,20 Q320,40 300,70 Q260,100 200,85 Q140,70 80,90 Q30,110 15,70 Z')",
+                    transform: "rotate(-3deg) scaleX(1.2)",
+                  }}
+                />
+              </div>
+
+              <div className="absolute bottom-1/3 right-5 w-64 h-20">
+                <div
+                  className="absolute inset-0 bg-[#be1e2d] blur-md"
+                  style={{
+                    clipPath:
+                      "path('M0,30 Q40,0 90,20 Q140,40 190,10 Q220,0 240,30 Q250,60 210,80 Q160,100 100,75 Q40,50 10,50 Z')",
+                    transform: "rotate(15deg)",
+                  }}
+                />
+              </div>
+
+              {/* Green strokes - organic, leaf-like brush strokes */}
+              <div className="absolute top-40 right-20 w-96 h-28">
+                <div
+                  className="absolute inset-0 bg-[#006241] blur-md"
+                  style={{
+                    clipPath:
+                      "path('M30,20 Q80,0 150,20 Q220,40 280,10 Q320,20 300,60 Q260,100 190,80 Q120,60 50,90 Q10,100 20,50 Z')",
+                    transform: "rotate(8deg)",
+                  }}
+                />
+              </div>
+
+              <div className="absolute bottom-10 left-1/3 w-72 h-24">
+                <div
+                  className="absolute inset-0 bg-[#006241] blur-md"
+                  style={{
+                    clipPath:
+                      "path('M40,10 Q100,-10 170,20 Q240,50 300,30 Q330,50 290,80 Q230,110 150,90 Q70,70 20,50 Z')",
+                    transform: "rotate(-12deg)",
+                  }}
+                />
+              </div>
+
+              {/* White strokes - light, dry brush effect */}
+              <div className="absolute top-0 left-0 w-full h-40">
+                <div
+                  className="absolute inset-0 bg-white/60 blur-xl"
+                  style={{
+                    clipPath:
+                      "path('M0,20 Q200,0 400,40 Q600,80 800,30 Q1000,0 1200,50 L1200,120 Q1000,80 800,100 Q600,120 400,90 Q200,60 0,80 Z')",
+                    transform: "rotate(-1deg)",
+                  }}
+                />
+              </div>
+
+              <div className="absolute bottom-0 right-0 w-full h-36">
+                <div
+                  className="absolute inset-0 bg-white/50 blur-lg"
+                  style={{
+                    clipPath:
+                      "path('M0,0 Q300,30 600,10 Q900,-10 1200,20 L1200,80 Q900,60 600,70 Q300,80 0,50 Z')",
+                    transform: "rotate(2deg)",
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Image */}
             <Image
               src={HeroImage}
               alt="Heritage"
               fill
               priority
-              className="object-contain scale-110"
+              className="object-contain scale-110 relative z-10"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 80vw, (max-width: 1366px) 45vw, 40vw"
             />
           </div>
@@ -289,7 +397,7 @@ export default function AboutPage() {
           <p className="mt-4 md:mt-5 lg:mt-6 xl:mt-8 text-[9px] md:text-[10px] lg:text-[11px] xl:text-xs uppercase tracking-[0.15em] md:tracking-[0.2em] lg:tracking-[0.25em] xl:tracking-[0.3em] text-neutral-400 font-light">
             — Daima MKenya —
           </p>
-          
+
           <Link
             href="/gallery"
             className="group relative inline-flex items-center gap-3 md:gap-4 lg:gap-6 xl:gap-8 py-4 md:py-5 lg:py-6 xl:py-8 px-8 md:px-10 lg:px-12 xl:px-16 border border-black/10 overflow-hidden transition-all hover:border-black mt-6 md:mt-7 lg:mt-8 xl:mt-10"
