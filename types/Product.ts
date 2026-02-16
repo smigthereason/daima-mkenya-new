@@ -50,10 +50,10 @@ export const sampleProduct: Product = {
   sizes: ["One Size"],
   images: {
     thumbnails: [
-      "/assets/1.webp",
-      "/assets/hand-carved-maasai-bracelet.webp",
+      "/assets/1.1.webp",
+      "/assets/hand-woven-beaded-headband-kenya.webp",
     ],
-    hero: "/assets/hand-carved-maasai-bracelet.webp",
+    hero: "/assets/hand-woven-beaded-headband-kenya.webp",
   },
   category: "Accessories"
 };
@@ -81,7 +81,7 @@ export const relatedProducts: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     images: {
       thumbnails: [
-        "/assets/2.webp",
+        "/assets/2.2.webp",
         "/assets/beaded-heritage-choker.webp",
       ],
       hero: "/assets/beaded-heritage-choker.webp",
@@ -109,10 +109,10 @@ export const relatedProducts: Product[] = [
     sizes: ["36", "38", "40", "42"],
     images: {
       thumbnails: [
-        "/assets/3.webp",
-        "/assets/woven-sisal-tote-bag.webp",
+        "/assets/3.3.webp",
+        "/assets/womens-cultural-fusion-wrap.webp",
       ],
-      hero: "/assets/woven-sisal-tote-bag.webp",
+      hero: "/assets/womens-cultural-fusion-wrap.webp",
     },
     category: "Sets"
   },
@@ -137,10 +137,10 @@ export const relatedProducts: Product[] = [
     sizes: ["M", "L", "XL", "XXL"],
     images: {
       thumbnails: [
-        "/assets/4.webp",
-        "/assets/brass-pendant-necklace-kenya.webp",
+        "/assets/4.4.webp",
+        "/assets/daima-mkenya-unisex-collection.webp",
       ],
-      hero: "/assets/brass-pendant-necklace-kenya.webp",
+      hero: "/assets/daima-mkenya-unisex-collection.webp",
     },
     category: "Shirts"
   },
@@ -165,10 +165,10 @@ export const relatedProducts: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     images: {
       thumbnails: [
-        "/assets/5.webp",
         "/assets/5.5.webp",
+        "/assets/daima-mkenya-luxury-knitwear.webp",
       ],
-      hero: "/assets/5.5.webp",
+      hero: "/assets/daima-mkenya-luxury-knitwear.webp",
     },
     category: "Tops"
   },
@@ -193,10 +193,10 @@ export const relatedProducts: Product[] = [
     sizes: ["XS", "S", "M", "L"],
     images: {
       thumbnails: [
-        "/assets/6.6.webp",
-        "/assets/recycled-glass-bead-anklet.webp",
+        "/assets/modern-african-craftsmanship.webp",
+        "/assets/sustainable-development-goals-impact.webp",
       ],
-      hero: "/assets/recycled-glass-bead-anklet.webp",
+      hero: "/assets/modern-african-craftsmanship.webp",
     },
     category: "Skirts"
   },
@@ -221,10 +221,10 @@ export const relatedProducts: Product[] = [
     sizes: ["One Size"],
     images: {
       thumbnails: [
-        "/assets/7.webp",
-        "/assets/leather-craft-sandals-nairobi.webp",
+        "/assets/7.7.webp",
+        "/assets/traditional-beadwork-modern-fashion.webp",
       ],
-      hero: "/assets/leather-craft-sandals-nairobi.webp",
+      hero: "/assets/traditional-beadwork-modern-fashion.webp",
     },
     category: "Accessories"
   },
@@ -250,10 +250,10 @@ export const relatedProducts: Product[] = [
     sizes: ["One Size Fits Most"],
     images: {
       thumbnails: [
-        "/assets/8.webp",
-        "/assets/hand-dyed-cotton-scarf.webp",
+        "/assets/8.8.webp",
+        "/assets/mens-sustainable-linen-collection.webp",
       ],
-      hero: "/assets/hand-dyed-cotton-scarf.webp",
+      hero: "/assets/mens-sustainable-linen-collection.webp",
     },
     category: "Skirts"
   },
@@ -278,10 +278,10 @@ export const relatedProducts: Product[] = [
     sizes: ["Free Size"],
     images: {
       thumbnails: [
-        "/assets/9.webp",
-        "/assets/premium-kenyan-wool-beanie.webp",
+        "/assets/9.9.webp",
+        "/assets/daima-mkenya-womens-editorial.webp",
       ],
-      hero: "/assets/premium-kenyan-wool-beanie.webp",
+      hero: "/assets/daima-mkenya-womens-editorial.webp",
     },
     category: "Dresses"
   },
@@ -306,10 +306,10 @@ export const relatedProducts: Product[] = [
     sizes: ["M", "L", "XL"],
     images: {
       thumbnails: [
-        "/assets/10.webp",
-        "/assets/ceremonial-beaded-belt.webp",
+        "/assets/10.10.webp",
+        "/assets/daima-mkenya-signature-look.webp",
       ],
-      hero: "/assets/ceremonial-beaded-belt.webp",
+      hero: "/assets/daima-mkenya-signature-look.webp",
     },
     category: "Shirts"
   },
@@ -335,10 +335,10 @@ export const relatedProducts: Product[] = [
     sizes: ["S", "M", "L", "XL"],
     images: {
       thumbnails: [
-        "/assets/11.webp",
         "/assets/11.11.webp",
+        "/assets/vibrant-kenyan-textiles-editorial.webp",
       ],
-      hero: "/assets/11.11.webp",
+      hero: "/assets/vibrant-kenyan-textiles-editorial.webp",
     },
     category: "Jackets"
   },
@@ -363,10 +363,10 @@ export const relatedProducts: Product[] = [
     sizes: ["30", "32", "34", "36"],
     images: {
       thumbnails: [
-        "/assets/12.webp",
-        "/assets/artisan-made-earrings-gold.webp",
+        "/assets/12.12.webp",
+        "/assets/minimalist-african-aesthetic-model.webp",
       ],
-      hero: "/assets/artisan-made-earrings-gold.webp",
+      hero: "/assets/minimalist-african-aesthetic-model.webp",
     },
     category: "Trousers"
   },
@@ -390,8 +390,8 @@ export const relatedProducts: Product[] = [
     sizes: ["S", "M", "L"],
     images: {
       thumbnails: [
-        "/assets/13.webp",
-        "/assets/hand-stitched-textile-clutch.webp",
+        "/assets/13.13.webp",
+        "/assets/heritage-roots-lifestyle-photography.webp",
       ],
       hero: "/assets/hand-stitched-textile-clutch.webp",
     },
@@ -417,10 +417,10 @@ export const relatedProducts: Product[] = [
     sizes: ["M", "L", "XL", "XXL"],
     images: {
       thumbnails: [
-        "/assets/14.webp",
-        "/assets/signature-daima-mkenya-tee.webp",
+        "/assets/14.14.webp",
+        "/assets/daima-mkenya-unisex-collection.webp",
       ],
-      hero: "/assets/signature-daima-mkenya-tee.webp",
+      hero: "/assets/daima-mkenya-unisex-collection.webp",
     },
     category: "Shirts"
   },
@@ -444,10 +444,10 @@ export const relatedProducts: Product[] = [
     sizes: ["S", "M", "L"],
     images: {
       thumbnails: [
-        "/assets/15.webp",
-        "/assets/heritage-hoodie-red-black.webp",
+        "/assets/15.15.webp",
+        "/assets/streetwear-roots-collection.webp",
       ],
-      hero: "/assets/heritage-hoodie-red-black.webp",
+      hero: "/assets/streetwear-roots-collection.webp",
     },
     category: "Streetwear"
   },
