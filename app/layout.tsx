@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/landing-page/Navbar";
-import Footer from "@/components/landing-page/Footer"
+import Footer from "@/components/landing-page/Footer";
 import { CartProvider } from "@/context/CartContext";
 
 const playfair = Playfair_Display({
@@ -15,8 +15,36 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "DMA Studio | Luxury Exotic Leather",
-  description: "Exquisite handmade exotic leather goods",
+  metadataBase: new URL("https://daima-mkenya-new.vercel.app"),
+  title: {
+    default: "Daima Mkenya Africa",
+    template: "%s | Daima Mkenya Africa",
+  },
+  description:
+    "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+  openGraph: {
+    title: "Daima Mkenya Africa",
+    description:
+      "Meaningful color, uncompromising quality, and considered design from the heart of Kenya.",
+    url: "https://daima-mkenya-new.vercel.app",
+    siteName: "Daima Mkenya Africa",
+    images: [
+      {
+        url: "/assets/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Daima Mkenya Africa - Heritage Fashion",
+      },
+    ],
+    locale: "en_KE",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Daima Mkenya Africa",
+    description: "Premium Kenyan Heritage Brand",
+    images: ["/assets/og-image.png"],
+  },
 };
 
 export default function RootLayout({
@@ -30,7 +58,7 @@ export default function RootLayout({
         <CartProvider>
           <Navbar />
           {children}
-          <Footer/>
+          <Footer />
         </CartProvider>
       </body>
     </html>
