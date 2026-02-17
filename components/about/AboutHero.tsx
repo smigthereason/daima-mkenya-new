@@ -22,7 +22,7 @@ const AboutHero = ({ serifDisplay, serifBody }: AboutHeroProps) => {
           </h1>
           <p className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal `}>
             Daima Mkenya Africa is a celebration of identity, crafted with
-            intention in the heart of Nairobi.
+            intention.
             <br />
             Our approach is deliberate:
           </p>
