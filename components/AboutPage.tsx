@@ -455,6 +455,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 // Import broken-down sections
 import AboutHero from "@/components/about/AboutHero";
+import BrandMission from "./about/BrandMission";
 import ColorSection from "@/components/about/ColorSection";
 import QualitySection from "@/components/about/QualitySection";
 import DesignSection from "@/components/about/DesignSection";
@@ -540,6 +541,12 @@ export default function AboutPage() {
       />
 
       <AboutHero serifDisplay={serifDisplay} serifBody={serifBody} />
+
+      <BrandMission 
+  serifDisplay={serifDisplay} 
+  serifBody={serifBody} 
+  serifSubheader={serifSubheader} 
+/>
 
       <ColorSection serifSubheader={serifSubheader} serifBody={serifBody} />
 
