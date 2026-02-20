@@ -10,6 +10,7 @@ const EditorialSection = () => (
         src={Assets.HeroImage}
         alt="Daima Mkenya Studio session 2026 - Kenyan Heritage Fashion Editorial Nairobi"
         fill
+        priority
         className="object-cover transition-all duration-1000 scale-105 group-hover:scale-100"
       />
       <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-10">

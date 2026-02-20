@@ -13,7 +13,7 @@ const AboutHero = ({ serifDisplay, serifBody }: AboutHeroProps) => {
   return (
     <section
       aria-label="Brand Identity"
-      className="relative min-h-[70vh] md:min-h-[60vh] lg:min-h-[70vh] xl:min-h-screen flex flex-col justify-center px-4 md:px-8 lg:px-12 xl:px-16 pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-12 md:pb-16 lg:pb-20"
+      className="relative min-h-[70vh] md:min-h-[60vh] lg:min-h-[70vh] xl:min-h-screen flex flex-col justify-center  px-4 md:px-8 lg:px-12 xl:px-16 pt-16 md:pt-20 lg:pt-24 xl:pt-32 pb-12 md:pb-16 lg:pb-20"
     >
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-12 items-center">
         <div className="lg:col-span-7 space-y-4 md:space-y-6 lg:space-y-8 xl:space-y-10">

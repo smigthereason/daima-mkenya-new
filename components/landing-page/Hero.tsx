@@ -161,7 +161,7 @@ export default function Hero() {
         </div>
         <div
           ref={innerRightRef}
-          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none"
+          className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none "
         >
           <Image
             src={Hero33}
