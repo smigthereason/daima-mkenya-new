@@ -44,30 +44,29 @@ const playfair = Playfair_Display({
 });
 
 // Construct the absolute URL for the image
-const imageUrl = "https://daima-mkenya-new.vercel.app/assets/og-image.png";
+const baseUrl = "https://daima-mkenya-new.vercel.app";
+const imageUrl = `${baseUrl}/assets/og-image.png`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://daima-mkenya-new.vercel.app"),
+  metadataBase: new URL(baseUrl),
   title: {
     default: "Daima Mkenya Africa",
     template: "%s | Daima Mkenya Africa",
   },
   description: "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
   
-  // OpenGraph metadata
+  // OpenGraph metadata - Simplified for better compatibility
   openGraph: {
     title: "Daima Mkenya Africa",
-    description: "Meaningful color, uncompromising quality, and considered design from the heart of Kenya.",
-    url: "https://daima-mkenya-new.vercel.app",
+    description: "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+    url: baseUrl,
     siteName: "Daima Mkenya Africa",
     images: [
       {
-        url: imageUrl, // Use absolute URL
-        secureUrl: imageUrl, // Add secure URL for HTTPS
+        url: imageUrl,
         width: 1200,
         height: 630,
         alt: "Daima Mkenya Africa - Heritage Fashion",
-        type: "image/png",
       },
     ],
     locale: "en_KE",
@@ -78,22 +77,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Daima Mkenya Africa",
-    description: "Premium Kenyan Heritage Brand",
-    images: [imageUrl], // Use absolute URL
+    description: "Authentic Kenyan heritage fashion 🇰🇪",
+    images: [imageUrl],
     creator: "@daimamkenya",
-    site: "@daimamkenya",
-  },
-  
-  // Additional metadata for better sharing
-  authors: [{ name: "Daima Mkenya Africa" }],
-  keywords: ["Kenyan fashion", "heritage clothing", "African fashion", "Nairobi"],
-  
-  // Facebook specific (optional but helps)
-  other: {
-    "fb:app_id": "YOUR_FACEBOOK_APP_ID", // Optional: Add your Facebook app ID if you have one
-    "og:image:width": "1200",
-    "og:image:height": "630",
-    "og:image:type": "image/png",
   },
 };
 
@@ -105,20 +91,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={playfair.className}>
       <head>
-        {/* Preload the OG image for better performance */}
-        <link rel="preload" as="image" href="https://daima-mkenya-new.vercel.app/assets/og-image.png" />
-        
-        {/* Fallback meta tags for platforms that don't read Next.js metadata well */}
-        <meta property="og:image" content="https://daima-mkenya-new.vercel.app/assets/og-image.png" />
-        <meta property="og:image:secure_url" content="https://daima-mkenya-new.vercel.app/assets/og-image.png" />
+        {/* Essential meta tags - WhatsApp reads these directly */}
+        <meta property="og:title" content="Daima Mkenya Africa" />
+        <meta property="og:description" content="Authentic Kenyan heritage fashion, crafted with intention in Nairobi." />
+        <meta property="og:image" content={imageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="og:image:type" content="image/png" />
-        <meta property="og:image:alt" content="Daima Mkenya Africa - Heritage Fashion" />
+        <meta property="og:url" content={baseUrl} />
+        <meta property="og:type" content="website" />
         
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:image" content="https://daima-mkenya-new.vercel.app/assets/og-image.png" />
-        <meta name="twitter:image:alt" content="Daima Mkenya Africa - Heritage Fashion" />
+        <meta name="twitter:title" content="Daima Mkenya Africa" />
+        <meta name="twitter:description" content="Authentic Kenyan heritage fashion 🇰🇪" />
+        <meta name="twitter:image" content={imageUrl} />
       </head>
       <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}
         suppressHydrationWarning={true}>
