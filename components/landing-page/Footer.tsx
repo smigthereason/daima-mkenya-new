@@ -6,6 +6,7 @@ import { Instagram, Facebook, ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { HeroImage2 } from "@/public/assets";
 import { FaXTwitter } from "react-icons/fa6";
+import Link from "next/link";
 
 const Footer = () => {
   return (
@@ -18,30 +19,30 @@ const Footer = () => {
         <div className="flex flex-col justify-between py-4 md:py-6 lg:py-8 px-2 md:px-4">
           <div>
             <nav className="flex flex-wrap gap-4 md:gap-6 text-sm font-medium mb-8 md:mb-12 lg:mb-16 text-zinc-300">
-              <a
+              <Link
                 href="/products"
                 className="inline-block transition-all duration-500 ease-out hover:text-white hover:scale-110 active:scale-95"
               >
                 Products
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/gallery"
                 className="inline-block transition-all duration-500 ease-out hover:text-white hover:scale-110 active:scale-95"
               >
-                Men
-              </a>
-              <a
-                href="#"
+                Gallery
+              </Link>
+              <Link
+                href="/about"
                 className="inline-block transition-all duration-500 ease-out hover:text-white hover:scale-110 active:scale-95"
               >
-                Women
-              </a>
-              <a
+                About
+              </Link>
+              <Link
                 href="#"
                 className="inline-block transition-all duration-500 ease-out hover:text-white hover:scale-110 active:scale-95"
               >
                 Kids
-              </a>
+              </Link>
             </nav>
 
             <h2 className="text-3xl md:text-4xl lg:text-5xl xl:text-6xl uppercase font-semibold tracking-tight leading-tight mb-8 md:mb-12 lg:mb-16">

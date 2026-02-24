@@ -71,6 +71,7 @@ import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { NextAuthProvider } from "./providers/NextAuthProvider";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -95,8 +96,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={playfair.className}>
-      <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}>
+      <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}
+      suppressHydrationWarning={true}>
         {/* NextAuthProvider must wrap the content for auth to work */}
+        <ErrorBoundary>
         <NextAuthProvider>
           <CartProvider>
             <Navbar />
@@ -104,6 +107,7 @@ export default function RootLayout({
             <Footer />
           </CartProvider>
         </NextAuthProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );
