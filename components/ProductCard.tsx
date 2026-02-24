@@ -16,7 +16,7 @@
 //   const [products, setProducts] = useState<Product[]>([]);
 //   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
 //   const [currentProductIndex, setCurrentProductIndex] = useState(0);
-  
+
 //   const [activeThumb, setActiveThumb] = useState(0);
 //   const [isFading, setIsFading] = useState(false);
 //   const [selectedColor, setSelectedColor] = useState(0);
@@ -64,12 +64,12 @@
 //   const handleAddToCart = () => {
 //     const size = activeProduct.sizes[selectedSize];
 //     const colorObj = activeProduct.colors[selectedColor];
-    
+
 //     addToCart(activeProduct, size, { 
 //       label: colorObj.label, 
 //       hex: colorObj.hex 
 //     });
-    
+
 //     setAddedFeedback(true);
 //     setTimeout(() => setAddedFeedback(false), 3000);
 //   };
@@ -161,7 +161,7 @@
 //           {titleLine1} <br /><span className="font-black">{titleLine2}</span>
 //         </h1>
 //         <p className="text-[2rem] font-light tracking-[0.15em] mb-12">{activeProduct.price}</p>
-        
+
 //         <div className="space-y-12">
 //           <div>
 //             <p className="text-[14px] uppercase tracking-[0.4em] font-bold mb-6">Palettes</p>
@@ -199,7 +199,7 @@
 //               {addedFeedback ? <><Check size={18} /> Added</> : <><ShoppingBag size={18} /> Add to Bag</>}
 //             </span>
 //           </button>
-          
+
 //           <button onClick={handlePurchaseNow} className="group relative w-full bg-black py-7 text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] text-white overflow-hidden">
 //             <span className="absolute inset-0 translate-y-full bg-[#be1e2d] transition-transform duration-500 ease-out group-hover:translate-y-0" />
 //             <span className="relative z-10 flex items-center justify-center gap-3">
@@ -234,7 +234,7 @@ export default function ProductCard({ productId }: ProductCardProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [activeProduct, setActiveProduct] = useState<Product | null>(null);
   const [currentProductIndex, setCurrentProductIndex] = useState(0);
-  
+
   const [activeThumb, setActiveThumb] = useState(0);
   const [isFading, setIsFading] = useState(false);
   const [selectedColor, setSelectedColor] = useState(0);
@@ -247,20 +247,24 @@ export default function ProductCard({ productId }: ProductCardProps) {
     const fetchData = async () => {
       const data = await getAllProducts();
       setProducts(data);
-      
+
       if (data.length > 0) {
         // FIX: Find product by checking both Sanity _id and potential numeric id
         // We convert both to strings to avoid "123" !== 123 errors
-        const foundIndex = productId 
-          ? data.findIndex(p => p._id?.toString() === productId?.toString() || p.id?.toString() === productId?.toString()) 
+        const foundIndex = productId
+          ? data.findIndex(p => {
+            const idMatch = p._id?.toString() === productId?.toString();
+            const slugMatch = p.slug?.current === productId;
+            return idMatch || slugMatch;
+          })
           : 0;
 
         // If not found (foundIndex is -1), we default to 0, otherwise use the found index
         const targetIndex = foundIndex === -1 ? 0 : foundIndex;
-        
+
         setCurrentProductIndex(targetIndex);
         setActiveProduct(data[targetIndex]);
-        
+
         // Reset local UI states for the new product
         setActiveThumb(0);
         setSelectedColor(0);
@@ -277,10 +281,11 @@ export default function ProductCard({ productId }: ProductCardProps) {
       const newProduct = products[newIndex];
       setCurrentProductIndex(newIndex);
       setActiveProduct(newProduct);
-      
+
       // Update URL so the browser matches the new item being viewed
-      const newId = newProduct._id || newProduct.id;
-      router.push(`/products/${newId}`, { scroll: false });
+      // const newId = newProduct._id || newProduct.id;
+      const productSlug = newProduct.slug?.current || newProduct._id;
+      router.push(`/products/${productSlug}`, { scroll: false });
 
       setActiveThumb(0);
       setSelectedColor(0);
@@ -320,12 +325,12 @@ export default function ProductCard({ productId }: ProductCardProps) {
 
   return (
     <div ref={cardRef} className="flex flex-col xl:flex-row w-full bg-white relative min-h-screen text-black antialiased overflow-x-hidden mt-20 md:mt-32 border-t border-neutral-400">
-      
+
       {/* Navigation Arrows */}
       <div className="absolute top-92 md:top-10 left-1/2 -translate-x-1/2 xl:left-auto xl:translate-x-0 xl:top-10 xl:right-12 z-30 flex items-center gap-8">
         <div className="flex items-left gap-8 bg-white/60 backdrop-blur-md px-6 py-3 rounded-full border border-gray-200/50 shadow-sm">
-          <button 
-            onClick={() => handleProductTransition(currentProductIndex === 0 ? products.length - 1 : currentProductIndex - 1)} 
+          <button
+            onClick={() => handleProductTransition(currentProductIndex === 0 ? products.length - 1 : currentProductIndex - 1)}
             className="hover:opacity-30 p-1 cursor-pointer"
           >
             <ChevronLeft size={24} />
@@ -333,8 +338,8 @@ export default function ProductCard({ productId }: ProductCardProps) {
           <span className="text-[14px] text-gray-500 font-light tracking-[0.5em]">
             {String(currentProductIndex + 1).padStart(2, "0")} / {String(products.length).padStart(2, "0")}
           </span>
-          <button 
-            onClick={() => handleProductTransition((currentProductIndex + 1) % products.length)} 
+          <button
+            onClick={() => handleProductTransition((currentProductIndex + 1) % products.length)}
             className="hover:opacity-30 p-1 cursor-pointer"
           >
             <ChevronRight size={24} />
@@ -348,13 +353,13 @@ export default function ProductCard({ productId }: ProductCardProps) {
           <span className="text-[14px] uppercase tracking-[0.5em] text-gray-400 block mb-4 font-light">The Collection</span>
           <span className="text-[12px] uppercase tracking-[0.3em] font-bold border-b-2 border-black pb-2">{activeProduct.category}</span>
         </div>
-        
+
         <div className="flex flex-row gap-6 mb-12 overflow-x-auto pb-4 scrollbar-hide">
           {activeProduct.images.thumbnails?.map((img, i) => (
-            <button 
-                key={i} 
-                onClick={() => { setIsFading(true); setTimeout(() => { setActiveThumb(i); setIsFading(false); }, 300); }} 
-                className={`relative shrink-0 transition-all duration-700 ${i === activeThumb ? "opacity-100 scale-100" : "opacity-30 scale-95"}`}
+            <button
+              key={i}
+              onClick={() => { setIsFading(true); setTimeout(() => { setActiveThumb(i); setIsFading(false); }, 300); }}
+              className={`relative shrink-0 transition-all duration-700 ${i === activeThumb ? "opacity-100 scale-100" : "opacity-30 scale-95"}`}
             >
               <div className="w-40 h-55 bg-[#fcfcfc] relative overflow-hidden">
                 <Image src={getImageUrl(img)} alt="" fill unoptimized className="object-cover" />
@@ -385,13 +390,13 @@ export default function ProductCard({ productId }: ProductCardProps) {
       {/* Center Panel: Hero Image */}
       <div className="order-1 xl:order-2 flex-1 bg-[#F9F9F9] relative flex items-center justify-center h-[60vh] md:h-screen">
         <div className={`relative w-full h-full transition-all duration-700 ${isFading ? "opacity-0 blur-md" : "opacity-100 blur-0"}`}>
-          <Image 
-            src={activeProduct.images.thumbnails?.[activeThumb] ? getImageUrl(activeProduct.images.thumbnails[activeThumb]) : getImageUrl(activeProduct.images.hero)} 
-            alt={activeProduct.name} 
-            fill 
-            unoptimized 
-            className="object-contain p-8 md:p-16" 
-            priority 
+          <Image
+            src={activeProduct.images.thumbnails?.[activeThumb] ? getImageUrl(activeProduct.images.thumbnails[activeThumb]) : getImageUrl(activeProduct.images.hero)}
+            alt={activeProduct.name}
+            fill
+            unoptimized
+            className="object-contain p-8 md:p-16"
+            priority
           />
         </div>
       </div>
@@ -399,41 +404,41 @@ export default function ProductCard({ productId }: ProductCardProps) {
       {/* Right Panel: Details & Actions */}
       <div className="order-3 flex flex-col w-full xl:w-[28%] p-8 md:p-12 xl:p-16 bg-white justify-center border-l border-gray-50">
         <span className="text-[12px] tracking-[0.6em] text-gray-900 uppercase block mb-8 font-light">
-            Ref. {activeProduct._id ? activeProduct._id.substring(0, 8) : activeProduct.id}
+          Ref. {activeProduct._id ? activeProduct._id.substring(0, 8) : activeProduct.id}
         </span>
         <h1 className="text-3xl md:text-5xl font-light tracking-tighter leading-[1.1] mb-6 uppercase">
           {titleLine1} <br /><span className="font-black">{titleLine2}</span>
         </h1>
         <p className="text-[2rem] font-light tracking-[0.15em] mb-12">{activeProduct.price}</p>
-        
+
         <div className="space-y-12">
           {activeProduct.colors && (
             <div>
               <p className="text-[14px] uppercase tracking-[0.4em] font-bold mb-6">Palettes</p>
               <div className="flex gap-6">
                 {activeProduct.colors.map((c, i) => (
-                  <button 
-                      key={i} 
-                      onClick={() => setSelectedColor(i)} 
-                      className={`w-8 h-8 rounded-full ring-offset-8 ring-1 transition-all duration-300 ${i === selectedColor ? "ring-black scale-125" : "ring-transparent"}`} 
-                      style={{ backgroundColor: c.hex }} 
+                  <button
+                    key={i}
+                    onClick={() => setSelectedColor(i)}
+                    className={`w-8 h-8 rounded-full ring-offset-8 ring-1 transition-all duration-300 ${i === selectedColor ? "ring-black scale-125" : "ring-transparent"}`}
+                    style={{ backgroundColor: c.hex }}
                   />
                 ))}
               </div>
             </div>
           )}
-          
+
           {activeProduct.sizes && (
             <div>
               <p className="text-[14px] uppercase tracking-[0.4em] font-bold mb-6">Dimensions</p>
               <div className="grid grid-cols-4 gap-3">
                 {activeProduct.sizes.map((s, i) => (
-                  <button 
-                      key={s} 
-                      onClick={() => setSelectedSize(i)} 
-                      className={`py-5 text-[16px] tracking-[0.2em] font-medium border transition-all duration-300 ${i === selectedSize ? "bg-black text-white border-black" : "border-gray-100 hover:border-black"}`}
+                  <button
+                    key={s}
+                    onClick={() => setSelectedSize(i)}
+                    className={`py-5 text-[16px] tracking-[0.2em] font-medium border transition-all duration-300 ${i === selectedSize ? "bg-black text-white border-black" : "border-gray-100 hover:border-black"}`}
                   >
-                      {s}
+                    {s}
                   </button>
                 ))}
               </div>
@@ -448,7 +453,7 @@ export default function ProductCard({ productId }: ProductCardProps) {
               {addedFeedback ? <><Check size={18} /> Added</> : <><ShoppingBag size={18} /> Add to Bag</>}
             </span>
           </button>
-          
+
           <button onClick={handlePurchaseNow} className="group relative w-full bg-black py-7 text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] text-white overflow-hidden">
             <span className="absolute inset-0 translate-y-full bg-[#be1e2d] transition-transform duration-500 ease-out group-hover:translate-y-0" />
             <span className="relative z-10 flex items-center justify-center gap-3">
