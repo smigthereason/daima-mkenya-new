@@ -252,7 +252,7 @@ export default function ProductCard({ productId }: ProductCardProps) {
         // FIX: Find product by checking both Sanity _id and potential numeric id
         // We convert both to strings to avoid "123" !== 123 errors
         const foundIndex = productId 
-          ? data.findIndex(p => p._id?.toString() === productId?.toString() || p.id?.toString() === productId?.toString()) 
+          ? data.findIndex(p => p._id?.toString() === productId?.toString() || p.slug?.toString() === productId?.toString()) 
           : 0;
 
         // If not found (foundIndex is -1), we default to 0, otherwise use the found index
@@ -279,8 +279,9 @@ export default function ProductCard({ productId }: ProductCardProps) {
       setActiveProduct(newProduct);
       
       // Update URL so the browser matches the new item being viewed
-      const newId = newProduct._id || newProduct.id;
-      router.push(`/products/${newId}`, { scroll: false });
+      // const newId = newProduct._id || newProduct.id;
+      const productSlug = newProduct.slug?.current || newProduct._id;
+      router.push(`/products/${productSlug}`, { scroll: false });
 
       setActiveThumb(0);
       setSelectedColor(0);

@@ -480,6 +480,9 @@ export interface Product {
   _id: string; // Sanity uses _id (string) instead of id (number)
   name: string;
   price: string;
+  slug: {
+    current: string;
+  };
   description: string[];
   category: string;
   details: {
@@ -503,6 +506,7 @@ export const getAllProducts = async (): Promise<Product[]> => {
     price,
     description,
     category,
+    slug,
     details,
     colors,
     sizes,
