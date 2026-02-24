@@ -59,7 +59,7 @@ export const metadata: Metadata = {
     siteName: "Daima Mkenya Africa",
     images: [
       {
-        url: "/assets/og-image.png", // FIXED: Correct path to your image
+        url: "/assets/og-image.png",
         width: 1200,
         height: 630,
         alt: "Daima Mkenya Africa - Heritage Fashion",
