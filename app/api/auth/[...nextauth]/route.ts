@@ -1,4 +1,5 @@
-import NextAuth from "next-auth";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 import AppleProvider from "next-auth/providers/apple";
@@ -6,7 +7,8 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { SanityAdapter } from "next-auth-sanity";
 import { client } from "@/sanity/lib/client";
 
-const handler = NextAuth({
+// Export authOptions so other files can import it
+export const authOptions: NextAuthOptions = {
   // The adapter handles saving Google/Facebook/Manual users into Sanity documents
   adapter: SanityAdapter(client as any),
   
@@ -33,8 +35,6 @@ const handler = NextAuth({
         name: { label: "Name", type: "text" }
       },
       async authorize(credentials) {
-        // This is a basic authorization. 
-        // In the future, you can add bcrypt to compare passwords from Sanity.
         if (credentials?.email && credentials?.password) {
           return { 
             id: credentials.email, 
@@ -57,11 +57,16 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.sub;
+        // Add the user ID from the token to the session
+        session.user.id = token.sub as string;
       }
       return session;
     },
   },
-});
+};
 
+// Create the handler using authOptions
+const handler = NextAuth(authOptions);
+
+// Export the handler methods
 export { handler as GET, handler as POST };
