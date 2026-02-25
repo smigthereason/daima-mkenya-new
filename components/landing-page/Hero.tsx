@@ -198,8 +198,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 1. REFINED SCRIM: 
-          Instead of a solid color, we use a radial gradient that is darker in the center 
+      {/* 1. REFINED SCRIM:
+          Instead of a solid color, we use a radial gradient that is darker in the center
           where the text sits, but fades out to show the models clearly on the sides.
       */}
       <div className="absolute inset-0 z-25 bg-[radial-gradient(circle,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0.1)_90%)] md:bg-black/20 pointer-events-none" />
@@ -225,8 +225,8 @@ export default function Hero() {
           Daima MKenya
         </h1>
 
-        {/* 3. SUBTITLE: 
-            Increased tracking further for a "minimalist luxury" vibe. 
+        {/* 3. SUBTITLE:
+            Increased tracking further for a "minimalist luxury" vibe.
             The white text on black/gray shadow works universally.
         */}
         <p className="text-white text-[9px] md:text-[12px] uppercase tracking-[0.6em] md:tracking-[0.8em] mb-10 md:mb-12 font-medium opacity-90 drop-shadow-md">

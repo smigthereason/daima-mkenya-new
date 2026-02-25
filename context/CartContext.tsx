@@ -1,7 +1,15 @@
+// context/CartContext.tsx
+
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { Product } from '@/types/Product';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import { Product } from "@/types/Product";
 
 interface CartItem {
   cartId: string;
@@ -13,20 +21,25 @@ interface CartItem {
 
 interface CartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, size: string, color: { label: string; hex: string }) => void;
+  addToCart: (
+    product: Product,
+    size: string,
+    color: { label: string; hex: string },
+  ) => void;
   removeFromCart: (cartId: string) => void;
   updateQuantity: (cartId: string, newQuantity: number) => void;
+  clearCart: () => void; // Add this
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const isInitialMount = useRef(true); // Ref to track the first load
+  const isInitialMount = useRef(true);
 
   // Load from LocalStorage once on mount
   useEffect(() => {
-    const savedCart = localStorage.getItem('daima_cart');
+    const savedCart = localStorage.getItem("daima_cart");
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
@@ -43,15 +56,20 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       isInitialMount.current = false;
       return;
     }
-    localStorage.setItem('daima_cart', JSON.stringify(cartItems));
+    localStorage.setItem("daima_cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product: Product, size: string, color: { label: string; hex: string }) => {
-    setCartItems(prev => {
-      const existingItemIndex = prev.findIndex(item =>
-        item.product._id === product._id &&
-        item.selectedSize === size &&
-        item.selectedColor.label === color.label
+  const addToCart = (
+    product: Product,
+    size: string,
+    color: { label: string; hex: string },
+  ) => {
+    setCartItems((prev) => {
+      const existingItemIndex = prev.findIndex(
+        (item) =>
+          item.product._id === product._id &&
+          item.selectedSize === size &&
+          item.selectedColor.label === color.label,
       );
 
       if (existingItemIndex > -1) {
@@ -60,29 +78,47 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         return newItems;
       }
 
-      return [...prev, {
-        cartId: `${product._id}-${size}-${color.label}-${Math.random().toString(36).substr(2, 5)}`,
-        product,
-        selectedSize: size,
-        selectedColor: color,
-        quantity: 1
-      }];
+      return [
+        ...prev,
+        {
+          cartId: `${product._id}-${size}-${color.label}-${Math.random().toString(36).substr(2, 5)}`,
+          product,
+          selectedSize: size,
+          selectedColor: color,
+          quantity: 1,
+        },
+      ];
     });
   };
 
   const updateQuantity = (cartId: string, newQuantity: number) => {
     if (newQuantity < 1) return;
-    setCartItems(prev => prev.map(item =>
-      item.cartId === cartId ? { ...item, quantity: newQuantity } : item
-    ));
+    setCartItems((prev) =>
+      prev.map((item) =>
+        item.cartId === cartId ? { ...item, quantity: newQuantity } : item,
+      ),
+    );
   };
 
   const removeFromCart = (cartId: string) => {
-    setCartItems(prev => prev.filter(item => item.cartId !== cartId));
+    setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+    localStorage.removeItem("daima_cart");
   };
 
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, updateQuantity }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart, // Add this
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

@@ -8,6 +8,7 @@ import Footer from "@/components/landing-page/Footer";
 import { CartProvider } from "@/context/CartContext";
 import { NextAuthProvider } from "./providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { Suspense } from "react";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -22,7 +23,8 @@ export const metadata: Metadata = {
     default: "Daima Mkenya Africa",
     template: "%s | Daima Mkenya Africa",
   },
-  description: "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+  description:
+    "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
 };
 
 export default function RootLayout({
@@ -32,18 +34,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={playfair.className}>
-      <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}
-        suppressHydrationWarning={true}>
+      <body
+        className={`${playfair.className} antialiased bg-[#e8e8e8]`}
+        suppressHydrationWarning={true}
+      >
         {/* NextAuthProvider must wrap the content for auth to work */}
-        <ErrorBoundary>
-          <NextAuthProvider>
-            <CartProvider>
-              <Navbar />
-              <main>{children}</main>
-              <Footer />
-            </CartProvider>
-          </NextAuthProvider>
-        </ErrorBoundary>
+        <Suspense>
+          <ErrorBoundary>
+            <NextAuthProvider>
+              <CartProvider>
+                <Navbar />
+                <main>{children}</main>
+                <Footer />
+              </CartProvider>
+            </NextAuthProvider>
+          </ErrorBoundary>
+        </Suspense>
       </body>
     </html>
   );

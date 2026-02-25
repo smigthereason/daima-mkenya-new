@@ -1,72 +1,177 @@
+// sanity/schemaTypes/order.ts
+
 export default {
-  name: 'order',
-  title: 'Orders',
-  type: 'document',
+  name: "order",
+  title: "Orders",
+  type: "document",
   fields: [
     {
-      name: 'orderNumber',
-      title: 'Order Number',
-      type: 'string',
+      name: "orderNumber",
+      title: "Order Number",
+      type: "string",
       readOnly: true,
-      description: 'Internal reference (e.g., ORD-2026-X)',
+      description: "Internal reference (e.g., ORD-2026-X)",
     },
     {
-      name: 'pesapalOrderTrackingId',
-      title: 'PesaPal Tracking ID',
-      type: 'string',
-      description: 'The ID returned by PesaPal once the order is registered',
+      name: "pesapalOrderTrackingId",
+      title: "PesaPal Tracking ID",
+      type: "string",
+      description: "The ID returned by PesaPal once the order is registered",
     },
     {
-      name: 'status',
-      title: 'Payment Status',
-      type: 'string',
+      name: "status",
+      title: "Payment Status",
+      type: "string",
       options: {
         list: [
-          { title: 'Pending', value: 'pending' },
-          { title: 'Completed', value: 'completed' },
-          { title: 'Failed', value: 'failed' },
+          { title: "Pending", value: "pending" },
+          { title: "Completed", value: "completed" },
+          { title: "Failed", value: "failed" },
         ],
       },
-      initialValue: 'pending',
+      initialValue: "pending",
     },
     {
-      name: 'customer',
-      title: 'Customer Details',
-      type: 'object',
+      name: "paymentMethod",
+      title: "Payment Method",
+      type: "string",
+      options: {
+        list: [
+          { title: "PesaPal", value: "pesapal" },
+          { title: "M-Pesa", value: "mpesa" },
+        ],
+      },
+    },
+    {
+      name: "paymentDate",
+      title: "Payment Date",
+      type: "datetime",
+    },
+    {
+      name: "transactionId",
+      title: "Transaction ID",
+      type: "string",
+      description: "PesaPal transaction ID",
+    },
+    {
+      name: "paymentDetails",
+      title: "Payment Details",
+      type: "object",
       fields: [
-        { name: 'name', type: 'string' },
-        { name: 'email', type: 'string' },
-        { name: 'phone', type: 'string' },
-        { name: 'address', type: 'string' },
+        { name: "status_code", type: "number" },
+        { name: "status", type: "string" },
+        { name: "payment_status_description", type: "string" },
+        { name: "payment_method", type: "string" },
+        { name: "amount", type: "number" },
+        { name: "currency", type: "string" },
+      ],
+      hidden: true,
+    },
+    {
+      name: "customer",
+      title: "Customer Details",
+      type: "object",
+      fields: [
+        { name: "name", type: "string" },
+        { name: "email", type: "string" },
+        { name: "phone", type: "string" },
+        { name: "address", type: "string" },
       ],
     },
     {
-      name: 'amount',
-      title: 'Total Amount',
-      type: 'number',
+      name: "amount",
+      title: "Total Amount",
+      type: "number",
     },
     {
-      name: 'items',
-      title: 'Ordered Items',
-      type: 'array',
+      name: "items",
+      title: "Ordered Items",
+      type: "array",
       of: [
         {
-          type: 'object',
+          type: "object",
           fields: [
-            { name: 'productName', type: 'string' },
-            { name: 'quantity', type: 'number' },
-            { name: 'price', type: 'string' },
-            { name: 'size', type: 'string' },
-            { name: 'color', type: 'string' },
+            { name: "productName", type: "string" },
+            { name: "quantity", type: "number" },
+            { name: "price", type: "string" },
+            { name: "size", type: "string" },
+            { name: "color", type: "string" },
           ],
+          preview: {
+            select: {
+              title: "productName",
+              quantity: "quantity",
+              size: "size",
+              color: "color",
+              price: "price",
+            },
+            prepare({
+              title,
+              quantity,
+              size,
+              color,
+              price,
+            }: {
+              title: string;
+              quantity: number;
+              size: string;
+              color: string;
+              price: string;
+            }) {
+              return {
+                title: title || "Unknown Product",
+                subtitle: `${price} | Qty: ${quantity} | Size: ${size} | Color: ${color}`,
+              };
+            },
+          },
         },
       ],
     },
     {
-      name: 'createdAt',
-      title: 'Created At',
-      type: 'datetime',
+      name: "createdAt",
+      title: "Created At",
+      type: "datetime",
       initialValue: () => new Date().toISOString(),
+    },
+  ],
+  preview: {
+    select: {
+      title: "orderNumber",
+      subtitle: "customer.name",
+      status: "status",
+      amount: "amount",
+      date: "createdAt",
+    },
+    prepare({
+      title,
+      subtitle,
+      status,
+      amount,
+      date,
+    }: {
+      title: string;
+      subtitle: string;
+      status: string;
+      amount: number;
+      date: string;
+    }) {
+      const statusColors: Record<string, string> = {
+        pending: "🟡",
+        completed: "🟢",
+        failed: "🔴",
+      };
+
+      return {
+        title: `${statusColors[status] || "⚪"} ${title || "No Order Number"}`,
+        subtitle: `${subtitle || "No Customer"} - Ksh ${amount?.toLocaleString() || "0"} - ${new Date(date).toLocaleDateString()}`,
+      };
+    },
+  },
+  orderings: [
+    {
+      title: "Date Descending",
+      name: "dateDesc",
+      by: [{ field: "createdAt", direction: "desc" }],
     },
   ],
 };
