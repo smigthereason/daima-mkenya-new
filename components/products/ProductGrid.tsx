@@ -10,7 +10,7 @@ import Link from "next/link";
 interface ProductGridProps {
   products: Product[];
   columns?: 3 | 4;
-  onQuickView?: (productId: string, slug?: string) => void; // Updated to accept slug
+  onQuickView?: (productId: string, slug?: string) => void;
 }
 
 export default function ProductGrid({
@@ -23,7 +23,19 @@ export default function ProductGrid({
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   // Categories from your schema
-  const categories = ["All", "Accessories", "Streetwear", "Sets", "Shirts", "Tops", "Skirts", "Dresses", "Jackets", "Trousers", "Knitwear"];
+  const categories = [
+    "All",
+    "Accessories",
+    "Streetwear",
+    "Sets",
+    "Shirts",
+    "Tops",
+    "Skirts",
+    "Dresses",
+    "Jackets",
+    "Trousers",
+    "Knitwear",
+  ];
 
   // Filter Logic
   const filteredProducts = useMemo(() => {
@@ -55,7 +67,9 @@ export default function ProductGrid({
             The Selection
           </span>
           <h2 className="text-lg md:text-2xl uppercase tracking-[0.2em] font-black text-zinc-900">
-            {selectedCategory === "All" ? "Current Collection" : selectedCategory}{" "}
+            {selectedCategory === "All"
+              ? "Current Collection"
+              : selectedCategory}{" "}
             <span className="text-zinc-400 ml-2 font-light">
               ({filteredProducts.length})
             </span>
@@ -69,7 +83,10 @@ export default function ProductGrid({
             className="w-full flex justify-between items-center border border-zinc-900/10 bg-white/50 backdrop-blur-sm px-6 py-4 text-[11px] font-black uppercase tracking-[0.3em] transition-all hover:bg-white"
           >
             Filter: {selectedCategory}
-            <ChevronDown size={14} className={`transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown
+              size={14}
+              className={`transition-transform duration-300 ${isFilterOpen ? "rotate-180" : ""}`}
+            />
           </button>
 
           {isFilterOpen && (
@@ -80,7 +97,7 @@ export default function ProductGrid({
                     key={cat}
                     onClick={() => handleCategoryChange(cat)}
                     className={`w-full text-left px-6 py-4 text-[10px] font-bold uppercase tracking-[0.2em] hover:bg-zinc-900 hover:text-white transition-colors
-                      ${selectedCategory === cat ? 'bg-zinc-100' : ''}`}
+                      ${selectedCategory === cat ? "bg-zinc-100" : ""}`}
                   >
                     {cat}
                   </button>
@@ -94,21 +111,26 @@ export default function ProductGrid({
       {/* ── PRODUCT GRID OR EMPTY STATE ── */}
       {filteredProducts.length > 0 ? (
         <div
-          className={`grid gap-x-6 gap-y-16 sm:gap-x-10 sm:gap-y-24 
-            grid-cols-1                
-            sm:grid-cols-2             
+          className={`grid gap-x-6 gap-y-16 sm:gap-x-10 sm:gap-y-24
+            grid-cols-1
+            sm:grid-cols-2
             ${columns === 3 ? "lg:grid-cols-3" : "lg:grid-cols-4"}
           `}
         >
           {displayedProducts.map((product) => (
-            <div key={product._id} className="group cursor-pointer flex flex-col">
-
-              <Link href={`/products/${product.slug?.current || product._id}`} className="block">
-                {/* Image Container */}
+            <div
+              key={product._id}
+              className="group cursor-pointer flex flex-col"
+            >
+              <Link
+                href={`/products/${product.slug?.current || product._id}`}
+                className="block"
+              >
+                {/* Image Container - Now using hero image */}
                 <div className="bg-[#F9F9F9] aspect-3/4 relative overflow-hidden mb-6 md:mb-8 border border-transparent transition-colors duration-700 ease-in-out hover:border-neutral-400 group-hover:bg-[#F2F2F2]">
-                  {product.images?.thumbnails?.[0] && (
+                  {product.images?.hero && (
                     <Image
-                      src={urlFor(product.images.thumbnails[0]).url()}
+                      src={urlFor(product.images.hero).url()}
                       alt={product.name}
                       fill
                       unoptimized
@@ -120,9 +142,12 @@ export default function ProductGrid({
                   <div className="hidden lg:flex absolute inset-0 bg-black/5 items-end justify-center pb-12 opacity-0 group-hover:opacity-100 transition-all duration-500">
                     <button
                       onClick={(e) => {
-                        e.preventDefault(); 
+                        e.preventDefault();
                         e.stopPropagation();
-                        handleQuickViewClick(product._id, product.slug?.current);
+                        handleQuickViewClick(
+                          product._id,
+                          product.slug?.current,
+                        );
                       }}
                       className="group relative overflow-hidden border-2 border-zinc-900 bg-zinc-900 px-10 py-5 text-[11px] font-black uppercase tracking-[0.4em] shadow-2xl transition-colors duration-300"
                     >
@@ -168,7 +193,8 @@ export default function ProductGrid({
             Collection Update
           </p>
           <h3 className="text-lg md:text-xl font-black uppercase tracking-[0.2em] text-zinc-900">
-            There are currently no items in the <span className="text-zinc-400">{selectedCategory}</span> category.
+            There are currently no items in the{" "}
+            <span className="text-zinc-400">{selectedCategory}</span> category.
           </h3>
           <button
             onClick={() => setSelectedCategory("All")}
@@ -193,7 +219,8 @@ export default function ProductGrid({
             <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
           </button>
           <p className="text-[11px] uppercase tracking-[0.3em] text-zinc-400 font-bold">
-            Showing {displayedProducts.length} of {filteredProducts.length} Items
+            Showing {displayedProducts.length} of {filteredProducts.length}{" "}
+            Items
           </p>
         </div>
       )}
