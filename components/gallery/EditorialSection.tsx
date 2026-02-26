@@ -1,13 +1,12 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import * as Assets from "@/public/assets";
 
 const EditorialSection = () => (
   <section className="mt-24 md:mt-40 border-t border-neutral-200 pt-16 md:pt-24 max-w-[1800px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
     <div className="lg:col-span-5 relative h-80 sm:h-96 lg:h-[500px] w-full group overflow-hidden shadow-xl">
       <Image
-        src={Assets.HeroImage}
+        src="/assets/Gallery/Editorial_sect.jpg"
         alt="Daima Mkenya Studio session 2026 - Kenyan Heritage Fashion Editorial Nairobi"
         fill
         priority
