@@ -27,8 +27,7 @@ const GalleryPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Dynamic gallery image configuration with correct public folder paths
-    // Images should be placed in public/gallery/ folder
+    // Dynamic gallery image configuration - using public folder paths
     const galleryImages: GalleryImage[] = [
       // Earth Theme Images (Terrain)
       { id: 'earth-1', src: '/gallery/1000317885.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
@@ -82,7 +81,7 @@ const GalleryPage = () => {
       { id: 'amber-4', src: '/gallery/IMG-20260225-WA0069.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'square' },
     ];
 
-    // Skip validation and use all images - let the UI handle broken images
+    // Arrange images in the desired pattern
     const arrangedImages = arrangeGalleryPattern(galleryImages);
     setGalleryItems(arrangedImages);
     setIsLoading(false);
@@ -163,17 +162,6 @@ const GalleryPage = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#B62025] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-neutral-600">Loading gallery...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (galleryItems.length === 0) {
-    return (
-      <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-neutral-600">No gallery images found.</p>
-          <p className="text-sm text-neutral-400 mt-2">Please check that images are in the /public/gallery/ folder</p>
         </div>
       </div>
     );
