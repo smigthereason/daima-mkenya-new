@@ -52,7 +52,7 @@ import Product13 from "./hand-stitched-textile-clutch.webp";
 import Product14 from "./striped-national-button-down.webp";
 import Product15 from "./leopard-shield-print-vest-3.webp";
 
-// Gallery Subfolder Images
+// Gallery Subfolder Images - ENSURE CASE SENSITIVITY
 import G_Earth1 from "./gallery/1000317885.webp";
 import G_Earth2 from "./gallery/1000317888.webp";
 import G_Earth3 from "./gallery/1000317894.webp";
