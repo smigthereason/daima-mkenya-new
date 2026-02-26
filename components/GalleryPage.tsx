@@ -288,25 +288,12 @@ const GalleryPage = () => {
 
     // Arrange in a visually interesting pattern (alternating themes)
     const arrangedImages = [
-      // Start with a strong opening - use Verdant (green) as it's striking
       ...imageFiles.filter((f) => f.theme === "Verdant").slice(0, 3),
-
-      // Intersperse with Earth tones
       ...imageFiles.filter((f) => f.theme === "Earth").slice(0, 2),
-
-      // More Verdant
       ...imageFiles.filter((f) => f.theme === "Verdant").slice(3, 6),
-
-      // Urban break
       ...imageFiles.filter((f) => f.theme === "Urban").slice(0, 3),
-
-      // Back to Verdant
       ...imageFiles.filter((f) => f.theme === "Verdant").slice(6, 10),
-
-      // Golden Hour accent
       ...imageFiles.filter((f) => f.theme === "Amber").slice(0, 2),
-
-      // Continue with pattern
       ...imageFiles.filter((f) => f.theme === "Earth").slice(2, 5),
       ...imageFiles.filter((f) => f.theme === "Verdant").slice(10, 15),
       ...imageFiles.filter((f) => f.theme === "Urban").slice(3, 7),
@@ -317,9 +304,9 @@ const GalleryPage = () => {
       ...imageFiles.filter((f) => f.theme === "Verdant").slice(20),
     ];
 
-    // Format for the gallery
+    // Format for the gallery - Re-applying the subfolder path
     const formatted = arrangedImages
-      .filter((item) => item) // Remove any undefined
+      .filter((item) => item) 
       .map((item, index) => ({
         _id: `gallery-${index}`,
         title: `${item.theme} ${item.series}`,
@@ -327,7 +314,6 @@ const GalleryPage = () => {
         theme: item.theme,
         series: item.series,
         mood: item.mood,
-        // Add aspect ratio hints for masonry (can be customized per image)
         aspectRatio:
           index % 5 === 0
             ? "portrait"
@@ -343,7 +329,6 @@ const GalleryPage = () => {
     if (galleryItems.length === 0) return;
 
     const ctx = gsap.context(() => {
-      // Initial fade-in with staggered reveal based on theme
       gsap.from(".gallery-item", {
         scrollTrigger: {
           trigger: containerRef.current,
@@ -361,8 +346,7 @@ const GalleryPage = () => {
         ease: "power3.out",
       });
 
-      // Parallax effect on scroll for each image
-      gsap.utils.toArray<HTMLElement>(".gallery-item").forEach((item, i) => {
+      gsap.utils.toArray<HTMLElement>(".gallery-item").forEach((item) => {
         const img = item.querySelector("img");
         if (img) {
           gsap.fromTo(
@@ -392,7 +376,6 @@ const GalleryPage = () => {
     >
       <GalleryHeader />
 
-      {/* Themed Masonry Grid with artistic arrangement */}
       <section className="relative z-10 max-w-[2000px] mx-auto">
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {galleryItems.map((item, index) => (
@@ -400,7 +383,6 @@ const GalleryPage = () => {
               key={item._id}
               className="gallery-item-wrapper break-inside-avoid"
             >
-              {/* Add different sizes based on theme for visual interest */}
               <div
                 className={`
                 ${item.theme === "Verdant" ? "transform hover:scale-[1.02] transition-transform duration-700" : ""}
@@ -416,7 +398,6 @@ const GalleryPage = () => {
         </div>
       </section>
 
-      {/* Add a thematic divider */}
       <section className="max-w-[1800px] mx-auto py-32 px-6 md:px-12">
         <div className="border-t border-neutral-200 pt-24 text-center quote-content">
           <p className="text-[10px] tracking-[0.6em] text-neutral-400 mb-8 uppercase font-medium">
@@ -429,8 +410,7 @@ const GalleryPage = () => {
           </h2>
 
           <div className="mt-12 flex flex-col items-center gap-4">
-            <span className="h-px w-12 bg-[#B62025]" />{" "}
-            {/* Maasai Red Accent */}
+            <span className="h-px w-12 bg-[#B62025]" />
             <p className="text-[11px] tracking-[0.4em] text-neutral-500 uppercase font-bold">
               DMA Africa
             </p>
