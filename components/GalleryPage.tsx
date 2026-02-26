@@ -27,88 +27,65 @@ const GalleryPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Dynamic gallery image configuration
-    // This approach uses public URLs instead of static imports
+    // Dynamic gallery image configuration with correct public folder paths
+    // Images should be placed in public/gallery/ folder
     const galleryImages: GalleryImage[] = [
       // Earth Theme Images (Terrain)
-      { id: 'earth-1', src: '/assets/gallery/1000317885.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
-      { id: 'earth-2', src: '/assets/gallery/1000317888.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
-      { id: 'earth-3', src: '/assets/gallery/1000317894.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'portrait' },
-      { id: 'earth-4', src: '/assets/gallery/1000317924.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
-      { id: 'earth-5', src: '/assets/gallery/1000317943.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'panoramic' },
-      { id: 'earth-6', src: '/assets/gallery/1000317945.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
+      { id: 'earth-1', src: '/gallery/1000317885.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
+      { id: 'earth-2', src: '/gallery/1000317888.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
+      { id: 'earth-3', src: '/gallery/1000317894.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'portrait' },
+      { id: 'earth-4', src: '/gallery/1000317924.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
+      { id: 'earth-5', src: '/gallery/1000317943.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'panoramic' },
+      { id: 'earth-6', src: '/gallery/1000317945.webp', theme: 'Earth', series: 'Terrain', aspectRatio: 'square' },
       
       // Urban Theme Images (Architecture)
-      { id: 'urban-1', src: '/assets/gallery/1000317966.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
-      { id: 'urban-2', src: '/assets/gallery/1000317968.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'portrait' },
-      { id: 'urban-3', src: '/assets/gallery/1000317970.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
-      { id: 'urban-4', src: '/assets/gallery/1000317972.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
-      { id: 'urban-5', src: '/assets/gallery/1000317974.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'panoramic' },
-      { id: 'urban-6', src: '/assets/gallery/1000317976.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
-      { id: 'urban-7', src: '/assets/gallery/1000317978.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'portrait' },
-      { id: 'urban-8', src: '/assets/gallery/1000317982.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
-      { id: 'urban-9', src: '/assets/gallery/1000317987.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-1', src: '/gallery/1000317966.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-2', src: '/gallery/1000317968.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'portrait' },
+      { id: 'urban-3', src: '/gallery/1000317970.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-4', src: '/gallery/1000317972.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-5', src: '/gallery/1000317974.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'panoramic' },
+      { id: 'urban-6', src: '/gallery/1000317976.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-7', src: '/gallery/1000317978.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'portrait' },
+      { id: 'urban-8', src: '/gallery/1000317982.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
+      { id: 'urban-9', src: '/gallery/1000317987.webp', theme: 'Urban', series: 'Architecture', aspectRatio: 'square' },
       
       // Verdant Theme Images (Botanical)
-      { id: 'verdant-1', src: '/assets/gallery/IMG-20260225-WA0012.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-2', src: '/assets/gallery/IMG-20260225-WA0013.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-3', src: '/assets/gallery/IMG-20260225-WA0014.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-4', src: '/assets/gallery/IMG-20260225-WA0015.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
-      { id: 'verdant-5', src: '/assets/gallery/IMG-20260225-WA0016.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-6', src: '/assets/gallery/IMG-20260225-WA0017.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-7', src: '/assets/gallery/IMG-20260225-WA0018.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-8', src: '/assets/gallery/IMG-20260225-WA0019.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-9', src: '/assets/gallery/IMG-20260225-WA0020.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-10', src: '/assets/gallery/IMG-20260225-WA0021.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-11', src: '/assets/gallery/IMG-20260225-WA0022.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-12', src: '/assets/gallery/IMG-20260225-WA0023.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
-      { id: 'verdant-13', src: '/assets/gallery/IMG-20260225-WA0024.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-14', src: '/assets/gallery/IMG-20260225-WA0028.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-15', src: '/assets/gallery/IMG-20260225-WA0029.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-16', src: '/assets/gallery/IMG-20260225-WA0034.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-17', src: '/assets/gallery/IMG-20260225-WA0035.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-18', src: '/assets/gallery/IMG-20260225-WA0037.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-19', src: '/assets/gallery/IMG-20260225-WA0038.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
-      { id: 'verdant-20', src: '/assets/gallery/IMG-20260225-WA0039.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-21', src: '/assets/gallery/IMG-20260225-WA0040.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-22', src: '/assets/gallery/IMG-20260225-WA0041.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
-      { id: 'verdant-23', src: '/assets/gallery/IMG-20260225-WA0043.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
-      { id: 'verdant-24', src: '/assets/gallery/IMG-20260225-WA0044.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-1', src: '/gallery/IMG-20260225-WA0012.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-2', src: '/gallery/IMG-20260225-WA0013.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-3', src: '/gallery/IMG-20260225-WA0014.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-4', src: '/gallery/IMG-20260225-WA0015.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
+      { id: 'verdant-5', src: '/gallery/IMG-20260225-WA0016.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-6', src: '/gallery/IMG-20260225-WA0017.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-7', src: '/gallery/IMG-20260225-WA0018.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-8', src: '/gallery/IMG-20260225-WA0019.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-9', src: '/gallery/IMG-20260225-WA0020.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-10', src: '/gallery/IMG-20260225-WA0021.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-11', src: '/gallery/IMG-20260225-WA0022.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-12', src: '/gallery/IMG-20260225-WA0023.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
+      { id: 'verdant-13', src: '/gallery/IMG-20260225-WA0024.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-14', src: '/gallery/IMG-20260225-WA0028.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-15', src: '/gallery/IMG-20260225-WA0029.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-16', src: '/gallery/IMG-20260225-WA0034.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-17', src: '/gallery/IMG-20260225-WA0035.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-18', src: '/gallery/IMG-20260225-WA0037.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-19', src: '/gallery/IMG-20260225-WA0038.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'panoramic' },
+      { id: 'verdant-20', src: '/gallery/IMG-20260225-WA0039.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-21', src: '/gallery/IMG-20260225-WA0040.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-22', src: '/gallery/IMG-20260225-WA0041.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'portrait' },
+      { id: 'verdant-23', src: '/gallery/IMG-20260225-WA0043.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
+      { id: 'verdant-24', src: '/gallery/IMG-20260225-WA0044.webp', theme: 'Verdant', series: 'Botanical', aspectRatio: 'square' },
       
       // Amber Theme Images (Golden Hour)
-      { id: 'amber-1', src: '/assets/gallery/IMG-20260225-WA0059.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'portrait' },
-      { id: 'amber-2', src: '/assets/gallery/IMG-20260225-WA0060.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'square' },
-      { id: 'amber-3', src: '/assets/gallery/IMG-20260225-WA0068.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'panoramic' },
-      { id: 'amber-4', src: '/assets/gallery/IMG-20260225-WA0069.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'square' },
+      { id: 'amber-1', src: '/gallery/IMG-20260225-WA0059.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'portrait' },
+      { id: 'amber-2', src: '/gallery/IMG-20260225-WA0060.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'square' },
+      { id: 'amber-3', src: '/gallery/IMG-20260225-WA0068.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'panoramic' },
+      { id: 'amber-4', src: '/gallery/IMG-20260225-WA0069.webp', theme: 'Amber', series: 'Golden Hour', aspectRatio: 'square' },
     ];
 
-    // Function to check if image exists and filter out broken ones
-    const validateImages = async () => {
-      const validatedImages: GalleryImage[] = [];
-      
-      for (const image of galleryImages) {
-        try {
-          // Attempt to load the image to check if it exists
-          const img = new Image();
-          await new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = reject;
-            img.src = image.src;
-          });
-          validatedImages.push(image);
-        } catch (error) {
-          console.warn(`Image not found: ${image.src}`);
-          // Optionally add a fallback image here
-        }
-      }
-      
-      // Arrange images in the desired pattern
-      const arrangedImages = arrangeGalleryPattern(validatedImages);
-      setGalleryItems(arrangedImages);
-      setIsLoading(false);
-    };
-
-    validateImages();
+    // Skip validation and use all images - let the UI handle broken images
+    const arrangedImages = arrangeGalleryPattern(galleryImages);
+    setGalleryItems(arrangedImages);
+    setIsLoading(false);
   }, []);
 
   // Function to arrange images in the specific pattern
@@ -140,39 +117,44 @@ const GalleryPage = () => {
   useEffect(() => {
     if (galleryItems.length === 0 || isLoading) return;
 
-    const ctx = gsap.context(() => {
-      gsap.from(".gallery-item", {
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: "top 80%",
-          toggleActions: "play none none reverse",
-        },
-        y: 100,
-        opacity: 0,
-        rotation: 2,
-        duration: 1.5,
-        stagger: { amount: 2, from: "random" },
-        ease: "power3.out",
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        gsap.from(".gallery-item", {
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: "top 80%",
+            toggleActions: "play none none reverse",
+          },
+          y: 100,
+          opacity: 0,
+          rotation: 2,
+          duration: 1.5,
+          stagger: { amount: 2, from: "random" },
+          ease: "power3.out",
+        });
+
+        gsap.utils.toArray<HTMLElement>(".gallery-item").forEach((item) => {
+          const img = item.querySelector("img");
+          if (img) {
+            gsap.fromTo(img, { y: 0 }, {
+              y: -40,
+              ease: "none",
+              scrollTrigger: {
+                trigger: item,
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1.5,
+              },
+            });
+          }
+        });
       });
 
-      gsap.utils.toArray<HTMLElement>(".gallery-item").forEach((item) => {
-        const img = item.querySelector("img");
-        if (img) {
-          gsap.fromTo(img, { y: 0 }, {
-            y: -40,
-            ease: "none",
-            scrollTrigger: {
-              trigger: item,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.5,
-            },
-          });
-        }
-      });
-    });
+      return () => ctx.revert();
+    }, 100);
 
-    return () => ctx.revert();
+    return () => clearTimeout(timer);
   }, [galleryItems, isLoading]);
 
   if (isLoading) {
@@ -181,6 +163,17 @@ const GalleryPage = () => {
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-[#B62025] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-neutral-600">Loading gallery...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (galleryItems.length === 0) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-neutral-600">No gallery images found.</p>
+          <p className="text-sm text-neutral-400 mt-2">Please check that images are in the /public/gallery/ folder</p>
         </div>
       </div>
     );
