@@ -198,16 +198,13 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 1. REFINED SCRIM:
-          Instead of a solid color, we use a radial gradient that is darker in the center
-          where the text sits, but fades out to show the models clearly on the sides.
-      */}
+      {/* 1. REFINED SCRIM */}
       <div className="absolute inset-0 z-25 bg-[radial-gradient(circle,rgba(0,0,0,0.5)_0%,rgba(0,0,0,0.1)_90%)] md:bg-black/20 pointer-events-none" />
 
       {/* ── CENTERED CONTENT ── */}
       <div className="relative z-30 flex flex-col items-center text-center w-[90%] md:w-full pointer-events-none">
-        {/* LOGO STRIPES: Added a strong drop shadow for mobile pop */}
-        <div className="relative w-40 h-20 md:w-64 md:h-32 lg:w-160 lg:h-100 mb-2 md:mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
+        {/* LOGO STRIPES: Hidden on mobile (hidden), visible on medium screens and up (md:block) */}
+        <div className="relative hidden md:block w-40 h-20 md:w-64 md:h-32 lg:w-160 lg:h-100 mb-2 md:mb-6 drop-shadow-[0_10px_10px_rgba(0,0,0,0.5)]">
           <Image
             src={HeroStripe}
             alt="Logo"
@@ -217,26 +214,18 @@ export default function Hero() {
           />
         </div>
 
-        {/* 2. EDITORIAL TYPOGRAPHY:
-            - Used a tighter tracking on mobile for that "Luxury Branding" feel.
-            - Added 'drop-shadow-2xl' to ensure every letter is readable against the photos.
-        */}
+        {/* 2. EDITORIAL TYPOGRAPHY */}
         <h1 className="text-[12vw] sm:text-5xl md:text-7xl lg:text-[7.5rem] font-serif mb-4 md:mb-6 tracking-[-0.02em] text-white drop-shadow-2xl">
           Daima MKenya
         </h1>
 
-        {/* 3. SUBTITLE:
-            Increased tracking further for a "minimalist luxury" vibe.
-            The white text on black/gray shadow works universally.
-        */}
+        {/* 3. SUBTITLE */}
         <p className="text-white text-[9px] md:text-[12px] uppercase tracking-[0.6em] md:tracking-[0.8em] mb-10 md:mb-12 font-medium opacity-90 drop-shadow-md">
           Unity in Every Thread
         </p>
 
         <Link href="/products" className="pointer-events-auto">
-          {/* 4. THE BUTTON:
-              Used a slightly thinner border (1px) and larger padding for a more "expensive" look.
-          */}
+          {/* 4. THE BUTTON */}
           <button className="group relative overflow-hidden cursor-pointer border-[1px] border-white bg-white/10 px-14 py-5 text-[11px] font-bold tracking-[0.5em] uppercase text-white transition-all duration-500 backdrop-blur-sm hover:bg-white hover:text-black">
             {/* The "Grow" Background Layer */}
             <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0" />
