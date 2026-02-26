@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Image from "next/image";
 
 interface GalleryItemProps {
@@ -10,8 +10,6 @@ interface GalleryItemProps {
 }
 
 const GalleryItem = ({ item, index }: GalleryItemProps) => {
-  const [imgError, setImgError] = useState(false);
-
   // Determine image dimensions based on aspect ratio
   const getImageDimensions = () => {
     switch (item.aspectRatio) {
@@ -26,26 +24,10 @@ const GalleryItem = ({ item, index }: GalleryItemProps) => {
 
   const { width, height } = getImageDimensions();
 
-  // Create a data URL for a colored placeholder in case image fails to load
-  const getPlaceholderColor = () => {
-    switch (item.theme) {
-      case 'Earth':
-        return 'bg-amber-800';
-      case 'Urban':
-        return 'bg-slate-600';
-      case 'Verdant':
-        return 'bg-emerald-700';
-      case 'Amber':
-        return 'bg-amber-600';
-      default:
-        return 'bg-neutral-400';
-    }
-  };
-
   return (
     <article className="gallery-item group relative break-inside-avoid flex flex-col mb-6 md:mb-10">
       <div className="relative overflow-hidden bg-neutral-100 shadow-sm aspect-square sm:aspect-auto">
-        {item.imageSrc && !imgError ? (
+        {item.imageSrc && (
           <Image
             src={item.imageSrc}
             alt={item.title || "Gallery Image"}
@@ -54,27 +36,7 @@ const GalleryItem = ({ item, index }: GalleryItemProps) => {
             className="w-full h-auto object-cover transition-transform duration-1000 ease-out group-hover:scale-110"
             priority={index < 6}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onError={() => setImgError(true)}
           />
-        ) : (
-          // Fallback placeholder when image fails to load
-          <div 
-            className={`w-full ${getPlaceholderColor()} flex items-center justify-center`}
-            style={{ 
-              aspectRatio: item.aspectRatio === 'portrait' ? '4/5' : 
-                          item.aspectRatio === 'panoramic' ? '2/1' : '1/1',
-              minHeight: '200px'
-            }}
-          >
-            <div className="text-white text-center p-4">
-              <p className="text-xs uppercase tracking-wider opacity-70">
-                {item.theme || "Daima Mkenya"}
-              </p>
-              <p className="text-[10px] mt-2 opacity-50">
-                Image Loading...
-              </p>
-            </div>
-          </div>
         )}
 
         {/* Subtle overlay on hover - more artistic */}
