@@ -18,88 +18,39 @@ const GalleryPage = () => {
   const [galleryItems, setGalleryItems] = useState<any[]>([]);
 
   useEffect(() => {
-    // Map imported assets to the gallery structure
-    const imageFiles = [
-      // Series 1: Earth Tones
-      { img: Assets.G_Earth1, theme: "Earth", series: "Terrain", mood: "warm" },
-      { img: Assets.G_Earth2, theme: "Earth", series: "Terrain", mood: "warm" },
-      { img: Assets.G_Earth3, theme: "Earth", series: "Terrain", mood: "warm" },
-      { img: Assets.G_Earth4, theme: "Earth", series: "Terrain", mood: "warm" },
-      { img: Assets.G_Earth5, theme: "Earth", series: "Terrain", mood: "warm" },
-      { img: Assets.G_Earth6, theme: "Earth", series: "Terrain", mood: "warm" },
+    // Mapping static assets explicitly to avoid build-time undefined errors
+    const earthSeries = [Assets.G_Earth1, Assets.G_Earth2, Assets.G_Earth3, Assets.G_Earth4, Assets.G_Earth5, Assets.G_Earth6];
+    const urbanSeries = [Assets.G_Urban1, Assets.G_Urban2, Assets.G_Urban3, Assets.G_Urban4, Assets.G_Urban5, Assets.G_Urban6, Assets.G_Urban7, Assets.G_Urban8, Assets.G_Urban9];
+    const verdantSeries = [Assets.G_Verdant1, Assets.G_Verdant2, Assets.G_Verdant3, Assets.G_Verdant4, Assets.G_Verdant5, Assets.G_Verdant6, Assets.G_Verdant7, Assets.G_Verdant8, Assets.G_Verdant9, Assets.G_Verdant10, Assets.G_Verdant11, Assets.G_Verdant12, Assets.G_Verdant13, Assets.G_Verdant14, Assets.G_Verdant15, Assets.G_Verdant16, Assets.G_Verdant17, Assets.G_Verdant18, Assets.G_Verdant19, Assets.G_Verdant20, Assets.G_Verdant21, Assets.G_Verdant22, Assets.G_Verdant23, Assets.G_Verdant24];
+    const amberSeries = [Assets.G_Amber1, Assets.G_Amber2, Assets.G_Amber3, Assets.G_Amber4];
 
-      // Series 2: Urban
-      { img: Assets.G_Urban1, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban2, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban3, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban4, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban5, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban6, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban7, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban8, theme: "Urban", series: "Architecture", mood: "cool" },
-      { img: Assets.G_Urban9, theme: "Urban", series: "Architecture", mood: "cool" },
-
-      // Series 3: Verdant
-      { img: Assets.G_Verdant1, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant2, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant3, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant4, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant5, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant6, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant7, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant8, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant9, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant10, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant11, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant12, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant13, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant14, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant15, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant16, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant17, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant18, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant19, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant20, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant21, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant22, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant23, theme: "Verdant", series: "Botanical", mood: "natural" },
-      { img: Assets.G_Verdant24, theme: "Verdant", series: "Botanical", mood: "natural" },
-
-      // Series 4: Amber
-      { img: Assets.G_Amber1, theme: "Amber", series: "Golden Hour", mood: "warm" },
-      { img: Assets.G_Amber2, theme: "Amber", series: "Golden Hour", mood: "warm" },
-      { img: Assets.G_Amber3, theme: "Amber", series: "Golden Hour", mood: "warm" },
-      { img: Assets.G_Amber4, theme: "Amber", series: "Golden Hour", mood: "warm" },
+    // Combine them into a flat structure for the gallery
+    const rawData = [
+      ...verdantSeries.slice(0, 3).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
+      ...earthSeries.slice(0, 2).map(img => ({ img, theme: "Earth", series: "Terrain" })),
+      ...verdantSeries.slice(3, 6).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
+      ...urbanSeries.slice(0, 3).map(img => ({ img, theme: "Urban", series: "Architecture" })),
+      ...verdantSeries.slice(6, 10).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
+      ...amberSeries.slice(0, 2).map(img => ({ img, theme: "Amber", series: "Golden Hour" })),
+      ...earthSeries.slice(2, 5).map(img => ({ img, theme: "Earth", series: "Terrain" })),
+      ...verdantSeries.slice(10, 15).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
+      ...urbanSeries.slice(3, 7).map(img => ({ img, theme: "Urban", series: "Architecture" })),
+      ...verdantSeries.slice(15, 20).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
+      ...amberSeries.slice(2, 4).map(img => ({ img, theme: "Amber", series: "Golden Hour" })),
+      ...earthSeries.slice(5, 8).map(img => ({ img, theme: "Earth", series: "Terrain" })),
+      ...urbanSeries.slice(7, 10).map(img => ({ img, theme: "Urban", series: "Architecture" })),
+      ...verdantSeries.slice(20).map(img => ({ img, theme: "Verdant", series: "Botanical" })),
     ];
 
-    const arrangedImages = [
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(0, 3),
-      ...imageFiles.filter((f) => f.theme === "Earth").slice(0, 2),
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(3, 6),
-      ...imageFiles.filter((f) => f.theme === "Urban").slice(0, 3),
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(6, 10),
-      ...imageFiles.filter((f) => f.theme === "Amber").slice(0, 2),
-      ...imageFiles.filter((f) => f.theme === "Earth").slice(2, 5),
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(10, 15),
-      ...imageFiles.filter((f) => f.theme === "Urban").slice(3, 7),
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(15, 20),
-      ...imageFiles.filter((f) => f.theme === "Amber").slice(2, 4),
-      ...imageFiles.filter((f) => f.theme === "Earth").slice(5, 8),
-      ...imageFiles.filter((f) => f.theme === "Urban").slice(7, 10),
-      ...imageFiles.filter((f) => f.theme === "Verdant").slice(20),
-    ];
-
-    const formatted = arrangedImages
-      .filter((item) => item.img) // Safety check
+    const formatted = rawData
+      .filter(item => item.img) // Critical: Removes any failed imports
       .map((item, index) => ({
         _id: `gallery-${index}`,
         title: `${item.theme} ${item.series}`,
-        imageSrc: item.img, // Now using the StaticImageData object
+        imageSrc: item.img,
         theme: item.theme,
         series: item.series,
-        mood: item.mood,
-        aspectRatio:
-          index % 5 === 0 ? "portrait" : index % 7 === 0 ? "panoramic" : "square",
+        aspectRatio: index % 5 === 0 ? "portrait" : index % 7 === 0 ? "panoramic" : "square",
       }));
 
     setGalleryItems(formatted);
@@ -127,7 +78,7 @@ const GalleryPage = () => {
         const img = item.querySelector("img");
         if (img) {
           gsap.fromTo(img, { y: 0 }, {
-            y: -50,
+            y: -40,
             ease: "none",
             scrollTrigger: {
               trigger: item,
@@ -145,7 +96,6 @@ const GalleryPage = () => {
   return (
     <main ref={containerRef} className="min-h-screen bg-[#F8F8F8] pt-32 pb-20 px-4 md:px-12 mt-2">
       <GalleryHeader />
-
       <section className="relative z-10 max-w-[2000px] mx-auto">
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6 space-y-6">
           {galleryItems.map((item, index) => (
@@ -164,7 +114,7 @@ const GalleryPage = () => {
       </section>
 
       <section className="max-w-[1800px] mx-auto py-32 px-6 md:px-12">
-        <div className="border-t border-neutral-200 pt-24 text-center quote-content">
+        <div className="border-t border-neutral-200 pt-24 text-center">
           <p className="text-[10px] tracking-[0.6em] text-neutral-400 mb-8 uppercase font-medium">The DMA Philosophy</p>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-extralight tracking-tight leading-[1.1] text-neutral-900 max-w-5xl mx-auto italic">
             "Cherish where you come from and <br className="hidden md:block" /> you'll cherish everywhere you go"
@@ -175,7 +125,6 @@ const GalleryPage = () => {
           </div>
         </div>
       </section>
-
       <EditorialSection />
     </main>
   );
