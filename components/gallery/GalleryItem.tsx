@@ -13,9 +13,9 @@ const GalleryItem = ({ item, index }: GalleryItemProps) => {
   // Determine image dimensions based on aspect ratio
   const getImageDimensions = () => {
     switch (item.aspectRatio) {
-      case 'portrait':
+      case "portrait":
         return { width: 800, height: 1000 };
-      case 'panoramic':
+      case "panoramic":
         return { width: 1200, height: 600 };
       default: // square
         return { width: 800, height: 800 };
@@ -26,7 +26,8 @@ const GalleryItem = ({ item, index }: GalleryItemProps) => {
 
   return (
     <article className="gallery-item group relative break-inside-avoid flex flex-col mb-6 md:mb-10">
-      <div className="relative overflow-hidden bg-neutral-100 shadow-sm aspect-square sm:aspect-auto">
+      {/* REMOVED: shadow-sm border border-gray-100 */}
+      <div className="relative overflow-hidden bg-neutral-100 aspect-square sm:aspect-auto">
         {item.imageSrc && (
           <Image
             src={item.imageSrc}
