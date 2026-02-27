@@ -131,6 +131,31 @@
         "name": "isNew",
         "type": "boolean",
         "title": "Is New Arrival"
+      },
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Current inventory count. Shows \"Low Stock\" when 5 or less, \"Out of Stock\" when 0.",
+        "name": "stock",
+        "type": "number",
+        "title": "Stock Quantity"
+      },
+      {
+        "initialValue": false,
+        "description": "When enabled, this product will not appear in the store (useful for editing or temporary removal)",
+        "name": "disabled",
+        "type": "boolean",
+        "title": "Disable Product"
       }
     ],
     "name": "product",
@@ -417,6 +442,21 @@
         "type": "string"
       },
       {
+        "description": "The user who placed this order",
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      },
+      {
+        "description": "Email of the user who placed the order",
+        "name": "userEmail",
+        "type": "string"
+      },
+      {
         "description": "The ID returned by PesaPal once the order is registered",
         "name": "pesapalOrderTrackingId",
         "type": "string",
@@ -442,7 +482,24 @@
         "initialValue": "pending",
         "name": "status",
         "type": "string",
-        "title": "Payment Status"
+        "title": "Order Status"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Paid",
+              "value": "paid"
+            },
+            {
+              "title": "Unpaid",
+              "value": "unpaid"
+            }
+          ]
+        },
+        "initialValue": "unpaid",
+        "name": "paymentStatus",
+        "type": "string"
       },
       {
         "options": {
