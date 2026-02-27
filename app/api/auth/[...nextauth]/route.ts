@@ -9,14 +9,13 @@
 
 // // Export authOptions so other files can import it
 // export const authOptions: NextAuthOptions = {
-//   // The adapter handles saving Google/Facebook/Manual users into Sanity documents
 //   adapter: SanityAdapter(client as any),
-  
+
 //   providers: [
 //     GoogleProvider({
 //       clientId: process.env.GOOGLE_CLIENT_ID || "",
 //       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-//       allowDangerousEmailAccountLinking: true, 
+//       allowDangerousEmailAccountLinking: true,
 //     }),
 //     FacebookProvider({
 //       clientId: process.env.FACEBOOK_CLIENT_ID || "",
@@ -32,45 +31,53 @@
 //       credentials: {
 //         email: { label: "Email", type: "email" },
 //         password: { label: "Password", type: "password" },
-//         name: { label: "Name", type: "text" }
+//         name: { label: "Name", type: "text" },
 //       },
 //       async authorize(credentials) {
 //         if (credentials?.email && credentials?.password) {
-//           return { 
-//             id: credentials.email, 
-//             name: credentials.name || "Member", 
+//           return {
+//             id: credentials.email,
+//             name: credentials.name || "Member",
 //             email: credentials.email,
-//             image: `https://ui-avatars.com/api/?name=${credentials.email}&background=000&color=fff&size=128` 
+//             image: `https://ui-avatars.com/api/?name=${credentials.email}&background=000&color=fff&size=128`,
 //           };
 //         }
 //         return null;
-//       }
-//     })
+//       },
+//     }),
 //   ],
 //   secret: process.env.NEXTAUTH_SECRET,
 //   session: {
 //     strategy: "jwt",
 //   },
 //   pages: {
-//     signIn: '/login',
+//     signIn: "/login",
 //   },
 //   callbacks: {
+//     // FIXED: Properly return the full session
 //     async session({ session, token }) {
-//       if (session.user) {
-//         // Add the user ID from the token to the session
+//       if (session?.user) {
+//         // Ensure all user properties are preserved
 //         session.user.id = token.sub as string;
+//         session.user.email = (token.email as string) || session.user.email;
+//         session.user.name = (token.name as string) || session.user.name;
 //       }
 //       return session;
+//     },
+//     // ADDED: JWT callback to ensure token has all necessary data
+//     async jwt({ token, user }) {
+//       if (user) {
+//         token.id = user.id;
+//         token.email = user.email;
+//         token.name = user.name;
+//       }
+//       return token;
 //     },
 //   },
 // };
 
-// // Create the handler using authOptions
 // const handler = NextAuth(authOptions);
-
-// // Export the handler methods
 // export { handler as GET, handler as POST };
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
@@ -83,12 +90,12 @@ import { client } from "@/sanity/lib/client";
 // Export authOptions so other files can import it
 export const authOptions: NextAuthOptions = {
   adapter: SanityAdapter(client as any),
-  
+
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      allowDangerousEmailAccountLinking: true, 
+      allowDangerousEmailAccountLinking: true,
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID || "",
@@ -104,40 +111,37 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
-        name: { label: "Name", type: "text" }
+        name: { label: "Name", type: "text" },
       },
       async authorize(credentials) {
         if (credentials?.email && credentials?.password) {
-          return { 
-            id: credentials.email, 
-            name: credentials.name || "Member", 
+          return {
+            id: credentials.email,
+            name: credentials.name || "Member",
             email: credentials.email,
-            image: `https://ui-avatars.com/api/?name=${credentials.email}&background=000&color=fff&size=128` 
+            image: `https://ui-avatars.com/api/?name=${credentials.email}&background=000&color=fff&size=128`,
           };
         }
         return null;
-      }
-    })
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
   pages: {
-    signIn: '/login',
+    signIn: "/login",
   },
   callbacks: {
-    // FIXED: Properly return the full session
     async session({ session, token }) {
       if (session?.user) {
-        // Ensure all user properties are preserved
         session.user.id = token.sub as string;
-        session.user.email = token.email as string || session.user.email;
-        session.user.name = token.name as string || session.user.name;
+        session.user.email = (token.email as string) || session.user.email;
+        session.user.name = (token.name as string) || session.user.name;
       }
       return session;
     },
-    // ADDED: JWT callback to ensure token has all necessary data
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
@@ -145,7 +149,7 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name;
       }
       return token;
-    }
+    },
   },
 };
 
