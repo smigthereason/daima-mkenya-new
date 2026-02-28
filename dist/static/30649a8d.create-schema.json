@@ -466,12 +466,12 @@
         "options": {
           "list": [
             {
-              "title": "Pending",
-              "value": "pending"
-            },
-            {
               "title": "Completed",
               "value": "completed"
+            },
+            {
+              "title": "Pending",
+              "value": "pending"
             },
             {
               "title": "Failed",
@@ -479,7 +479,7 @@
             }
           ]
         },
-        "initialValue": "pending",
+        "initialValue": "completed",
         "name": "status",
         "type": "string",
         "title": "Order Status"
@@ -494,10 +494,14 @@
             {
               "title": "Unpaid",
               "value": "unpaid"
+            },
+            {
+              "title": "Refunded",
+              "value": "refunded"
             }
           ]
         },
-        "initialValue": "unpaid",
+        "initialValue": "paid",
         "name": "paymentStatus",
         "type": "string"
       },
@@ -530,40 +534,47 @@
       {
         "fields": [
           {
+            "description": "PesaPal status code (1 = success)",
             "name": "status_code",
             "type": "number"
           },
           {
+            "description": "PesaPal status message",
             "name": "status",
             "type": "string"
           },
           {
+            "description": "Description of payment status (e.g., 'Completed')",
             "name": "payment_status_description",
             "type": "string"
           },
           {
+            "description": "Method used (e.g., 'MpesaKE')",
             "name": "payment_method",
             "type": "string"
           },
           {
+            "description": "Payment amount",
             "name": "amount",
             "type": "number"
           },
           {
+            "description": "Payment currency (e.g., 'KES')",
             "name": "currency",
             "type": "string"
           },
           {
-            "description": "Phone number or account used for payment",
+            "description": "Phone number or account used for payment (e.g., '2547xxx98723')",
             "name": "payment_account",
             "type": "string"
           },
           {
-            "description": "Phone number from PesaPal",
-            "name": "phone_number",
+            "description": "M-Pesa confirmation code (e.g., 'UBS7F82T2V')",
+            "name": "confirmation_code",
             "type": "string"
           }
         ],
+        "hidden": false,
         "name": "paymentDetails",
         "type": "object"
       },
@@ -601,6 +612,27 @@
           {
             "fields": [
               {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Reference to the product (required for stock updates)",
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "product",
+                "type": "reference"
+              },
+              {
                 "name": "productName",
                 "type": "string"
               },
@@ -619,6 +651,20 @@
               {
                 "name": "color",
                 "type": "string"
+              },
+              {
+                "fields": [
+                  {
+                    "options": {
+                      "hotspot": true
+                    },
+                    "name": "hero",
+                    "type": "image",
+                    "title": "Hero Image"
+                  }
+                ],
+                "name": "productImage",
+                "type": "object"
               }
             ],
             "type": "object"

@@ -1,135 +1,3 @@
-// // context/CartContext.tsx
-
-// "use client";
-
-// import React, {
-//   createContext,
-//   useContext,
-//   useState,
-//   useEffect,
-//   useRef,
-// } from "react";
-// import { Product } from "@/types/Product";
-
-// interface CartItem {
-//   cartId: string;
-//   product: Product;
-//   selectedSize: string;
-//   selectedColor: { label: string; hex: string };
-//   quantity: number;
-// }
-
-// interface CartContextType {
-//   cartItems: CartItem[];
-//   addToCart: (
-//     product: Product,
-//     size: string,
-//     color: { label: string; hex: string },
-//   ) => void;
-//   removeFromCart: (cartId: string) => void;
-//   updateQuantity: (cartId: string, newQuantity: number) => void;
-//   clearCart: () => void; // Add this
-// }
-
-// const CartContext = createContext<CartContextType | undefined>(undefined);
-
-// export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-//   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-//   const isInitialMount = useRef(true);
-
-//   // Load from LocalStorage once on mount
-//   useEffect(() => {
-//     const savedCart = localStorage.getItem("daima_cart");
-//     if (savedCart) {
-//       try {
-//         const parsed = JSON.parse(savedCart);
-//         if (Array.isArray(parsed)) setCartItems(parsed);
-//       } catch (e) {
-//         console.error("Failed to parse cart", e);
-//       }
-//     }
-//   }, []);
-
-//   // Sync to LocalStorage only AFTER initial load
-//   useEffect(() => {
-//     if (isInitialMount.current) {
-//       isInitialMount.current = false;
-//       return;
-//     }
-//     localStorage.setItem("daima_cart", JSON.stringify(cartItems));
-//   }, [cartItems]);
-
-//   const addToCart = (
-//     product: Product,
-//     size: string,
-//     color: { label: string; hex: string },
-//   ) => {
-//     setCartItems((prev) => {
-//       const existingItemIndex = prev.findIndex(
-//         (item) =>
-//           item.product._id === product._id &&
-//           item.selectedSize === size &&
-//           item.selectedColor.label === color.label,
-//       );
-
-//       if (existingItemIndex > -1) {
-//         const newItems = [...prev];
-//         newItems[existingItemIndex].quantity += 1;
-//         return newItems;
-//       }
-
-//       return [
-//         ...prev,
-//         {
-//           cartId: `${product._id}-${size}-${color.label}-${Math.random().toString(36).substr(2, 5)}`,
-//           product,
-//           selectedSize: size,
-//           selectedColor: color,
-//           quantity: 1,
-//         },
-//       ];
-//     });
-//   };
-
-//   const updateQuantity = (cartId: string, newQuantity: number) => {
-//     if (newQuantity < 1) return;
-//     setCartItems((prev) =>
-//       prev.map((item) =>
-//         item.cartId === cartId ? { ...item, quantity: newQuantity } : item,
-//       ),
-//     );
-//   };
-
-//   const removeFromCart = (cartId: string) => {
-//     setCartItems((prev) => prev.filter((item) => item.cartId !== cartId));
-//   };
-
-//   const clearCart = () => {
-//     setCartItems([]);
-//     localStorage.removeItem("daima_cart");
-//   };
-
-//   return (
-//     <CartContext.Provider
-//       value={{
-//         cartItems,
-//         addToCart,
-//         removeFromCart,
-//         updateQuantity,
-//         clearCart, // Add this
-//       }}
-//     >
-//       {children}
-//     </CartContext.Provider>
-//   );
-// };
-
-// export const useCart = () => {
-//   const context = useContext(CartContext);
-//   if (!context) throw new Error("useCart must be used within CartProvider");
-//   return context;
-// };
-
 "use client";
 
 import React, {
@@ -165,7 +33,6 @@ interface CartContextType {
   loading: boolean;
   error: string | null;
   itemCount: number;
-  isInitialized: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -175,11 +42,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
+  const pendingRequests = useRef<Map<string, Promise<any>>>(new Map());
+  const isClearing = useRef(false); // Add this to prevent multiple clear operations
 
   const { data: session, status } = useSession();
   const prevSessionRef = useRef<typeof session>(null);
 
-  // Fetch cart from Sanity
+  // Fetch cart from Sanity only once when user logs in
   const fetchCart = useCallback(async () => {
     if (status !== "authenticated" || !session?.user?.email) {
       setCartItems([]);
@@ -187,15 +56,16 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       return;
     }
 
-    setLoading(true);
-    setError(null);
+    // Don't show loading for initial fetch if we already have items
+    if (cartItems.length === 0) {
+      setLoading(true);
+    }
 
     try {
       const response = await fetch("/api/cart");
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch cart");
+        throw new Error("Failed to fetch cart");
       }
 
       const data = await response.json();
@@ -207,21 +77,35 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
       setIsInitialized(true);
     }
-  }, [session, status]);
+  }, [session, status, cartItems.length]);
 
   // Fetch cart on mount and when session changes
   useEffect(() => {
     fetchCart();
   }, [fetchCart]);
 
-  // Handle logout - clear cart state
+  // Handle logout - clear cart state immediately
   useEffect(() => {
     if (prevSessionRef.current && !session) {
-      setCartItems([]);
-      setIsInitialized(true);
+      setCartItems([]); // Clear immediately on logout
     }
     prevSessionRef.current = session;
   }, [session]);
+
+  // Helper to find duplicate item
+  const findExistingItem = (
+    items: CartItem[],
+    productId: string,
+    size: string,
+    colorLabel: string,
+  ) => {
+    return items.find(
+      (item) =>
+        item.product._id === productId &&
+        item.selectedSize === size &&
+        item.selectedColor.label === colorLabel,
+    );
+  };
 
   const addToCart = async (
     product: Product,
@@ -231,14 +115,48 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   ) => {
     if (status !== "authenticated") {
       setError("Please log in to add items to cart");
-      throw new Error("Please log in to add items to cart");
+      return;
     }
 
-    setLoading(true);
-    setError(null);
+    // Optimistic update
+    setCartItems((prevItems) => {
+      const existingItem = findExistingItem(
+        prevItems,
+        product._id,
+        size,
+        color.label,
+      );
+
+      if (existingItem) {
+        // Update existing item quantity
+        return prevItems.map((item) =>
+          item.cartId === existingItem.cartId
+            ? { ...item, quantity: item.quantity + quantity }
+            : item,
+        );
+      } else {
+        // Create new item with temporary cartId
+        const tempCartId = `temp-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const newItem: CartItem = {
+          cartId: tempCartId,
+          product,
+          selectedSize: size,
+          selectedColor: color,
+          quantity,
+        };
+        return [...prevItems, newItem];
+      }
+    });
 
     try {
-      const response = await fetch("/api/cart", {
+      // Check if this exact item is already being added
+      const requestKey = `${product._id}-${size}-${color.label}`;
+      if (pendingRequests.current.has(requestKey)) {
+        await pendingRequests.current.get(requestKey);
+        return;
+      }
+
+      const request = fetch("/api/cart", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -254,29 +172,61 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           selectedSize: size,
           selectedColor: color,
         }),
-      });
+      })
+        .then(async (response) => {
+          if (!response.ok) {
+            throw new Error("Failed to add to cart");
+          }
+          const data = await response.json();
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to add to cart");
-      }
+          // Update with server data to get correct cartIds
+          setCartItems(data.items);
+          return data;
+        })
+        .catch((err) => {
+          // Revert optimistic update on error
+          setCartItems((prevItems) => {
+            const existingItem = findExistingItem(
+              prevItems,
+              product._id,
+              size,
+              color.label,
+            );
+            if (existingItem) {
+              // Revert quantity change
+              return prevItems.map((item) =>
+                item.cartId === existingItem.cartId
+                  ? { ...item, quantity: item.quantity - quantity }
+                  : item,
+              );
+            } else {
+              // Remove the temporary item
+              return prevItems.filter(
+                (item) => !item.cartId.startsWith("temp-"),
+              );
+            }
+          });
+          throw err;
+        });
 
-      const data = await response.json();
-      setCartItems(data.items);
+      pendingRequests.current.set(requestKey, request);
+      await request;
+      pendingRequests.current.delete(requestKey);
     } catch (err) {
       console.error("Error adding to cart:", err);
       setError(err instanceof Error ? err.message : "Failed to add to cart");
-      throw err;
-    } finally {
-      setLoading(false);
     }
   };
 
   const removeFromCart = async (cartId: string) => {
-    if (status !== "authenticated") return;
+    // Store item for potential revert
+    let removedItem: CartItem | undefined;
 
-    setLoading(true);
-    setError(null);
+    // Optimistic update
+    setCartItems((prevItems) => {
+      removedItem = prevItems.find((item) => item.cartId === cartId);
+      return prevItems.filter((item) => item.cartId !== cartId);
+    });
 
     try {
       const response = await fetch(`/api/cart?cartId=${cartId}`, {
@@ -284,28 +234,37 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to remove from cart");
+        throw new Error("Failed to remove from cart");
       }
 
       const data = await response.json();
+      // Update with server data to ensure consistency
       setCartItems(data.items);
     } catch (err) {
+      // Revert optimistic update on error
+      if (removedItem) {
+        setCartItems((prevItems) => [...prevItems, removedItem!]);
+      }
       console.error("Error removing from cart:", err);
       setError(
         err instanceof Error ? err.message : "Failed to remove from cart",
       );
-    } finally {
-      setLoading(false);
     }
   };
 
   const updateQuantity = async (cartId: string, newQuantity: number) => {
-    if (status !== "authenticated") return;
     if (newQuantity < 1) return;
 
-    setLoading(true);
-    setError(null);
+    // Store original quantity for potential revert
+    let originalItem: CartItem | undefined;
+
+    // Optimistic update
+    setCartItems((prevItems) => {
+      originalItem = prevItems.find((item) => item.cartId === cartId);
+      return prevItems.map((item) =>
+        item.cartId === cartId ? { ...item, quantity: newQuantity } : item,
+      );
+    });
 
     try {
       const response = await fetch("/api/cart", {
@@ -320,31 +279,45 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || "Failed to update quantity");
+        throw new Error("Failed to update quantity");
       }
 
       const data = await response.json();
+      // Update with server data to ensure consistency
       setCartItems(data.items);
     } catch (err) {
+      // Revert optimistic update on error
+      if (originalItem) {
+        setCartItems((prevItems) =>
+          prevItems.map((item) =>
+            item.cartId === cartId ? { ...originalItem! } : item,
+          ),
+        );
+      }
       console.error("Error updating quantity:", err);
       setError(
         err instanceof Error ? err.message : "Failed to update quantity",
       );
-    } finally {
-      setLoading(false);
     }
   };
 
   const clearCart = async () => {
-    if (status !== "authenticated") return;
+    // Prevent multiple clear operations
+    if (isClearing.current) return;
 
-    setLoading(true);
-    setError(null);
+    // If cart is already empty, just return
+    if (cartItems.length === 0) return;
+
+    isClearing.current = true;
+
+    // Store current items for potential revert
+    const currentItems = [...cartItems];
+
+    // Optimistic update
+    setCartItems([]);
 
     try {
-      // Get all cart items and remove them one by one
-      const removePromises = cartItems.map((item) =>
+      const removePromises = currentItems.map((item) =>
         fetch(`/api/cart?cartId=${item.cartId}`, {
           method: "DELETE",
         }).then((res) => {
@@ -354,12 +327,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       );
 
       await Promise.all(removePromises);
-      setCartItems([]);
     } catch (err) {
+      // Revert optimistic update on error
+      setCartItems(currentItems);
       console.error("Error clearing cart:", err);
       setError(err instanceof Error ? err.message : "Failed to clear cart");
     } finally {
-      setLoading(false);
+      isClearing.current = false;
     }
   };
 
@@ -373,10 +347,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         removeFromCart,
         updateQuantity,
         clearCart,
-        loading,
+        loading: loading && !isInitialized, // Only show loading on initial fetch
         error,
         itemCount,
-        isInitialized,
       }}
     >
       {children}

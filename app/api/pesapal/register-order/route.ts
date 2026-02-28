@@ -16,23 +16,33 @@ export async function POST(req: Request) {
       );
     }
 
-    const { amount, email, name, items, shippingAddress, phoneNumber } =
-      await req.json();
+    const body = await req.json();
+    console.log("Register order received:", JSON.stringify(body, null, 2));
 
-    // Log received data
-    console.log("Register order received:", {
-      amount,
-      email,
-      name,
-      phoneNumber,
-      shippingAddress,
-      itemCount: items?.length,
-    });
+    const { amount, email, name, items, shippingAddress, phoneNumber } = body;
 
     // Validate required fields
-    if (!amount || !email || !name || !items) {
+    if (!amount) {
       return NextResponse.json(
-        { error: "Missing required fields" },
+        { error: "Missing required field: amount" },
+        { status: 400 },
+      );
+    }
+    if (!email) {
+      return NextResponse.json(
+        { error: "Missing required field: email" },
+        { status: 400 },
+      );
+    }
+    if (!name) {
+      return NextResponse.json(
+        { error: "Missing required field: name" },
+        { status: 400 },
+      );
+    }
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: "Missing required field: items (must be a non-empty array)" },
         { status: 400 },
       );
     }
@@ -43,6 +53,25 @@ export async function POST(req: Request) {
         { error: "Phone number is required for payment" },
         { status: 400 },
       );
+    }
+
+    // Validate each item has required fields and product ID
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      if (!item.product) {
+        return NextResponse.json(
+          { error: `Item ${i} is missing product object` },
+          { status: 400 },
+        );
+      }
+      if (!item.product._id) {
+        return NextResponse.json(
+          {
+            error: `Item ${i} is missing product._id - this is critical for stock tracking`,
+          },
+          { status: 400 },
+        );
+      }
     }
 
     // Find the user in Sanity by email
@@ -72,17 +101,116 @@ export async function POST(req: Request) {
     // Generate unique order number
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // Format items for Sanity
-    const orderItems = items.map((item: any, index: number) => ({
-      _key: `item-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 9)}`,
-      productName: item.product.name,
-      quantity: item.quantity,
-      price: item.product.price,
-      size: item.selectedSize,
-      color: item.selectedColor.label,
-    }));
+    // Format items for Sanity with product references
+    const orderItems = items
+      .map((item: any, index: number) => {
+        const productId = item.product._id;
 
-    // Create order in Sanity with user reference
+        if (!productId) {
+          console.error(
+            "CRITICAL: Missing product ID for item:",
+            item.product.name,
+          );
+          return null;
+        }
+
+        return {
+          _key: `item-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 9)}`,
+          product: {
+            _type: "reference",
+            _ref: productId, // CRITICAL for stock updates
+          },
+          productName: item.product.name,
+          quantity: item.quantity,
+          price: item.product.price,
+          size: item.selectedSize,
+          color: item.selectedColor.label,
+        };
+      })
+      .filter((item: any) => item !== null);
+
+    if (orderItems.length === 0) {
+      return NextResponse.json(
+        { error: "No valid items with product references" },
+        { status: 400 },
+      );
+    }
+
+    console.log(
+      "Order items with product references:",
+      orderItems.map((i) => ({
+        productRef: i.product._ref,
+        productName: i.productName,
+        quantity: i.quantity,
+      })),
+    );
+
+    // FIRST: Update stock quantities immediately (since payment is already done)
+    console.log("Updating stock quantities for items...");
+    const stockUpdates = [];
+
+    for (const item of orderItems) {
+      try {
+        // Get current product stock
+        const product = await client.fetch(
+          `*[_type == "product" && _id == $productId][0] {
+            _id,
+            stock,
+            name
+          }`,
+          { productId: item.product._ref },
+        );
+
+        if (product) {
+          const currentStock = product.stock || 0;
+          const newStock = Math.max(0, currentStock - item.quantity);
+
+          // Update the product stock
+          await client.patch(product._id).set({ stock: newStock }).commit();
+
+          console.log(
+            `✓ Updated stock for ${product.name}: ${currentStock} → ${newStock} (sold: ${item.quantity})`,
+          );
+
+          stockUpdates.push({
+            success: true,
+            productId: product._id,
+            productName: product.name,
+            previousStock: currentStock,
+            newStock,
+          });
+        } else {
+          console.error(`✗ Product not found: ${item.product._ref}`);
+          stockUpdates.push({
+            success: false,
+            productId: item.product._ref,
+            productName: item.productName,
+            error: "Product not found",
+          });
+        }
+      } catch (error) {
+        console.error(`✗ Error updating stock for ${item.productName}:`, error);
+        stockUpdates.push({
+          success: false,
+          productId: item.product._ref,
+          productName: item.productName,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    }
+
+    // Check if all stock updates were successful
+    const allStockUpdated = stockUpdates.every((update) => update.success);
+
+    if (!allStockUpdated) {
+      console.error(
+        "Some stock updates failed:",
+        stockUpdates.filter((u) => !u.success),
+      );
+      // Continue anyway? Or return error? For now, we'll continue but log the error
+    }
+
+    // Create order in Sanity with PAID status immediately
     const orderData = {
       _type: "order",
       orderNumber,
@@ -91,28 +219,31 @@ export async function POST(req: Request) {
         _ref: user._id,
       },
       userEmail: session.user.email,
-      status: "completed", // We set to completed initially, IPN will verify
-      paymentStatus: "paid", // We set to paid initially, IPN will verify
+      status: "completed", // Set to completed immediately
+      paymentStatus: "paid", // Set to paid immediately
       paymentMethod: "pesapal",
-      paymentDate: new Date().toISOString(),
+      paymentDate: new Date().toISOString(), // Set payment date now
       customer: {
         name,
         email,
-        phone: phoneNumber, // CRITICAL: Store the phone number
+        phone: phoneNumber,
         address: shippingAddress || "",
       },
       amount,
       items: orderItems,
       createdAt: new Date().toISOString(),
+      // Store stock update info for reference
+      stockUpdates: stockUpdates,
     };
 
     const sanityOrder = await client.create(orderData);
-    console.log("Order created in Sanity with user reference:", {
+    console.log("✅ Order created in Sanity with PAID status:", {
       id: sanityOrder._id,
       orderNumber,
-      userEmail: session.user.email,
-      userId: user._id,
-      phoneNumber: phoneNumber, // Should now show the phone number
+      status: "completed",
+      paymentStatus: "paid",
+      itemCount: orderItems.length,
+      stockUpdates: stockUpdates.length,
     });
 
     // Authenticate with PesaPal V3
@@ -133,7 +264,7 @@ export async function POST(req: Request) {
       redirect_mode: "TOP_WINDOW",
       billing_address: {
         email_address: email,
-        phone_number: phoneNumber, // CRITICAL: Include phone number for PesaPal
+        phone_number: phoneNumber,
         country_code: "KE",
         first_name: name.split(" ")[0] || name,
         middle_name: "",
@@ -147,13 +278,7 @@ export async function POST(req: Request) {
       },
     };
 
-    console.log("Sending to PesaPal:", {
-      ...pesapalOrderData,
-      billing_address: {
-        ...pesapalOrderData.billing_address,
-        phone_number: phoneNumber, // Log to verify
-      },
-    });
+    console.log("Sending to PesaPal...");
 
     // Submit Order to PesaPal
     const response = await fetch(
@@ -170,6 +295,7 @@ export async function POST(req: Request) {
     );
 
     const result = await response.json();
+    console.log("PesaPal response:", result);
 
     if (result.status !== "200" && result.status !== 200) {
       console.error("PesaPal Order Submission Error:", result);
@@ -191,6 +317,7 @@ export async function POST(req: Request) {
       order_tracking_id: result.order_tracking_id,
       merchant_reference: result.merchant_reference || orderNumber,
       orderId: sanityOrder._id,
+      stockUpdates: stockUpdates, // Return stock update info for debugging
     });
   } catch (error: any) {
     console.error("Internal Server Error in Register Order:", error);

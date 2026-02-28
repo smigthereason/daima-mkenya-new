@@ -31,6 +31,7 @@ export async function GET() {
       `*[_type == "cart" && user._ref == $userId][0] {
         _id,
         items[] {
+          _key,
           cartId,
           quantity,
           selectedSize,
@@ -75,7 +76,6 @@ export async function GET() {
         selectedColor: item.selectedColor,
         product: {
           ...item.product,
-          // Ensure images structure is preserved
           images: item.product.images || { hero: null, thumbnails: [] },
         },
       })) || [];
@@ -90,7 +90,7 @@ export async function GET() {
   }
 }
 
-// POST /api/cart - Add item to cart (with duplicate checking)
+// POST /api/cart - Add item to cart
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -129,7 +129,15 @@ export async function POST(req: Request) {
     let cart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         _id,
-        items
+        items[] {
+          _key,
+          cartId,
+          product {
+            _ref
+          },
+          selectedSize,
+          selectedColor
+        }
       }`,
       { userId: user._id },
     );
@@ -146,8 +154,10 @@ export async function POST(req: Request) {
     if (!cart) {
       // Create new cart with item
       const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+      const itemKey = `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       const newItem = {
+        _key: itemKey, // REQUIRED for Sanity
         cartId,
         product: {
           _type: "reference",
@@ -189,8 +199,10 @@ export async function POST(req: Request) {
       } else {
         // New item - add to cart
         const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+        const itemKey = `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
         const newItem = {
+          _key: itemKey, // REQUIRED for Sanity
           cartId,
           product: {
             _type: "reference",
@@ -220,6 +232,7 @@ export async function POST(req: Request) {
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
+          _key,
           cartId,
           quantity,
           selectedSize,
@@ -319,6 +332,7 @@ export async function PATCH(req: Request) {
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
+          _key,
           cartId,
           quantity,
           selectedSize,
@@ -413,6 +427,7 @@ export async function DELETE(req: Request) {
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
+          _key,
           cartId,
           quantity,
           selectedSize,

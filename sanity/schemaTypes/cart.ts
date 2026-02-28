@@ -72,8 +72,14 @@ export const cart = {
               title: "Selected Color",
               type: "object",
               fields: [
-                { name: "label", type: "string" },
-                { name: "hex", type: "string" },
+                {
+                  name: "label",
+                  type: "string",
+                },
+                {
+                  name: "hex",
+                  type: "string",
+                },
               ],
             },
             {

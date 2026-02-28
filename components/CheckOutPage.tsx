@@ -32,7 +32,8 @@ declare global {
 
 export default function CheckOutPage({ onBack }: CheckOutPageProps) {
   const { data: session, status } = useSession();
-  const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, clearCart, loading } =
+    useCart(); // Fixed: added loading here
   const router = useRouter();
 
   const [isProcessing, setIsProcessing] = useState(false);
@@ -40,8 +41,23 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
   // Shipping form state
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState(""); // Phone number field
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
+
+  // If cart is loading, show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // If cart is empty, redirect or show empty state
+  if (cartItems.length === 0) {
+    router.push("/cart");
+    return null;
+  }
 
   useEffect(() => {
     if (session?.user?.email) {
@@ -73,33 +89,58 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     e.preventDefault();
     setIsProcessing(true);
 
-    // Log what we're sending
-    console.log("Sending to API:", {
+    // Format items correctly for the API - ensure product._id is included
+    const formattedItems = cartItems.map((item) => ({
+      product: {
+        _id: item.product._id, // CRITICAL: This must be included
+        name: item.product.name,
+        price: item.product.price,
+      },
+      quantity: item.quantity,
+      selectedSize: item.selectedSize,
+      selectedColor: {
+        label: item.selectedColor.label,
+        hex: item.selectedColor.hex,
+      },
+    }));
+
+    console.log(
+      "Sending items with product IDs:",
+      formattedItems.map((i) => ({
+        productId: i.product._id,
+        name: i.product.name,
+      })),
+    );
+
+    const requestData = {
       amount: totalAmount,
       email: email,
       name: fullName,
-      phoneNumber: phoneNumber, // This should now have a value
-      items: cartItems,
+      phoneNumber: phoneNumber,
+      items: formattedItems,
       shippingAddress: shippingAddress,
-    });
+    };
 
     try {
       const response = await fetch("/api/pesapal/register-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: totalAmount,
-          email: email,
-          name: fullName,
-          phoneNumber: phoneNumber, // CRITICAL: Include phone number
-          items: cartItems,
-          shippingAddress: shippingAddress,
-        }),
+        body: JSON.stringify(requestData),
       });
 
       const data = await response.json();
 
+      if (!response.ok) {
+        console.error("API Error:", data);
+        alert(`Error: ${data.error || "Could not initiate payment."}`);
+        setIsProcessing(false);
+        return;
+      }
+
       if (data.redirect_url) {
+        // Store order ID in session storage to clear cart after successful payment
+        sessionStorage.setItem("pendingOrderId", data.orderId);
+
         if (window.PesaPal) {
           window.PesaPal.pay(data.redirect_url);
           setIsProcessing(false);

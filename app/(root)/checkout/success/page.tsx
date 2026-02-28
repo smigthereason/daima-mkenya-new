@@ -1,203 +1,134 @@
-// app/checkout/success/page.tsx
-
 "use client";
 
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { Check, Package, ArrowRight, Loader2, XCircle } from "lucide-react";
-import Link from "next/link";
+import { useEffect, useState, useRef } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartContext";
+import { CheckCircle, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 export default function CheckoutSuccessPage() {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { clearCart } = useCart();
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    "loading",
+  );
   const [orderId, setOrderId] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState(10);
-  const [verifying, setVerifying] = useState(true);
-  const [paymentStatus, setPaymentStatus] = useState<
-    "success" | "pending" | "failed"
-  >("pending");
+
+  // Add a ref to prevent double execution
+  const hasProcessed = useRef(false);
+
+  const orderTrackingId = searchParams.get("OrderTrackingId");
+  const orderMerchantReference = searchParams.get("OrderMerchantReference");
+  const orderIdParam = searchParams.get("orderId");
 
   useEffect(() => {
-    // Get orderId from URL
-    const orderIdParam = searchParams.get("orderId");
-    const orderTrackingId = searchParams.get("OrderTrackingId");
+    // Prevent double execution in Strict Mode
+    if (hasProcessed.current) return;
+    hasProcessed.current = true;
 
-    const verifyPayment = async () => {
-      if (orderTrackingId) {
-        try {
-          // Verify payment status with your backend
+    const processSuccess = async () => {
+      try {
+        // Clear the cart - this will trigger a re-render but our ref prevents re-execution
+        await clearCart();
+
+        // Also clear from session storage
+        sessionStorage.removeItem("pendingOrderId");
+
+        // Verify payment status
+        if (orderTrackingId) {
           const response = await fetch(
             `/api/pesapal/verify?orderTrackingId=${orderTrackingId}`,
           );
           const data = await response.json();
 
-          if (
-            data.status_code === 1 ||
-            data.status === "COMPLETED" ||
-            data.status === "SUCCESS"
-          ) {
-            setPaymentStatus("success");
-            clearCart(); // Clear the cart on successful payment
-          } else if (data.status_code === 0 || data.status === "PENDING") {
-            setPaymentStatus("pending");
+          if (data.status_code === 1) {
+            setStatus("success");
+            setOrderId(orderIdParam || orderMerchantReference);
           } else {
-            setPaymentStatus("failed");
+            setStatus("error");
           }
-        } catch (error) {
-          console.error("Error verifying payment:", error);
-          setPaymentStatus("pending");
+        } else {
+          setStatus("success");
+          setOrderId(orderIdParam || orderMerchantReference);
         }
+      } catch (error) {
+        console.error("Error processing success:", error);
+        setStatus("error");
       }
-
-      setVerifying(false);
     };
 
-    if (orderIdParam) {
-      setOrderId(orderIdParam);
-      verifyPayment();
+    processSuccess();
+  }, [clearCart, orderTrackingId, orderIdParam, orderMerchantReference]); // Keep dependencies
 
-      // Clear pending order from session storage
-      sessionStorage.removeItem("pendingOrder");
-    } else {
-      // Try to get from session storage as fallback
-      const pendingOrder = sessionStorage.getItem("pendingOrder");
-      if (pendingOrder) {
-        const { orderId } = JSON.parse(pendingOrder);
-        setOrderId(orderId);
-        verifyPayment();
-        sessionStorage.removeItem("pendingOrder");
-      } else {
-        setVerifying(false);
-      }
-    }
-  }, [searchParams, clearCart]); // Remove router and paymentStatus from dependencies
-
-  // Separate useEffect for redirect countdown
-  useEffect(() => {
-    if (paymentStatus === "success") {
-      const timer = setInterval(() => {
-        setCountdown((prev) => {
-          if (prev <= 1) {
-            clearInterval(timer);
-            router.push("/profile?tab=orders");
-          }
-          return prev - 1;
-        });
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [paymentStatus, router]);
-
-  if (verifying) {
+  if (status === "loading") {
     return (
-      <div className="min-h-screen bg-white pt-32 md:pt-40 pb-20 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <Loader2 className="animate-spin mx-auto mb-4" size={40} />
-          <p className="text-gray-500">Verifying your payment...</p>
+          <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-black" />
+          <p className="text-sm uppercase tracking-widest">
+            Processing your order...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span className="text-3xl">⚠️</span>
+          </div>
+          <h1 className="text-2xl font-black uppercase tracking-wider mb-4">
+            Payment Issue
+          </h1>
+          <p className="text-gray-600 mb-8">
+            There was an issue processing your payment. Please check your email
+            for confirmation or contact support.
+          </p>
+          <Link
+            href="/"
+            className="inline-block border-2 border-black px-8 py-4 text-sm font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
+          >
+            Return Home
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white pt-32 md:pt-40 pb-20">
-      <div className="max-w-2xl mx-auto px-4 text-center">
-        {paymentStatus === "success" && (
-          <>
-            <div className="mb-8 flex justify-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#81b73e]/10 flex items-center justify-center">
-                <Check size={40} className="text-[#81b73e]" strokeWidth={2.5} />
-              </div>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl font-serif font-black uppercase tracking-widest mb-4">
-              Payment Successful!
-            </h1>
-
-            <p className="text-gray-500 text-sm md:text-base mb-8 max-w-md mx-auto">
-              Thank you for your purchase. Your order has been received and is
-              ready for processing.
-            </p>
-
-            {orderId && (
-              <div className="bg-gray-50 p-6 md:p-8 mb-8 border border-gray-100">
-                <p className="text-[9px] uppercase tracking-[0.3em] font-bold text-gray-400 mb-2">
-                  Order Reference
-                </p>
-                <p className="font-mono text-lg font-bold">{orderId}</p>
-              </div>
-            )}
-
-            <div className="space-y-4">
-              <Link
-                href="/profile?tab=orders"
-                className="flex items-center justify-center gap-3 w-full bg-black text-white py-5 text-sm font-black uppercase tracking-widest hover:bg-[#c5a059] transition-colors"
-              >
-                <Package size={18} />
-                View Your Orders
-              </Link>
-
-              <p className="text-[10px] text-gray-400">
-                Redirecting to your profile in {countdown} seconds...
-              </p>
-            </div>
-          </>
-        )}
-
-        {paymentStatus === "pending" && (
-          <>
-            <div className="mb-8 flex justify-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#c5a059]/10 flex items-center justify-center">
-                <Loader2 size={40} className="text-[#c5a059] animate-spin" />
-              </div>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl font-serif font-black uppercase tracking-widest mb-4">
-              Payment Processing
-            </h1>
-
-            <p className="text-gray-500 text-sm md:text-base mb-8 max-w-md mx-auto">
-              Your payment is being processed. You'll receive a confirmation
-              once it's complete.
-            </p>
-
-            <Link
-              href="/profile?tab=orders"
-              className="flex items-center justify-center gap-3 w-full bg-black text-white py-5 text-sm font-black uppercase tracking-widest hover:bg-[#c5a059] transition-colors"
-            >
-              <Package size={18} />
-              Check Order Status
-            </Link>
-          </>
-        )}
-
-        {paymentStatus === "failed" && (
-          <>
-            <div className="mb-8 flex justify-center">
-              <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-[#be1e2d]/10 flex items-center justify-center">
-                <XCircle size={40} className="text-[#be1e2d]" />
-              </div>
-            </div>
-
-            <h1 className="text-3xl md:text-5xl font-serif font-black uppercase tracking-widest mb-4">
-              Payment Failed
-            </h1>
-
-            <p className="text-gray-500 text-sm md:text-base mb-8 max-w-md mx-auto">
-              Something went wrong with your payment. Please try again.
-            </p>
-
-            <Link
-              href="/checkout"
-              className="flex items-center justify-center gap-3 w-full bg-black text-white py-5 text-sm font-black uppercase tracking-widest hover:bg-[#c5a059] transition-colors"
-            >
-              Try Again
-            </Link>
-          </>
-        )}
+    <div className="min-h-screen flex items-center justify-center bg-white mt-20">
+      <div className="text-center max-w-md mx-auto px-4">
+        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <CheckCircle className="w-10 h-10 text-green-600" />
+        </div>
+        <h1 className="text-2xl font-black uppercase tracking-wider mb-2">
+          Thank You!
+        </h1>
+        <p className="text-sm uppercase tracking-widest text-gray-500 mb-4">
+          Order #{orderId}
+        </p>
+        <p className="text-gray-600 mb-8">
+          Your order has been confirmed and will be processed shortly. You'll
+          receive a confirmation email with your order details.
+        </p>
+        <div className="space-y-3">
+          <Link
+            href="/profile"
+            className="block w-full bg-black text-white px-8 py-4 text-sm font-black uppercase tracking-widest hover:bg-opacity-80 transition-all"
+          >
+            View Order Status
+          </Link>
+          <Link
+            href="/products"
+            className="block w-full border-2 border-black px-8 py-4 text-sm font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all"
+          >
+            Continue Shopping
+          </Link>
+        </div>
       </div>
     </div>
   );
