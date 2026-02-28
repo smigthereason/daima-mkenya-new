@@ -556,26 +556,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
           )}
         </div>
 
-        {/* Login Prompt if not authenticated */}
-        {status !== "authenticated" && (
-          <div className="mt-8 mb-4 p-4 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-[12px] text-blue-800 text-center">
-              Please{" "}
-              <button
-                onClick={() =>
-                  router.push(
-                    "/login?callbackUrl=" +
-                      encodeURIComponent(window.location.pathname),
-                  )
-                }
-                className="font-bold underline hover:text-blue-600"
-              >
-                log in
-              </button>{" "}
-              to purchase items
-            </p>
-          </div>
-        )}
+        {/* REMOVED: Login Prompt section */}
 
         {/* Action Buttons */}
         <div className="mt-16 space-y-4">
@@ -602,19 +583,18 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
                 onClick={handleAddToCart}
                 disabled={
                   stockStatus.disabled ||
-                  status !== "authenticated" ||
                   addToCartLoading ||
                   cartLoading ||
                   purchaseLoading
                 }
                 className={`group relative w-full border-2 border-black py-7 text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] overflow-hidden transition-all
                   ${
-                    stockStatus.disabled || status !== "authenticated"
+                    stockStatus.disabled
                       ? "bg-gray-200 border-gray-300 cursor-not-allowed opacity-60"
                       : "bg-white hover:border-black"
                   }`}
               >
-                {!stockStatus.disabled && status === "authenticated" && (
+                {!stockStatus.disabled && (
                   <span
                     className={`absolute inset-0 bg-black transition-transform duration-500 ease-out ${
                       addedFeedback
@@ -625,7 +605,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
                 )}
                 <span
                   className={`relative z-10 flex items-center justify-center gap-3 transition-colors duration-500 ${
-                    stockStatus.disabled || status !== "authenticated"
+                    stockStatus.disabled
                       ? "text-gray-500"
                       : addedFeedback
                         ? "text-white"
@@ -641,11 +621,6 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
                     <>
                       <MinusCircle size={18} />
                       <span>Unavailable</span>
-                    </>
-                  ) : status !== "authenticated" ? (
-                    <>
-                      <ShoppingBag size={18} />
-                      <span>Login to Add</span>
                     </>
                   ) : addedFeedback ? (
                     <>
@@ -665,19 +640,18 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
                 onClick={handlePurchaseNow}
                 disabled={
                   stockStatus.disabled ||
-                  status !== "authenticated" ||
                   purchaseLoading ||
                   addToCartLoading ||
                   cartLoading
                 }
                 className={`group relative w-full py-7 text-[12px] md:text-[14px] font-black uppercase tracking-[0.4em] overflow-hidden transition-all
                   ${
-                    stockStatus.disabled || status !== "authenticated"
+                    stockStatus.disabled
                       ? "bg-gray-300 cursor-not-allowed opacity-60"
                       : "bg-black text-white hover:bg-[#be1e2d]"
                   }`}
               >
-                {!stockStatus.disabled && status === "authenticated" && (
+                {!stockStatus.disabled && (
                   <span className="absolute inset-0 translate-y-full bg-[#be1e2d] transition-transform duration-500 ease-out group-hover:translate-y-0" />
                 )}
                 <span className="relative z-10 flex items-center justify-center gap-3">
@@ -687,8 +661,6 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
                       <Loader2 size={18} className="animate-spin" />
                       <span>Processing...</span>
                     </>
-                  ) : status !== "authenticated" ? (
-                    "Login to Purchase"
                   ) : stockStatus.disabled ? (
                     "Not Available"
                   ) : (
