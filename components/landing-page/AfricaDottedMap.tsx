@@ -96,9 +96,9 @@ export default function AfricaDottedMap() {
         <span className="text-[8px] md:text-[10px] tracking-[0.6em] text-neutral-400 uppercase block mb-2">
           The Source
         </span>
-        <h3 className="text-l md:text-2xl font-serif italic text-white">
-          Identity & Pride
-        </h3>
+        <p className="text-xs font-medium tracking-[0.2em] text-white">
+          IDENTITY • PRIDE
+        </p>
         <div className="w-12 h-px bg-white/40 mt-2 md:mt-6" />
       </div>
 
