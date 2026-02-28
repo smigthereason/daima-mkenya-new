@@ -636,5 +636,165 @@
     "name": "order",
     "type": "document",
     "title": "Orders"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The user who owns this cart",
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Email of the user who owns this cart",
+        "name": "userEmail",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Unique identifier for this cart item",
+                "name": "cartId",
+                "type": "string",
+                "title": "Cart Item ID"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "product",
+                "type": "reference"
+              },
+              {
+                "description": "Denormalized product name",
+                "name": "productName",
+                "type": "string"
+              },
+              {
+                "description": "Denormalized product price",
+                "name": "productPrice",
+                "type": "string"
+              },
+              {
+                "initialValue": 1,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "min",
+                        "constraint": 1
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "quantity",
+                "type": "number"
+              },
+              {
+                "name": "selectedSize",
+                "type": "string"
+              },
+              {
+                "fields": [
+                  {
+                    "name": "label",
+                    "type": "string"
+                  },
+                  {
+                    "name": "hex",
+                    "type": "string"
+                  }
+                ],
+                "name": "selectedColor",
+                "type": "object"
+              },
+              {
+                "fields": [
+                  {
+                    "options": {
+                      "hotspot": true
+                    },
+                    "name": "hero",
+                    "type": "image",
+                    "title": "Hero Image"
+                  }
+                ],
+                "name": "productImage",
+                "type": "object"
+              },
+              {
+                "name": "addedAt",
+                "type": "datetime"
+              }
+            ],
+            "type": "object",
+            "name": "cartItem"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Cart Items"
+      },
+      {
+        "name": "lastUpdated",
+        "type": "datetime"
+      }
+    ],
+    "name": "cart",
+    "type": "document",
+    "title": "Shopping Cart"
   }
 ]

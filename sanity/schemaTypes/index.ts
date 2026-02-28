@@ -91,7 +91,7 @@
 //       type: "boolean",
 //       initialValue: false,
 //     },
-//     // NEW STOCK FIELD
+//     // STOCK FIELD
 //     {
 //       name: "stock",
 //       title: "Stock Quantity",
@@ -101,16 +101,27 @@
 //       validation: (Rule) => Rule.min(0).integer(),
 //       initialValue: 0,
 //     },
+//     // DISABLED PRODUCT TOGGLE
+//     {
+//       name: "disabled",
+//       title: "Disable Product",
+//       type: "boolean",
+//       description:
+//         "When enabled, this product will not appear in the store (useful for editing or temporary removal)",
+//       initialValue: false,
+//     },
 //   ],
 // };
 
 // export const schema: { types: SchemaTypeDefinition[] } = {
 //   types: [product, user, account, session, verificationToken, order],
 // };
+
 // sanity/schemaTypes/index.ts
 import { type SchemaTypeDefinition } from "sanity";
 import { user, account, session, verificationToken } from "./user";
 import order from "./order";
+import { cart } from "./cart";
 
 const product: SchemaTypeDefinition = {
   name: "product",
@@ -200,7 +211,6 @@ const product: SchemaTypeDefinition = {
       type: "boolean",
       initialValue: false,
     },
-    // STOCK FIELD
     {
       name: "stock",
       title: "Stock Quantity",
@@ -210,7 +220,6 @@ const product: SchemaTypeDefinition = {
       validation: (Rule) => Rule.min(0).integer(),
       initialValue: 0,
     },
-    // DISABLED PRODUCT TOGGLE
     {
       name: "disabled",
       title: "Disable Product",
@@ -223,5 +232,5 @@ const product: SchemaTypeDefinition = {
 };
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [product, user, account, session, verificationToken, order],
+  types: [product, user, account, session, verificationToken, order, cart],
 };
