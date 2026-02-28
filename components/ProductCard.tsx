@@ -76,13 +76,77 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
     };
   };
 
+  // SAFE image URL helper with error handling
+  const getImageUrl = (source: any): string => {
+    if (!source) return "/assets/placeholder.png";
+
+    try {
+      // If it's a string URL, return it directly
+      if (typeof source === "string") return source;
+
+      // If it has an asset property (standard Sanity image)
+      if (source.asset) {
+        return urlFor(source).url();
+      }
+
+      // If it's just an object with _ref (direct reference)
+      if (source._ref) {
+        // Create a proper image object for urlFor
+        const imageObj = { asset: { _ref: source._ref } };
+        return urlFor(imageObj).url();
+      }
+
+      // If it has a hero property (your product structure)
+      if (source.hero) {
+        return getImageUrl(source.hero);
+      }
+
+      // If it's an array of images, take the first one
+      if (Array.isArray(source) && source.length > 0) {
+        return getImageUrl(source[0]);
+      }
+
+      console.warn("Unable to resolve image URL from source:", source);
+      return "/assets/placeholder.png";
+    } catch (error) {
+      console.error("Error resolving image URL:", error);
+      return "/assets/placeholder.png";
+    }
+  };
+
   // Initialize gallery
   useEffect(() => {
     if (activeProduct) {
-      const allImages = [
-        activeProduct.images.hero,
-        ...(activeProduct.images.thumbnails || []),
-      ].filter(Boolean);
+      // Safely extract all images
+      const allImages: any[] = [];
+
+      // Add hero image if it exists
+      if (activeProduct.images?.hero) {
+        allImages.push(activeProduct.images.hero);
+      }
+
+      // Add thumbnails if they exist
+      if (
+        activeProduct.images?.thumbnails &&
+        Array.isArray(activeProduct.images.thumbnails)
+      ) {
+        allImages.push(...activeProduct.images.thumbnails);
+      }
+
+      // If no images found, try to find any image field
+      if (allImages.length === 0) {
+        // Try to find any property that might contain an image
+        Object.values(activeProduct).forEach((value) => {
+          if (value && typeof value === "object" && "asset" in value) {
+            allImages.push(value);
+          }
+        });
+      }
+
+      // If still no images, use placeholder
+      if (allImages.length === 0) {
+        allImages.push("/assets/placeholder.png");
+      }
 
       setGalleryImages(allImages);
       setCenterImage(allImages[0]);
@@ -205,23 +269,33 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
 
     setPurchaseLoading(true);
     try {
-      // Add to cart first (in background)
-      await addToCart(activeProduct!, size, {
-        label: colorObj.label,
-        hex: colorObj.hex,
-      });
+      // Create a cart-item-like structure that matches what checkout expects
+      const directCheckoutItem = {
+        cartId: `direct-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+        product: activeProduct,
+        quantity: 1,
+        selectedSize: size,
+        selectedColor: {
+          label: colorObj.label,
+          hex: colorObj.hex,
+        },
+      };
 
-      // Navigate directly to checkout
-      router.push("/checkout");
+      console.log("Storing direct checkout item:", directCheckoutItem);
+
+      sessionStorage.setItem(
+        "directCheckout",
+        JSON.stringify(directCheckoutItem),
+      );
+
+      // Navigate directly to checkout with a flag indicating it's a direct purchase
+      router.push("/checkout?direct=true");
     } catch (error) {
       console.error("Failed to process purchase:", error);
       setPurchaseLoading(false);
-      // Show error to user
       alert("Failed to process purchase. Please try again.");
     }
   };
-
-  const getImageUrl = (source: any) => (source ? urlFor(source).url() : "");
 
   // Loading State
   if (loading) {

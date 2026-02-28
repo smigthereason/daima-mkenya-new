@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { urlFor } from "@/sanity/lib/image";
 
 interface CheckOutPageProps {
@@ -31,12 +31,17 @@ declare global {
 }
 
 export default function CheckOutPage({ onBack }: CheckOutPageProps) {
+  // ALL HOOKS MUST BE AT THE TOP - BEFORE ANY CONDITIONAL RETURNS
   const { data: session, status } = useSession();
   const { cartItems, removeFromCart, updateQuantity, clearCart, loading } =
-    useCart(); // Fixed: added loading here
+    useCart();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [directCheckoutItem, setDirectCheckoutItem] = useState<any>(null);
+  const [shouldRedirect, setShouldRedirect] = useState(false);
+  const [isDirectCheckoutChecked, setIsDirectCheckoutChecked] = useState(false);
 
   // Shipping form state
   const [fullName, setFullName] = useState("");
@@ -44,21 +49,53 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
 
-  // If cart is loading, show loading state
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" />
-      </div>
-    );
-  }
+  // Check for direct purchase
+  useEffect(() => {
+    const isDirect = searchParams.get("direct") === "true";
+    console.log("isDirect:", isDirect);
 
-  // If cart is empty, redirect or show empty state
-  if (cartItems.length === 0) {
-    router.push("/cart");
-    return null;
-  }
+    if (isDirect) {
+      const storedItem = sessionStorage.getItem("directCheckout");
+      console.log("storedItem:", storedItem);
 
+      if (storedItem) {
+        try {
+          const parsedItem = JSON.parse(storedItem);
+          console.log("parsedItem:", parsedItem);
+          setDirectCheckoutItem(parsedItem);
+          // Clear it from sessionStorage after reading
+          sessionStorage.removeItem("directCheckout");
+        } catch (e) {
+          console.error("Error parsing direct checkout item:", e);
+        }
+      }
+    }
+
+    // Mark that we've checked for direct checkout
+    setIsDirectCheckoutChecked(true);
+  }, [searchParams]);
+
+  // Handle redirect logic in useEffect instead of during render
+  useEffect(() => {
+    // Wait for loading to complete and for direct checkout to be checked
+    if (loading || !isDirectCheckoutChecked) return;
+
+    const hasItems = directCheckoutItem ? true : cartItems.length > 0;
+
+    // Only redirect if we're sure there are no items AND no direct checkout item
+    if (!hasItems && !directCheckoutItem) {
+      setShouldRedirect(true);
+    }
+  }, [directCheckoutItem, cartItems, loading, isDirectCheckoutChecked]);
+
+  // Perform the actual redirect
+  useEffect(() => {
+    if (shouldRedirect) {
+      router.push("/cart");
+    }
+  }, [shouldRedirect, router]);
+
+  // Pre-fill form with session data
   useEffect(() => {
     if (session?.user?.email) {
       setFullName(session?.user?.name || "");
@@ -66,14 +103,52 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     }
   }, [session]);
 
-  if (status === "unauthenticated") {
-    router.push("/login");
+  // Handle unauthenticated redirect
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login");
+    }
+  }, [status, router]);
+
+  // Determine which items to display
+  const displayItems = directCheckoutItem ? [directCheckoutItem] : cartItems;
+
+  console.log("displayItems:", displayItems);
+  console.log("directCheckoutItem:", directCheckoutItem);
+
+  // NOW WE CAN HAVE CONDITIONAL RETURNS - AFTER ALL HOOKS
+  // If cart is loading, show loading state
+  if (loading && !directCheckoutItem) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </div>
+    );
+  }
+
+  // If we're redirecting, show nothing
+  if (shouldRedirect) {
     return null;
   }
 
-  const totalAmount = cartItems.reduce((acc, item) => {
+  // If no items to display and not loading, show empty state (but don't redirect during render)
+  if (displayItems.length === 0 && !loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center uppercase tracking-[0.5em] text-gray-400">
+        Your bag is empty
+        <button
+          onClick={() => router.push("/products")}
+          className="mt-10 text-black font-bold border-b border-black"
+        >
+          Continue Shopping
+        </button>
+      </div>
+    );
+  }
+
+  const totalAmount = displayItems.reduce((acc, item) => {
     const price = parseFloat(item.product.price.replace(/[^0-9.]/g, ""));
-    return acc + price * item.quantity;
+    return acc + price * (item.quantity || 1);
   }, 0);
 
   const getImageUrl = (source: any) => {
@@ -90,13 +165,13 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     setIsProcessing(true);
 
     // Format items correctly for the API - ensure product._id is included
-    const formattedItems = cartItems.map((item) => ({
+    const formattedItems = displayItems.map((item) => ({
       product: {
         _id: item.product._id, // CRITICAL: This must be included
         name: item.product.name,
         price: item.product.price,
       },
-      quantity: item.quantity,
+      quantity: item.quantity || 1,
       selectedSize: item.selectedSize,
       selectedColor: {
         label: item.selectedColor.label,
@@ -158,6 +233,12 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     }
   };
 
+  // Custom remove function for direct checkout items
+  const handleRemoveDirectItem = () => {
+    setDirectCheckoutItem(null);
+    router.push("/products");
+  };
+
   return (
     <div className="min-h-screen bg-white text-black antialiased mt-20 md:mt-32 border-t border-neutral-200">
       {/* ── PESAPAL V3 SDK ── */}
@@ -194,51 +275,65 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                 01. Review Order
               </span>
               <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                {cartItems.length} {cartItems.length === 1 ? "Item" : "Items"}
+                {displayItems.length}{" "}
+                {displayItems.length === 1 ? "Item" : "Items"}
+                {directCheckoutItem && " (Direct Purchase)"}
               </span>
             </div>
 
             <div className="space-y-8 mb-10 max-h-none xl:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-              {cartItems.map((item) => {
+              {displayItems.map((item, index) => {
                 const titleParts = item.product.name.split(" ");
                 const titleLine1 = titleParts.slice(0, 2).join(" ");
                 const titleLine2 = titleParts.slice(2).join(" ");
 
                 return (
                   <div
-                    key={item.cartId}
+                    key={directCheckoutItem ? `direct-${index}` : item.cartId}
                     className="group relative border-b border-gray-200 pb-8 last:border-0"
                   >
-                    {/* Quantity Controls */}
-                    <div className="absolute top-0 right-0 flex items-center border border-gray-200 bg-white z-10">
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.cartId, item.quantity - 1)
-                        }
-                        className="p-2 hover:bg-gray-50 disabled:opacity-30"
-                        disabled={item.quantity <= 1}
-                      >
-                        <Minus size={12} />
-                      </button>
-                      <span className="w-8 text-center text-[11px] font-bold">
-                        {item.quantity}
-                      </span>
-                      <button
-                        onClick={() =>
-                          updateQuantity(item.cartId, item.quantity + 1)
-                        }
-                        className="p-2 hover:bg-gray-50"
-                      >
-                        <Plus size={12} />
-                      </button>
-                    </div>
+                    {/* Quantity Controls - FIXED: Removed the !directCheckoutItem condition that was hiding them */}
+                    {item.cartId && (
+                      <div className="absolute top-0 right-0 flex items-center border border-gray-200 bg-white z-10">
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.cartId, item.quantity - 1)
+                          }
+                          className="p-2 hover:bg-gray-50 disabled:opacity-30"
+                          disabled={item.quantity <= 1}
+                        >
+                          <Minus size={12} />
+                        </button>
+                        <span className="w-8 text-center text-[11px] font-bold">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() =>
+                            updateQuantity(item.cartId, item.quantity + 1)
+                          }
+                          className="p-2 hover:bg-gray-50"
+                        >
+                          <Plus size={12} />
+                        </button>
+                      </div>
+                    )}
 
-                    <button
-                      onClick={() => removeFromCart(item.cartId)}
-                      className="absolute top-12 right-0 text-gray-300 hover:text-[#be1e2d] p-2"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                    {/* Remove button - Different behavior for direct vs cart items */}
+                    {directCheckoutItem ? (
+                      <button
+                        onClick={handleRemoveDirectItem}
+                        className="absolute top-0 right-0 text-gray-300 hover:text-[#be1e2d] p-2"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => removeFromCart(item.cartId)}
+                        className="absolute top-12 right-0 text-gray-300 hover:text-[#be1e2d] p-2"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
 
                     <div className="flex flex-row gap-5 md:gap-8 mt-12">
                       <div className="relative w-24 h-32 md:w-32 md:h-44 bg-white shadow-sm border border-gray-100 shrink-0">
@@ -288,7 +383,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                               {item.product.price}
                             </p>
                           </div>
-                          {item.quantity > 1 && (
+                          {(item.quantity || 1) > 1 && (
                             <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-dashed border-gray-200">
                               <span className="text-[9px] font-bold uppercase text-gray-400">
                                 Subtotal
@@ -298,7 +393,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                                 {(
                                   parseFloat(
                                     item.product.price.replace(/[^0-9.]/g, ""),
-                                  ) * item.quantity
+                                  ) * (item.quantity || 1)
                                 ).toLocaleString()}
                               </p>
                             </div>
@@ -406,51 +501,20 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                   </div>
                 </section>
 
-                {/* Payment Section */}
-                <section>
-                  <h3 className="text-[12px] md:text-[14px] uppercase tracking-[0.4em] font-black mb-10 pb-4 border-b border-black w-fit">
-                    03. Payment Method
-                  </h3>
-
-                  {/* PesaPal Option */}
-                  <div className="p-5 md:p-7 border-2 border-black bg-white shadow-lg hover:shadow-xl transition-shadow">
-                    <div className="flex items-center gap-4">
-                      <div className="w-4 h-4 rounded-full border-4 border-black" />
-                      <div>
-                        <p className="text-[11px] uppercase tracking-widest font-black text-black">
-                          PesaPal
-                        </p>
-                        <p className="text-[9px] text-gray-400 tracking-wider mt-1">
-                          Pay with M-Pesa, Cards, or Bank Transfer
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Payment info notice */}
-                    <div className="mt-6 pt-4 border-t border-dashed border-gray-200">
-                      <p className="text-[10px] text-gray-500">
-                        <span className="font-bold">Note:</span> You'll complete
-                        your payment on PesaPal's secure page. Your phone number
-                        will be used for M-Pesa payment confirmation.
-                      </p>
-                    </div>
-                  </div>
-                </section>
+                {/* REMOVED: Section 3 Payment Method - Now just the button */}
 
                 <div className="pt-8">
                   <button
                     type="submit"
                     disabled={
                       isProcessing ||
-                      cartItems.length === 0 ||
+                      displayItems.length === 0 ||
                       !phoneNumber.trim()
                     }
-                    className="group relative w-full overflow-hidden bg-black py-7 md:py-9 text-[13px] md:text-[15px] font-black uppercase tracking-[0.6em] text-white transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed border border-transparent hover:border-black"
+                    className="group relative w-full overflow-hidden bg-black text-white py-7 md:py-9 text-[13px] md:text-[15px] font-black uppercase tracking-[0.6em] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-black hover:bg-white hover:text-black"
                   >
-                    {/* White background overlay that slides up on hover */}
-                    <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-out group-hover:translate-y-0 group-disabled:hidden" />
-
-                    <span className="relative z-10 group-hover:text-black flex items-center justify-center gap-4">
+                    {/* Removed the white overlay span that was causing hover issues */}
+                    <span className="relative z-10 flex items-center justify-center gap-4">
                       {isProcessing ? (
                         <>
                           <Loader2 className="animate-spin" size={20} />
