@@ -101,8 +101,21 @@ export async function POST(req: Request) {
     // Generate unique order number
     const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // Format items for Sanity with product references
-    const orderItems = items
+    // Format items for Sanity with product references - define a proper type
+    type OrderItem = {
+      _key: string;
+      product: {
+        _type: "reference";
+        _ref: string;
+      };
+      productName: string;
+      quantity: number;
+      price: string;
+      size: string;
+      color: string;
+    };
+
+    const orderItems: OrderItem[] = items
       .map((item: any, index: number) => {
         const productId = item.product._id;
 
@@ -117,7 +130,7 @@ export async function POST(req: Request) {
         return {
           _key: `item-${Date.now()}-${index}-${Math.random().toString(36).substring(2, 9)}`,
           product: {
-            _type: "reference",
+            _type: "reference" as const,
             _ref: productId, // CRITICAL for stock updates
           },
           productName: item.product.name,
@@ -127,7 +140,7 @@ export async function POST(req: Request) {
           color: item.selectedColor.label,
         };
       })
-      .filter((item: any) => item !== null);
+      .filter((item): item is OrderItem => item !== null); // Type guard to filter out nulls
 
     if (orderItems.length === 0) {
       return NextResponse.json(
