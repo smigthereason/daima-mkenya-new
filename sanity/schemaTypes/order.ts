@@ -1,180 +1,3 @@
-// // sanity/schemaTypes/order.ts
-
-// export default {
-//   name: "order",
-//   title: "Orders",
-//   type: "document",
-//   fields: [
-//     {
-//       name: "orderNumber",
-//       title: "Order Number",
-//       type: "string",
-//       readOnly: true,
-//       description: "Internal reference (e.g., ORD-2026-X)",
-//     },
-//     {
-//       name: "pesapalOrderTrackingId",
-//       title: "PesaPal Tracking ID",
-//       type: "string",
-//       description: "The ID returned by PesaPal once the order is registered",
-//     },
-//     {
-//       name: "status",
-//       title: "Payment Status",
-//       type: "string",
-//       options: {
-//         list: [
-//           { title: "Pending", value: "pending" },
-//           { title: "Completed", value: "completed" },
-//           { title: "Failed", value: "failed" },
-//         ],
-//       },
-//       initialValue: "pending",
-//     },
-//     {
-//       name: "paymentMethod",
-//       title: "Payment Method",
-//       type: "string",
-//       options: {
-//         list: [
-//           { title: "PesaPal", value: "pesapal" },
-//           { title: "M-Pesa", value: "mpesa" },
-//         ],
-//       },
-//     },
-//     {
-//       name: "paymentDate",
-//       title: "Payment Date",
-//       type: "datetime",
-//     },
-//     {
-//       name: "transactionId",
-//       title: "Transaction ID",
-//       type: "string",
-//       description: "PesaPal transaction ID",
-//     },
-//     {
-//       name: "paymentDetails",
-//       title: "Payment Details",
-//       type: "object",
-//       fields: [
-//         { name: "status_code", type: "number" },
-//         { name: "status", type: "string" },
-//         { name: "payment_status_description", type: "string" },
-//         { name: "payment_method", type: "string" },
-//         { name: "amount", type: "number" },
-//         { name: "currency", type: "string" },
-//       ],
-//       hidden: true,
-//     },
-//     {
-//       name: "customer",
-//       title: "Customer Details",
-//       type: "object",
-//       fields: [
-//         { name: "name", type: "string" },
-//         { name: "email", type: "string" },
-//         { name: "phone", type: "string" },
-//         { name: "address", type: "string" },
-//       ],
-//     },
-//     {
-//       name: "amount",
-//       title: "Total Amount",
-//       type: "number",
-//     },
-//     {
-//       name: "items",
-//       title: "Ordered Items",
-//       type: "array",
-//       of: [
-//         {
-//           type: "object",
-//           fields: [
-//             { name: "productName", type: "string" },
-//             { name: "quantity", type: "number" },
-//             { name: "price", type: "string" },
-//             { name: "size", type: "string" },
-//             { name: "color", type: "string" },
-//           ],
-//           preview: {
-//             select: {
-//               title: "productName",
-//               quantity: "quantity",
-//               size: "size",
-//               color: "color",
-//               price: "price",
-//             },
-//             prepare({
-//               title,
-//               quantity,
-//               size,
-//               color,
-//               price,
-//             }: {
-//               title: string;
-//               quantity: number;
-//               size: string;
-//               color: string;
-//               price: string;
-//             }) {
-//               return {
-//                 title: title || "Unknown Product",
-//                 subtitle: `${price} | Qty: ${quantity} | Size: ${size} | Color: ${color}`,
-//               };
-//             },
-//           },
-//         },
-//       ],
-//     },
-//     {
-//       name: "createdAt",
-//       title: "Created At",
-//       type: "datetime",
-//       initialValue: () => new Date().toISOString(),
-//     },
-//   ],
-//   preview: {
-//     select: {
-//       title: "orderNumber",
-//       subtitle: "customer.name",
-//       status: "status",
-//       amount: "amount",
-//       date: "createdAt",
-//     },
-//     prepare({
-//       title,
-//       subtitle,
-//       status,
-//       amount,
-//       date,
-//     }: {
-//       title: string;
-//       subtitle: string;
-//       status: string;
-//       amount: number;
-//       date: string;
-//     }) {
-//       const statusColors: Record<string, string> = {
-//         pending: "🟡",
-//         completed: "🟢",
-//         failed: "🔴",
-//       };
-
-//       return {
-//         title: `${statusColors[status] || "⚪"} ${title || "No Order Number"}`,
-//         subtitle: `${subtitle || "No Customer"} - Ksh ${amount?.toLocaleString() || "0"} - ${new Date(date).toLocaleDateString()}`,
-//       };
-//     },
-//   },
-//   orderings: [
-//     {
-//       title: "Date Descending",
-//       name: "dateDesc",
-//       by: [{ field: "createdAt", direction: "desc" }],
-//     },
-//   ],
-// };
 // sanity/schemaTypes/order.ts
 
 export default {
@@ -266,8 +89,18 @@ export default {
         { name: "payment_method", type: "string" },
         { name: "amount", type: "number" },
         { name: "currency", type: "string" },
+        {
+          name: "payment_account",
+          type: "string",
+          description: "Phone number or account used for payment",
+        },
+        {
+          name: "phone_number",
+          type: "string",
+          description: "Phone number from PesaPal",
+        },
       ],
-      hidden: true,
+      // Not hidden anymore so we can see the payment account
     },
     {
       name: "customer",
@@ -276,7 +109,11 @@ export default {
       fields: [
         { name: "name", type: "string" },
         { name: "email", type: "string" },
-        { name: "phone", type: "string" },
+        {
+          name: "phone",
+          type: "string",
+          description: "Phone number for customer contact",
+        },
         { name: "address", type: "string" },
       ],
     },
@@ -339,7 +176,8 @@ export default {
   preview: {
     select: {
       title: "orderNumber",
-      subtitle: "customer.name",
+      customerName: "customer.name",
+      customerPhone: "customer.phone",
       status: "status",
       paymentStatus: "paymentStatus",
       amount: "amount",
@@ -348,7 +186,8 @@ export default {
     },
     prepare({
       title,
-      subtitle,
+      customerName,
+      customerPhone,
       status,
       paymentStatus,
       amount,
@@ -356,7 +195,8 @@ export default {
       userEmail,
     }: {
       title: string;
-      subtitle: string;
+      customerName: string;
+      customerPhone: string;
       status: string;
       paymentStatus: string;
       amount: number;
@@ -370,10 +210,13 @@ export default {
       };
 
       const paymentIcon = paymentStatus === "paid" ? "✅" : "⏳";
+      const phoneDisplay = customerPhone
+        ? `📞 ${customerPhone}`
+        : "📞 No phone";
 
       return {
         title: `${statusColors[status] || "⚪"} ${title || "No Order Number"} ${paymentIcon}`,
-        subtitle: `${subtitle || "No Customer"} - Ksh ${amount?.toLocaleString() || "0"} - ${userEmail || "No Email"} - ${new Date(date).toLocaleDateString()}`,
+        subtitle: `${customerName || "No Customer"} - ${phoneDisplay} - Ksh ${amount?.toLocaleString() || "0"} - ${new Date(date).toLocaleDateString()}`,
       };
     },
   },
