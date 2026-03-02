@@ -285,6 +285,11 @@ export const authOptions: NextAuthOptions = {
       console.log("Base URL:", baseUrl);
 
       try {
+        // Handle relative URLs
+        if (url.startsWith("/")) {
+          return `${baseUrl}${url}`;
+        }
+
         const urlObj = new URL(url);
         const hostname = urlObj.hostname;
 
@@ -296,7 +301,7 @@ export const authOptions: NextAuthOptions = {
         // Handle sign-in redirects for admin users
         if (url.includes("/api/auth/callback")) {
           try {
-            // Use the baseUrl from the request, not the environment variable
+            // Use the baseUrl from the request
             const sessionUrl = `${urlObj.origin}/api/auth/session`;
             const sessionRes = await fetch(sessionUrl);
             const session = await sessionRes.json();
@@ -308,14 +313,12 @@ export const authOptions: NextAuthOptions = {
               console.log("Admin user, redirecting to admin panel");
               return `${urlObj.origin}/admin`;
             }
+
+            // Regular user redirect to home
+            return `${urlObj.origin}/`;
           } catch (error) {
             console.error("Error determining redirect:", error);
           }
-        }
-
-        // Allow relative URLs
-        if (url.startsWith("/")) {
-          return `${urlObj.origin}${url}`;
         }
 
         // Allow URLs from allowed domains
@@ -337,9 +340,8 @@ export const authOptions: NextAuthOptions = {
       }
     },
   },
-  // Enable trust host for multiple domain support
-  trustHost: true,
-  // Enable debug logs in development
+  // Remove trustHost as it's not a valid option
+  // Instead, we handle multiple domains in the redirect callback
   debug: process.env.NODE_ENV === "development",
 };
 
