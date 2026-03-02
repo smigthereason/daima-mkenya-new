@@ -10,7 +10,17 @@ import { client } from "@/sanity/lib/client";
 import bcrypt from "bcryptjs";
 
 // Admin email
-const ADMIN_EMAILS = ["prodbysmig@gmail.com"];
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "prodbysmig@gmail.com")
+  .split(",")
+  .map((email) => email.trim());
+
+// Allowed domains for redirects (supporting both Vercel and custom domain)
+const ALLOWED_DOMAINS = [
+  "daima-mkenya-new.vercel.app",
+  "www.daimamkenyaafrica.com",
+  "daimamkenyaafrica.com",
+  "localhost:3000",
+];
 
 // Export authOptions so other files can import it
 export const authOptions: NextAuthOptions = {
@@ -31,7 +41,6 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.APPLE_ID || "",
       clientSecret: process.env.APPLE_SECRET || "",
     }),
-    // UPDATED CredentialsProvider with full password verification
     CredentialsProvider({
       name: "Credentials",
       credentials: {
@@ -156,7 +165,7 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile }) {
-      console.log("SignIn callback - User:", user.email);
+      console.log("🔐 SignIn callback - User:", user.email);
       console.log("Admin emails:", ADMIN_EMAILS);
 
       // Check if this email should be admin
@@ -226,14 +235,14 @@ export const authOptions: NextAuthOptions = {
         session.user.role =
           (token.role as string) || (token.isAdmin ? "admin" : "customer");
 
-        console.log("Session callback - User role:", session.user.role);
-        console.log("Session callback - Is admin:", session.user.isAdmin);
+        console.log("📝 Session callback - User role:", session.user.role);
+        console.log("📝 Session callback - Is admin:", session.user.isAdmin);
       }
       return session;
     },
 
     async jwt({ token, user, account, profile }) {
-      console.log("JWT callback - User email:", user?.email);
+      console.log("🔑 JWT callback - User email:", user?.email);
 
       if (user) {
         token.id = user.id;
@@ -272,40 +281,65 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      console.log("Redirect callback - URL:", url);
+      console.log("🔄 Redirect callback - URL:", url);
       console.log("Base URL:", baseUrl);
 
-      // Handle sign-in redirects
-      if (url.includes("/api/auth/callback")) {
-        // Get the user's email from the session to determine redirect
-        try {
-          const session = await fetch(`${baseUrl}/api/auth/session`).then(
-            (res) => res.json(),
-          );
-          const isAdmin =
-            session?.user?.isAdmin || session?.user?.role === "admin";
+      try {
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname;
 
-          if (isAdmin) {
-            console.log("Admin user, redirecting to /admin");
-            return `${baseUrl}/admin`;
+        // Check if the redirect URL is from an allowed domain
+        const isAllowedDomain = ALLOWED_DOMAINS.some((domain) =>
+          hostname.includes(domain.replace(/^www\./, "")),
+        );
+
+        // Handle sign-in redirects for admin users
+        if (url.includes("/api/auth/callback")) {
+          try {
+            // Use the baseUrl from the request, not the environment variable
+            const sessionUrl = `${urlObj.origin}/api/auth/session`;
+            const sessionRes = await fetch(sessionUrl);
+            const session = await sessionRes.json();
+
+            const isAdmin =
+              session?.user?.isAdmin || session?.user?.role === "admin";
+
+            if (isAdmin) {
+              console.log("Admin user, redirecting to admin panel");
+              return `${urlObj.origin}/admin`;
+            }
+          } catch (error) {
+            console.error("Error determining redirect:", error);
           }
-        } catch (error) {
-          console.error("Error determining redirect:", error);
         }
-      }
 
-      // Allows relative callback URLs
-      if (url.startsWith("/")) {
-        return `${baseUrl}${url}`;
-      }
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) {
-        return url;
-      }
+        // Allow relative URLs
+        if (url.startsWith("/")) {
+          return `${urlObj.origin}${url}`;
+        }
 
-      return baseUrl;
+        // Allow URLs from allowed domains
+        if (isAllowedDomain) {
+          return url;
+        }
+
+        // Allow same origin
+        if (urlObj.origin === baseUrl) {
+          return url;
+        }
+
+        // Default to base URL
+        console.log("Redirect falling back to base URL:", baseUrl);
+        return baseUrl;
+      } catch (error) {
+        console.error("Error in redirect callback:", error);
+        return baseUrl;
+      }
     },
   },
+  // Enable trust host for multiple domain support
+  trustHost: true,
+  // Enable debug logs in development
   debug: process.env.NODE_ENV === "development",
 };
 
