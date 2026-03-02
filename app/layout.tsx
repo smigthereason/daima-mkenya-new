@@ -53,12 +53,14 @@ export const metadata: Metadata = {
     default: "Daima Mkenya Africa",
     template: "%s | Daima Mkenya Africa",
   },
-  description: "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
-  
+  description:
+    "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+
   // OpenGraph metadata - Simplified for better compatibility
   openGraph: {
     title: "Daima Mkenya Africa",
-    description: "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+    description:
+      "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
     url: baseUrl,
     siteName: "Daima Mkenya Africa",
     images: [
@@ -72,7 +74,7 @@ export const metadata: Metadata = {
     locale: "en_KE",
     type: "website",
   },
-  
+
   // Twitter metadata
   twitter: {
     card: "summary_large_image",
@@ -93,25 +95,31 @@ export default function RootLayout({
       <head>
         {/* Essential meta tags - WhatsApp reads these directly */}
         <meta property="og:title" content="Daima Mkenya Africa" />
-        <meta property="og:description" content="Authentic Kenyan heritage fashion, crafted with intention in Nairobi." />
+        <meta
+          property="og:description"
+          content="Authentic Kenyan heritage fashion, crafted with intention in Nairobi."
+        />
         <meta property="og:image" content={imageUrl} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:url" content={baseUrl} />
         <meta property="og:type" content="website" />
-        
+
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Daima Mkenya Africa" />
-        <meta name="twitter:description" content="Authentic Kenyan heritage fashion 🇰🇪" />
+        <meta
+          name="twitter:description"
+          content="Authentic Kenyan heritage fashion 🇰🇪"
+        />
         <meta name="twitter:image" content={imageUrl} />
       </head>
-      <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}
-        suppressHydrationWarning={true}>
+      <body
+        className={`${playfair.className} antialiased bg-[#e8e8e8]`}
+        suppressHydrationWarning={true}
+      >
         <ErrorBoundary>
           <NextAuthProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
+            <CartProvider>{children}</CartProvider>
           </NextAuthProvider>
         </ErrorBoundary>
       </body>

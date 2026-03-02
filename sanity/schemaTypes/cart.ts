@@ -1,4 +1,5 @@
 // sanity/schemaTypes/cart.ts
+import { PreviewValue } from "sanity";
 
 export const cart = {
   name: "cart",
@@ -110,7 +111,8 @@ export const cart = {
               color: "selectedColor.label",
               price: "productPrice",
             },
-            prepare({ title, quantity, size, color, price }: any) {
+            prepare(selection: Record<string, any>) {
+              const { title, quantity, size, color, price } = selection;
               return {
                 title: title || "Unknown Product",
                 subtitle: `${price} | Qty: ${quantity} | Size: ${size} | Color: ${color}`,
@@ -133,11 +135,13 @@ export const cart = {
       items: "items",
       lastUpdated: "lastUpdated",
     },
-    prepare({ title, items, lastUpdated }: any) {
+    prepare(selection: Record<string, any>): PreviewValue {
+      const { title, items, lastUpdated } = selection;
       const itemCount = items?.length || 0;
       const date = lastUpdated
         ? new Date(lastUpdated).toLocaleDateString()
         : "Never";
+
       return {
         title: `Cart: ${title || "Unknown User"}`,
         subtitle: `${itemCount} item${itemCount !== 1 ? "s" : ""} • Updated: ${date}`,
