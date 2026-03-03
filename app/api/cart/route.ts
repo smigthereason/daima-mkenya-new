@@ -4,6 +4,29 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { client } from "@/sanity/lib/client";
 
+// Cache for user IDs to reduce queries
+const userCache = new Map<string, { id: string; timestamp: number }>();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Helper to get user ID with caching
+async function getUserId(email: string) {
+  const cached = userCache.get(email);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.id;
+  }
+
+  const user = await client.fetch(
+    `*[_type == "user" && email == $email][0]._id`,
+    { email },
+  );
+
+  if (user) {
+    userCache.set(email, { id: user, timestamp: Date.now() });
+  }
+
+  return user;
+}
+
 // GET /api/cart - Fetch user's cart
 export async function GET() {
   try {
@@ -13,25 +36,17 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Find user in Sanity
-    const user = await client.fetch(
-      `*[_type == "user" && email == $email][0] {
-        _id,
-        email
-      }`,
-      { email: session.user.email },
-    );
+    // Get user ID first
+    const userId = await getUserId(session.user.email);
 
-    if (!user) {
+    if (!userId) {
       return NextResponse.json({ items: [] });
     }
 
-    // Find or create cart
-    let cart = await client.fetch(
+    // Single optimized query - get cart with products in one go
+    const cart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
-        _id,
         items[] {
-          _key,
           cartId,
           quantity,
           selectedSize,
@@ -48,39 +63,10 @@ export async function GET() {
           }
         }
       }`,
-      { userId: user._id },
+      { userId },
     );
 
-    if (!cart) {
-      // Create new cart for user
-      cart = await client.create({
-        _type: "cart",
-        user: {
-          _type: "reference",
-          _ref: user._id,
-        },
-        userEmail: session.user.email,
-        items: [],
-        lastUpdated: new Date().toISOString(),
-      });
-
-      return NextResponse.json({ items: [] });
-    }
-
-    // Transform items to match frontend format
-    const transformedItems =
-      cart.items?.map((item: any) => ({
-        cartId: item.cartId,
-        quantity: item.quantity,
-        selectedSize: item.selectedSize,
-        selectedColor: item.selectedColor,
-        product: {
-          ...item.product,
-          images: item.product.images || { hero: null, thumbnails: [] },
-        },
-      })) || [];
-
-    return NextResponse.json({ items: transformedItems });
+    return NextResponse.json({ items: cart?.items || [] });
   } catch (error) {
     console.error("Error fetching cart:", error);
     return NextResponse.json(
@@ -99,140 +85,101 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { product, quantity, selectedSize, selectedColor } = await req.json();
+    const {
+      product,
+      quantity = 1,
+      selectedSize,
+      selectedColor,
+    } = await req.json();
 
-    // Validate input
-    if (!product || !product._id) {
+    if (!product?._id) {
       return NextResponse.json(
         { error: "Invalid product data" },
         { status: 400 },
       );
     }
 
-    // Find user in Sanity
-    const user = await client.fetch(
-      `*[_type == "user" && email == $email][0] {
-        _id,
-        email
-      }`,
-      { email: session.user.email },
-    );
+    // Get user ID
+    const userId = await getUserId(session.user.email);
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found in Sanity" },
-        { status: 404 },
-      );
+    if (!userId) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Find or create cart
+    // Find existing cart
     let cart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] {
-        _id,
-        items[] {
-          _key,
-          cartId,
-          product {
-            _ref
-          },
-          selectedSize,
-          selectedColor
-        }
-      }`,
-      { userId: user._id },
+      `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
+      { userId },
     );
 
-    // Check if the same product with same size and color already exists in cart
-    const existingItemIndex =
-      cart?.items?.findIndex(
-        (item: any) =>
-          item.product._ref === product._id &&
-          item.selectedSize === selectedSize &&
-          item.selectedColor.label === selectedColor.label,
-      ) ?? -1;
+    const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    const itemKey = `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+
+    const newItem = {
+      _key: itemKey,
+      cartId,
+      product: {
+        _type: "reference",
+        _ref: product._id,
+      },
+      quantity,
+      selectedSize,
+      selectedColor,
+      addedAt: new Date().toISOString(),
+    };
 
     if (!cart) {
       // Create new cart with item
-      const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-      const itemKey = `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
-      const newItem = {
-        _key: itemKey, // REQUIRED for Sanity
-        cartId,
-        product: {
-          _type: "reference",
-          _ref: product._id,
-        },
-        productName: product.name,
-        productPrice: product.price,
-        quantity: quantity || 1,
-        selectedSize,
-        selectedColor,
-        productImage: product.images || {},
-        addedAt: new Date().toISOString(),
-      };
-
       await client.create({
         _type: "cart",
         user: {
           _type: "reference",
-          _ref: user._id,
+          _ref: userId,
         },
         userEmail: session.user.email,
         items: [newItem],
         lastUpdated: new Date().toISOString(),
       });
     } else {
-      // Cart exists
+      // Check if item already exists with same size and color
+      const existingItemIndex =
+        cart.items?.findIndex(
+          (item: any) =>
+            item.product._ref === product._id &&
+            item.selectedSize === selectedSize &&
+            item.selectedColor.label === selectedColor.label,
+        ) ?? -1;
+
       if (existingItemIndex >= 0) {
-        // Item exists - increment quantity
-        const currentItems = [...cart.items];
-        currentItems[existingItemIndex].quantity += quantity || 1;
+        // Update existing item quantity
+        const updatedItems = [...cart.items];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + quantity,
+        };
 
         await client
           .patch(cart._id)
           .set({
-            items: currentItems,
+            items: updatedItems,
             lastUpdated: new Date().toISOString(),
           })
           .commit();
       } else {
-        // New item - add to cart
-        const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-        const itemKey = `item-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
-
-        const newItem = {
-          _key: itemKey, // REQUIRED for Sanity
-          cartId,
-          product: {
-            _type: "reference",
-            _ref: product._id,
-          },
-          productName: product.name,
-          productPrice: product.price,
-          quantity: quantity || 1,
-          selectedSize,
-          selectedColor,
-          productImage: product.images || {},
-          addedAt: new Date().toISOString(),
-        };
-
-        const currentItems = cart.items || [];
+        // Add new item
         await client
           .patch(cart._id)
-          .set({
-            items: [...currentItems, newItem],
-            lastUpdated: new Date().toISOString(),
-          })
-          .commit();
+          .setIfMissing({ items: [] })
+          .append("items", [newItem])
+          .set({ lastUpdated: new Date().toISOString() })
+          .commit({ autoGenerateArrayKeys: true });
       }
     }
 
-    // Fetch updated cart to return
+    // Fetch updated cart with product details
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
-          _key,
           cartId,
           quantity,
           selectedSize,
@@ -249,21 +196,12 @@ export async function POST(req: Request) {
           }
         }
       }`,
-      { userId: user._id },
+      { userId },
     );
-
-    const transformedItems =
-      updatedCart.items?.map((item: any) => ({
-        cartId: item.cartId,
-        quantity: item.quantity,
-        selectedSize: item.selectedSize,
-        selectedColor: item.selectedColor,
-        product: item.product,
-      })) || [];
 
     return NextResponse.json({
       success: true,
-      items: transformedItems,
+      items: updatedCart?.items || [],
     });
   } catch (error) {
     console.error("Error adding to cart:", error);
@@ -292,20 +230,16 @@ export async function PATCH(req: Request) {
       );
     }
 
-    // Find user in Sanity
-    const user = await client.fetch(
-      `*[_type == "user" && email == $email][0] { _id }`,
-      { email: session.user.email },
-    );
+    const userId = await getUserId(session.user.email);
 
-    if (!user) {
+    if (!userId) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Find cart
     const cart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
-      { userId: user._id },
+      { userId },
     );
 
     if (!cart) {
@@ -332,7 +266,6 @@ export async function PATCH(req: Request) {
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
-          _key,
           cartId,
           quantity,
           selectedSize,
@@ -349,21 +282,12 @@ export async function PATCH(req: Request) {
           }
         }
       }`,
-      { userId: user._id },
+      { userId },
     );
-
-    const transformedItems =
-      updatedCart.items?.map((item: any) => ({
-        cartId: item.cartId,
-        quantity: item.quantity,
-        selectedSize: item.selectedSize,
-        selectedColor: item.selectedColor,
-        product: item.product,
-      })) || [];
 
     return NextResponse.json({
       success: true,
-      items: transformedItems,
+      items: updatedCart?.items || [],
     });
   } catch (error) {
     console.error("Error updating cart:", error);
@@ -390,20 +314,16 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Cart ID required" }, { status: 400 });
     }
 
-    // Find user in Sanity
-    const user = await client.fetch(
-      `*[_type == "user" && email == $email][0] { _id }`,
-      { email: session.user.email },
-    );
+    const userId = await getUserId(session.user.email);
 
-    if (!user) {
+    if (!userId) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Find cart
     const cart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
-      { userId: user._id },
+      { userId },
     );
 
     if (!cart) {
@@ -427,7 +347,6 @@ export async function DELETE(req: Request) {
     const updatedCart = await client.fetch(
       `*[_type == "cart" && user._ref == $userId][0] {
         items[] {
-          _key,
           cartId,
           quantity,
           selectedSize,
@@ -444,21 +363,12 @@ export async function DELETE(req: Request) {
           }
         }
       }`,
-      { userId: user._id },
+      { userId },
     );
-
-    const transformedItems =
-      updatedCart.items?.map((item: any) => ({
-        cartId: item.cartId,
-        quantity: item.quantity,
-        selectedSize: item.selectedSize,
-        selectedColor: item.selectedColor,
-        product: item.product,
-      })) || [];
 
     return NextResponse.json({
       success: true,
-      items: transformedItems,
+      items: updatedCart?.items || [],
     });
   } catch (error) {
     console.error("Error removing from cart:", error);

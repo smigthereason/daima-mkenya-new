@@ -165,6 +165,7 @@ export default async function EditProductPage({
               src={product.heroImage}
               alt={product.name}
               fill
+              unoptimized
               className="object-cover"
               sizes="160px"
             />
