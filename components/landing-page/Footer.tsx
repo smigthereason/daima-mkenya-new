@@ -103,8 +103,8 @@ const Footer = () => {
                 <a
                   key={idx}
                   href="#"
-                  className="p-1.5 md:p-2 bg-white text-black transition-all duration-300 
-                 hover:bg-zinc-900 hover:text-white hover:scale-110 
+                  className="p-1.5 md:p-2 bg-white text-black transition-all duration-300
+                 hover:bg-zinc-900 hover:text-white hover:scale-110
                  border border-transparent hover:border-zinc-400"
                 >
                   <Icon
@@ -138,28 +138,6 @@ const Footer = () => {
             <p className="text-zinc-300 text-[10px] sm:text-xs md:text-sm mt-1">
               Premium Clothing Line
             </p>
-          </div>
-
-          {/* Responsive Button */}
-          <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 lg:bottom-8 right-3 sm:right-4 md:right-6 lg:right-8">
-            <button
-              className="group/btn bg-white text-black hover:bg-zinc-100 transition-all duration-300 shadow-2xl hover:shadow-xl hover:scale-105
-    p-3 sm:p-4 md:p-5 lg:p-6
-    w-28 sm:w-32 md:w-36 lg:w-40 xl:w-48
-  "
-            >
-              <div className="flex items-center justify-between w-full">
-                <span className="text-left font-semibold leading-tight text-[10px] sm:text-xs md:text-sm">
-                  See the <br className="block sm:hidden" />
-                  Product <br className="hidden sm:block" />
-                  Specification
-                </span>
-                <ArrowRight
-                  size={14}
-                  className="sm:w-4 sm:h-4 md:w-5 md:h-5 group-hover/btn:translate-x-1 sm:group-hover/btn:translate-x-2 transition-transform duration-300 flex-shrink-0 ml-1 sm:ml-2"
-                />
-              </div>
-            </button>
           </div>
         </div>
       </div>
