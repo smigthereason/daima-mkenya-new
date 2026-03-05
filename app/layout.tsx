@@ -6,6 +6,7 @@ import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { NextAuthProvider } from "./(root)/providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
   subsets: ["latin"],
@@ -16,7 +17,6 @@ const playfair = Playfair_Display({
 
 const baseUrl = "https://daimamkenyaafrica.com";
 const imageUrl = `${baseUrl}/assets/og-image.png`;
-
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -85,6 +85,7 @@ export default function RootLayout({
             <CartProvider>{children}</CartProvider>
           </NextAuthProvider>
         </ErrorBoundary>
+        <Analytics />
       </body>
     </html>
   );
