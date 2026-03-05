@@ -490,6 +490,18 @@ const GalleryPage = () => {
     return () => clearTimeout(timer);
   }, [galleryItems, isLoading]);
 
+  const galleryJsonLd =
+    galleryItems.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Daima Mkenya Africa Gallery",
+          description:
+            "A visual gallery of Daima Mkenya Africa Kenyan heritage fashion, grouped into Earth, Urban, Verdant and Amber themes.",
+          url: "https://daimamkenyaafrica.com/gallery",
+        }
+      : null;
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
@@ -506,6 +518,15 @@ const GalleryPage = () => {
       ref={containerRef}
       className="min-h-screen bg-[#F8F8F8] pt-32 pb-20 px-4 md:px-12 mt-2"
     >
+      {galleryJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(galleryJsonLd),
+          }}
+        />
+      )}
+
       <GalleryHeader />
 
       <section className="relative z-10 max-w-[2000px] mx-auto">

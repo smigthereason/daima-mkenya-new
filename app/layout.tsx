@@ -1,35 +1,6 @@
-// // app/layout.tsx
-
-// import { Playfair_Display } from "next/font/google";
-// import "./globals.css";
-// import { NextAuthProvider } from "./(root)/providers/NextAuthProvider";
-
-// const playfair = Playfair_Display({
-//   subsets: ["latin"],
-//   weight: ["400", "700", "900"],
-//   style: ["normal", "italic"],
-//   display: "swap",
-// });
-
-// export default function RootLayout({
-//   children,
-// }: {
-//   children: React.ReactNode;
-// }) {
-//   return (
-//     <html lang="en" className={playfair.className}>
-//       <body className={`${playfair.className} antialiased bg-[#e8e8e8]`}>
-//         <NextAuthProvider>
-//           {children}
-//         </NextAuthProvider>
-//       </body>
-//     </html>
-//   );
-// }
-
 // app/layout.tsx
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
@@ -43,24 +14,30 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-// Construct the absolute URL for the image
-const baseUrl = "https://daima-mkenya-new.vercel.app";
+const baseUrl = "https://daimamkenyaafrica.com";
 const imageUrl = `${baseUrl}/assets/og-image.png`;
+
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Daima Mkenya Africa",
+    default: "Daima Mkenya Africa | Premium Kenyan Clothing",
     template: "%s | Daima Mkenya Africa",
   },
   description:
-    "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
-
-  // OpenGraph metadata - Simplified for better compatibility
+    "Authentic Kenyan heritage fashion, crafted with intention in Nairobi. Premium Kenyan-branded clothing made for Kenya and the world.",
+  alternates: {
+    canonical: baseUrl,
+  },
   openGraph: {
-    title: "Daima Mkenya Africa",
+    title: "Daima Mkenya Africa | Premium Kenyan Clothing",
     description:
-      "Authentic Kenyan heritage fashion, crafted with intention in Nairobi.",
+      "Authentic Kenyan heritage fashion, crafted with intention in Nairobi. Premium Kenyan-branded clothing made for Kenya and the world.",
     url: baseUrl,
     siteName: "Daima Mkenya Africa",
     images: [
@@ -74,15 +51,22 @@ export const metadata: Metadata = {
     locale: "en_KE",
     type: "website",
   },
-
-  // Twitter metadata
   twitter: {
     card: "summary_large_image",
-    title: "Daima Mkenya Africa",
-    description: "Authentic Kenyan heritage fashion 🇰🇪",
+    title: "Daima Mkenya Africa | Premium Kenyan Clothing",
+    description:
+      "Authentic Kenyan heritage fashion 🇰🇪 — premium Kenyan-branded clothing made in Nairobi.",
     images: [imageUrl],
-    creator: "@daimamkenya",
+    creator: "@Daimaafricake_",
   },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  // viewport: {
+  //   width: "device-width",
+  //   initialScale: 1,
+  // },
 };
 
 export default function RootLayout({
@@ -92,27 +76,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={playfair.className}>
-      <head>
-        {/* Essential meta tags - WhatsApp reads these directly */}
-        <meta property="og:title" content="Daima Mkenya Africa" />
-        <meta
-          property="og:description"
-          content="Authentic Kenyan heritage fashion, crafted with intention in Nairobi."
-        />
-        <meta property="og:image" content={imageUrl} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:url" content={baseUrl} />
-        <meta property="og:type" content="website" />
-
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Daima Mkenya Africa" />
-        <meta
-          name="twitter:description"
-          content="Authentic Kenyan heritage fashion 🇰🇪"
-        />
-        <meta name="twitter:image" content={imageUrl} />
-      </head>
       <body
         className={`${playfair.className} antialiased bg-[#e8e8e8]`}
         suppressHydrationWarning={true}

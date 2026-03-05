@@ -1,19 +1,178 @@
-import ProductCard from "@/components/ProductCard";
+import type { Metadata } from "next";
 import Link from "next/link";
+import ProductCard from "@/components/ProductCard";
+import { getProductBySlug } from "@/types/Product";
 
-// This page now uses slug instead of id
-export default async function Page({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
-}) {
-  // Unwrapping the params promise
-  const { slug } = await params;
+const baseUrl = "https://daimamkenyaafrica.com";
+
+type PageProps = {
+  params: { slug: string };
+};
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { slug } = params;
+  const product = await getProductBySlug(slug);
+
+  const url = `${baseUrl}/products/${slug}`;
+
+  if (!product) {
+    return {
+      title: "Product not found | Daima Mkenya Africa",
+      description: "This product is not available.",
+      alternates: { canonical: url },
+      robots: { index: false, follow: false },
+    };
+  }
+
+  const name = product.name;
+  const category = product.category;
+  const descriptionText =
+    product.description?.join(" ").slice(0, 150) ||
+    "Premium Kenyan-branded clothing made in Nairobi.";
+
+  const title = `${name} – ${category} | Daima Mkenya Africa`;
+  const description = `${descriptionText} Shop ${name} in the ${category} collection from Daima Mkenya Africa, crafted in Nairobi and shipped worldwide.`;
+
+  const ogImageUrl =
+    product.images?.hero?.asset?.url ||
+    "https://www.daimamkenyaafrica.com/assets/4.4.webp";
+
+  const ogImageAlt =
+    product.images?.hero?.alt || `${name} – Daima Mkenya Africa`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: "Daima Mkenya Africa",
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: ogImageAlt,
+        },
+      ],
+      locale: "en_KE",
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
+      card: "summary_large_image",
+      images: ogImageUrl,
+      creator: "@Daimaafricake_",
+    },
+    robots: {
+      index: product.disabled ? false : true,
+      follow: product.disabled ? false : true,
+    },
+  };
+}
+
+export default async function Page({ params }: PageProps) {
+  const { slug } = params;
+  const product = await getProductBySlug(slug);
+
+  const url = `${baseUrl}/products/${slug}`;
+
+  const productJsonLd =
+    product && !product.disabled
+      ? {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          image: [
+            product.images?.hero?.asset?.url ||
+              "https://www.daimamkenyaafrica.com/assets/4.4.webp",
+          ],
+          description:
+            product.description?.join(" ").slice(0, 200) ||
+            "Premium Kenyan-branded clothing made in Nairobi.",
+          sku: product._id,
+          category: product.category,
+          brand: {
+            "@type": "Brand",
+            name: "Daima Mkenya Africa",
+          },
+          color: product.colors?.map((c) => c.label).join(", ") || undefined,
+          material: product.details?.material || undefined,
+          offers: {
+            "@type": "Offer",
+            url,
+            priceCurrency: "KES",
+            price: product.price,
+            availability:
+              product.stock && product.stock > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+          },
+        }
+      : null;
+
+  const breadcrumbJsonLd =
+    product && !product.disabled
+      ? {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            {
+              "@type": "ListItem",
+              position: 1,
+              item: {
+                "@id": baseUrl,
+                name: "Home",
+              },
+            },
+            {
+              "@type": "ListItem",
+              position: 2,
+              item: {
+                "@id": `${baseUrl}/products`,
+                name: "Products",
+              },
+            },
+            {
+              "@type": "ListItem",
+              position: 3,
+              item: {
+                "@id": url,
+                name: product.name,
+              },
+            },
+          ],
+        }
+      : null;
 
   return (
     <main className="min-h-screen flex flex-col items-center bg-white pb-20">
+      {productJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(productJsonLd),
+          }}
+        />
+      )}
+
+      {breadcrumbJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(breadcrumbJsonLd),
+          }}
+        />
+      )}
+
       <div className="w-full">
-        {/* Pass the slug into your ProductCard */}
         <ProductCard productSlug={slug} />
       </div>
 
