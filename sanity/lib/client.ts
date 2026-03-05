@@ -18,8 +18,6 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  // This token must be added to your .env.local with "Editor" permissions
   token: process.env.SANITY_API_TOKEN, 
-  // useCdn must be false for authentication/writing data
   useCdn: false, 
 })
