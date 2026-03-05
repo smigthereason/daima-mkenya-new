@@ -1,4 +1,5 @@
 // components/admin/CategoryPieChart.tsx
+
 "use client";
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
@@ -6,24 +7,32 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 const COLORS = ["#171717", "#be1e2d", "#404040", "#737373", "#a3a3a3"];
 
 export default function CategoryPieChart({ orders }: { orders: any[] }) {
-  // DEBUGGING: Check what orders are being passed from page.tsx
-  console.log("Orders received in PieChart:", orders);
-
   const categorySales = new Map();
 
-  // Ensure orders exist and is an array
   if (orders && Array.isArray(orders)) {
     orders.forEach((order: any) => {
-      // 1. Verify "paymentStatus" matches this exact string
+      // Ensure we only count paid orders
       if (order.paymentStatus === "paid" && order.items) {
         order.items.forEach((item: any) => {
-          // Ensure nested product data exists
           const category = item.product?.category || "Other";
-          const revenue = (item.price || 0) * (item.quantity || 1);
-          categorySales.set(
-            category,
-            (categorySales.get(category) || 0) + revenue,
-          );
+
+          // PARSING FIX: item.price might be "Ksh 8,500" or a number.
+          // We need to ensure it's a clean number for the chart.
+          let rawPrice = item.price;
+          if (typeof rawPrice === "string") {
+            rawPrice = parseFloat(rawPrice.replace(/[^0-9.]/g, ""));
+          }
+
+          const price = Number(rawPrice) || 0;
+          const quantity = Number(item.quantity) || 1;
+          const revenue = price * quantity;
+
+          if (revenue > 0) {
+            categorySales.set(
+              category,
+              (categorySales.get(category) || 0) + revenue,
+            );
+          }
         });
       }
     });
@@ -33,13 +42,12 @@ export default function CategoryPieChart({ orders }: { orders: any[] }) {
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value);
 
-  // DEBUGGING: Check calculated data
-  console.log("Calculated pie data:", data);
+  const totalRevenue = data.reduce((sum, item) => sum + item.value, 0);
 
-  // 2. UI: Handle Empty State
+  // UI: Handle Empty State
   if (data.length === 0) {
     return (
-      <div className="w-full h-[300px] flex flex-col items-center justify-center border border-neutral-100 rounded-none bg-neutral-50/50">
+      <div className="w-full h-[300px] flex flex-col items-center justify-center border border-neutral-100 bg-neutral-50/50">
         <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
           No Sales Data
         </p>
@@ -52,24 +60,39 @@ export default function CategoryPieChart({ orders }: { orders: any[] }) {
 
   return (
     <div className="w-full flex flex-col items-center max-w-md mx-auto">
-      <div className="w-full h-[300px]">
+      <div className="w-full h-[300px] relative">
+        {/* Total Revenue Center Label */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+          <span className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em]">
+            Total
+          </span>
+          <span className="text-lg font-serif font-black italic">
+            {totalRevenue >= 1000
+              ? `${(totalRevenue / 1000).toFixed(1)}k`
+              : totalRevenue}
+          </span>
+        </div>
+
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
               cy="50%"
-              innerRadius="70%"
+              innerRadius="72%"
               outerRadius="95%"
               paddingAngle={4}
               dataKey="value"
+              nameKey="name"
               stroke="none"
-              cornerRadius={0}
+              animationBegin={0}
+              animationDuration={1200}
             >
               {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
+                  className="hover:opacity-80 transition-opacity cursor-pointer"
                 />
               ))}
             </Pie>
@@ -78,17 +101,20 @@ export default function CategoryPieChart({ orders }: { orders: any[] }) {
                 backgroundColor: "black",
                 border: "none",
                 borderRadius: "0px",
+                padding: "12px",
               }}
               itemStyle={{
                 color: "white",
                 fontSize: "10px",
                 fontWeight: "900",
                 textTransform: "uppercase",
+                letterSpacing: "0.1em",
               }}
-              // FIX: Handle possible undefined value for TypeScript
-              formatter={(value: number | undefined) => [
-                `KES ${value ? value.toLocaleString() : "0"}`,
-                "Revenue",
+              labelStyle={{ display: "none" }}
+              // FIXED: Changed type to number | any to satisfy Recharts strict type check
+              formatter={(value: number | any) => [
+                `KES ${Number(value || 0).toLocaleString()}`,
+                "REVENUE",
               ]}
             />
           </PieChart>
@@ -96,18 +122,23 @@ export default function CategoryPieChart({ orders }: { orders: any[] }) {
       </div>
 
       {/* 2-Column Grid Legend */}
-      <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-12 w-full">
+      <div className="grid grid-cols-2 gap-x-8 gap-y-4 mt-8 w-full">
         {data.map((entry, index) => (
           <div
             key={entry.name}
-            className="flex items-center gap-3 border-l-2 pl-3 border-neutral-100"
+            className="flex items-center justify-between border-b border-neutral-50 pb-2"
           >
-            <div
-              className="w-1.5 h-1.5 shrink-0"
-              style={{ backgroundColor: COLORS[index % COLORS.length] }}
-            />
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400 truncate">
-              {entry.name}
+            <div className="flex items-center gap-3">
+              <div
+                className="w-1.5 h-1.5 shrink-0"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-500 truncate max-w-[80px]">
+                {entry.name}
+              </span>
+            </div>
+            <span className="text-[9px] font-black text-black">
+              {Math.round((entry.value / totalRevenue) * 100)}%
             </span>
           </div>
         ))}
