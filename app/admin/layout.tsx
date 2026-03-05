@@ -63,6 +63,7 @@ export default function AdminLayout({
                 alt="Daima Mkenya"
                 fill
                 className="object-contain"
+                sizes="(max-width: 768px) 112px, 128px"
                 priority
               />
             </Link>
