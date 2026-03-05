@@ -14,11 +14,12 @@ export { default as Stripes } from "./Logo_Stripes.png";
 export { default as SideStripe } from "./SideStripe.png";
 export { default as HeroStripe } from "./Stripe2.png";
 export { default as Hero22 } from "./unity-ribbed-tank-top-women.webp";
-export { default as Hero33 } from "./unity-ribbed-tank-top-men.webp";
+export { default as Hero33 } from "./IMG-20260225-WA0050.jpg";
 export { default as Hero44 } from "./Shield-stripe-maxi-skirt-2.webp";
 export { default as Hero55 } from "./unity-ribbed-tank-top.webp";
 export { default as Hero66 } from "./leopard-shield-print-vest.webp";
 export { default as Hero77 } from "./leopard-shield-print-vest-women.webp";
+export { default as Hero88 } from "./unity-ribbed-tank-top-men.webp";
 export { default as SDG1 } from "./shield-stripe-maxi-skirt.webp";
 
 // Collection Model Images

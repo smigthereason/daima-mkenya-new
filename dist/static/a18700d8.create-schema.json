@@ -249,6 +249,12 @@
         "title": "User Role"
       },
       {
+        "initialValue": false,
+        "description": "Grant full administrative access",
+        "name": "isAdmin",
+        "type": "boolean"
+      },
+      {
         "hidden": true,
         "name": "resetToken",
         "type": "string"
@@ -259,128 +265,8 @@
         "type": "datetime"
       },
       {
-        "of": [
-          {
-            "fields": [
-              {
-                "name": "id",
-                "type": "string",
-                "title": "ID"
-              },
-              {
-                "options": {
-                  "list": [
-                    {
-                      "title": "PesaPal",
-                      "value": "pesapal"
-                    },
-                    {
-                      "title": "M-Pesa",
-                      "value": "mpesa"
-                    }
-                  ]
-                },
-                "name": "type",
-                "type": "string"
-              },
-              {
-                "description": "Phone number for M-Pesa or account ID for PesaPal",
-                "name": "details",
-                "type": "string"
-              },
-              {
-                "initialValue": false,
-                "name": "isDefault",
-                "type": "boolean"
-              },
-              {
-                "name": "createdAt",
-                "type": "datetime"
-              }
-            ],
-            "type": "object",
-            "name": "paymentMethod"
-          }
-        ],
-        "name": "paymentMethods",
-        "type": "array"
-      },
-      {
-        "of": [
-          {
-            "fields": [
-              {
-                "name": "id",
-                "type": "string",
-                "title": "ID"
-              },
-              {
-                "options": {
-                  "list": [
-                    {
-                      "title": "Shipping",
-                      "value": "shipping"
-                    },
-                    {
-                      "title": "Billing",
-                      "value": "billing"
-                    }
-                  ]
-                },
-                "name": "type",
-                "type": "string",
-                "title": "Address Type"
-              },
-              {
-                "name": "recipientName",
-                "type": "string"
-              },
-              {
-                "name": "phoneNumber",
-                "type": "string"
-              },
-              {
-                "name": "addressLine1",
-                "type": "string"
-              },
-              {
-                "name": "addressLine2",
-                "type": "string"
-              },
-              {
-                "name": "city",
-                "type": "string"
-              },
-              {
-                "name": "state",
-                "type": "string",
-                "title": "State/County"
-              },
-              {
-                "name": "postalCode",
-                "type": "string"
-              },
-              {
-                "initialValue": "Kenya",
-                "name": "country",
-                "type": "string"
-              },
-              {
-                "initialValue": false,
-                "name": "isDefault",
-                "type": "boolean"
-              },
-              {
-                "name": "createdAt",
-                "type": "datetime"
-              }
-            ],
-            "type": "object",
-            "name": "address"
-          }
-        ],
-        "name": "addresses",
-        "type": "array"
+        "name": "createdAt",
+        "type": "datetime"
       }
     ],
     "name": "user",
@@ -389,141 +275,46 @@
   {
     "fields": [
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
-        "description": "OAuth provider name (google, facebook, etc.)",
         "name": "provider",
         "type": "string"
       },
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
-        "description": "User ID from the OAuth provider",
         "name": "providerAccountId",
-        "type": "string",
-        "title": "Provider Account ID"
+        "type": "string"
       },
       {
-        "options": {
-          "list": [
-            {
-              "title": "OAuth",
-              "value": "oauth"
-            },
-            {
-              "title": "Email",
-              "value": "email"
-            },
-            {
-              "title": "Credentials",
-              "value": "credentials"
-            }
-          ]
-        },
-        "description": "Type of account (oauth, email, credentials)",
         "name": "type",
-        "type": "string",
-        "title": "Account Type"
-      },
-      {
-        "description": "OAuth access token",
-        "hidden": true,
-        "name": "accessToken",
         "type": "string"
       },
       {
-        "description": "Timestamp when access token expires",
-        "hidden": true,
-        "name": "accessTokenExpires",
-        "type": "number"
-      },
-      {
-        "description": "OAuth refresh token",
-        "hidden": true,
-        "name": "refreshToken",
+        "name": "access_token",
         "type": "string"
       },
       {
-        "description": "OAuth token type (bearer, etc.)",
-        "hidden": true,
         "name": "token_type",
         "type": "string"
       },
       {
-        "description": "Alternative expiration timestamp",
-        "hidden": true,
         "name": "expires_at",
         "type": "number"
       },
       {
-        "description": "Alternative refresh token field",
-        "hidden": true,
         "name": "refresh_token",
-        "type": "string",
-        "title": "Refresh Token (alt)"
+        "type": "string"
       },
       {
-        "description": "OAuth scope",
-        "hidden": true,
         "name": "scope",
         "type": "string"
       },
       {
-        "description": "OAuth ID token",
-        "hidden": true,
         "name": "id_token",
-        "type": "string",
-        "title": "ID Token"
+        "type": "string"
       },
       {
-        "description": "OAuth session state",
-        "hidden": true,
         "name": "session_state",
         "type": "string"
       },
       {
-        "description": "Alternative provider identifier",
-        "hidden": true,
-        "name": "providerId",
-        "type": "string",
-        "title": "Provider ID"
-      },
-      {
-        "description": "Type of provider",
-        "hidden": true,
-        "name": "providerType",
-        "type": "string"
-      },
-      {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "to": [
           {
             "type": "user"
@@ -531,11 +322,6 @@
         ],
         "name": "user",
         "type": "reference"
-      },
-      {
-        "hidden": true,
-        "name": "createdAt",
-        "type": "datetime"
       }
     ],
     "name": "account",
@@ -544,52 +330,18 @@
   {
     "fields": [
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "name": "sessionToken",
         "type": "string"
       },
       {
         "name": "userId",
-        "type": "string",
-        "title": "User ID"
+        "type": "string"
       },
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "name": "expires",
         "type": "datetime"
       },
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "to": [
           {
             "type": "user"
@@ -597,11 +349,6 @@
         ],
         "name": "user",
         "type": "reference"
-      },
-      {
-        "hidden": true,
-        "name": "createdAt",
-        "type": "datetime"
       }
     ],
     "name": "session",
@@ -610,47 +357,14 @@
   {
     "fields": [
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "name": "identifier",
         "type": "string"
       },
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "name": "token",
         "type": "string"
       },
       {
-        "validation": [
-          {
-            "rules": [
-              {
-                "flag": "presence",
-                "constraint": "required"
-              }
-            ],
-            "level": "error"
-          }
-        ],
         "name": "expires",
         "type": "datetime"
       }

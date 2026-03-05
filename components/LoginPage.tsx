@@ -1,4 +1,3 @@
-// // components/LoginPage.tsx
 // "use client";
 
 // import React, { useState, useRef, useEffect } from "react";
@@ -8,88 +7,138 @@
 // import Link from "next/link";
 // import { Logo, HeroImage2 } from "@/public/assets";
 // import { signIn, useSession } from "next-auth/react";
-// import { useRouter } from "next/navigation";
+// import { useRouter, useSearchParams } from "next/navigation";
 
 // const Login = () => {
 //   const [isSignUp, setIsSignUp] = useState(false);
 //   const [showPassword, setShowPassword] = useState(false);
 //   const containerRef = useRef<HTMLDivElement>(null);
 //   const router = useRouter();
-//   const { data: session, status } = useSession();
+//   const searchParams = useSearchParams();
+//   const { data: session, status, update } = useSession();
 
 //   // Form States
 //   const [email, setEmail] = useState("");
 //   const [password, setPassword] = useState("");
 //   const [name, setName] = useState("");
 //   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState<string | null>(null);
 
-//   // Check if user is already logged in and redirect accordingly
+//   // Safe client-side state for redirection
+//   const [redirectTo, setRedirectTo] = useState("/");
+
+//   useEffect(() => {
+//     // This only runs on the client, fixing the ReferenceError
+//     const callbackUrl = searchParams.get("callbackUrl");
+//     const storedRedirect =
+//       typeof window !== "undefined"
+//         ? sessionStorage.getItem("redirectAfterLogin")
+//         : null;
+//     setRedirectTo(callbackUrl || storedRedirect || "/");
+//   }, [searchParams]);
+
+//   // Handle automatic redirect if session already exists
 //   useEffect(() => {
 //     if (status === "loading") return;
 
 //     if (session?.user) {
-//       const isAdmin = session.user.isAdmin || session.user.role === "admin";
-//       console.log("User already logged in, isAdmin:", isAdmin);
+//       const isAdmin =
+//         session.user.isAdmin ||
+//         session.user?.role === "admin" ||
+//         session.user?.email === "prodbysmig@gmail.com";
 
 //       if (isAdmin) {
-//         router.push("/admin");
-//       } else {
-//         router.push("/");
+//         if (typeof window !== "undefined")
+//           sessionStorage.removeItem("redirectAfterLogin");
+//         router.replace("/admin");
+//       } else if (redirectTo !== "/login") {
+//         if (typeof window !== "undefined")
+//           sessionStorage.removeItem("redirectAfterLogin");
+//         router.replace(redirectTo);
 //       }
 //     }
-//   }, [session, status, router]);
+//   }, [session, status, router, redirectTo]);
 
 //   const toggleForm = () => {
 //     setIsSignUp(!isSignUp);
+//     setError(null);
+//     setEmail("");
+//     setPassword("");
+//     setName("");
 //   };
 
 //   const handleAuth = async (e: React.FormEvent) => {
 //     e.preventDefault();
 //     setLoading(true);
+//     setError(null);
 
-//     const result = await signIn("credentials", {
-//       email,
-//       password,
-//       name,
-//       redirect: false,
-//       callbackUrl: "/", // This will be overridden based on role
-//     });
+//     try {
+//       const result = await signIn("credentials", {
+//         email,
+//         password,
+//         ...(isSignUp && { name }),
+//         redirect: false,
+//         callbackUrl: redirectTo,
+//       });
 
-//     if (result?.ok) {
-//       // Get the updated session
-//       const updatedSession = await fetch("/api/auth/session").then((res) =>
-//         res.json(),
-//       );
-//       const isAdmin =
-//         updatedSession?.user?.isAdmin || updatedSession?.user?.role === "admin";
-
-//       if (isAdmin) {
-//         router.push("/admin");
-//       } else {
-//         router.push("/");
+//       if (result?.error) {
+//         setError(result.error);
+//         setLoading(false);
+//         return;
 //       }
-//       router.refresh();
-//     } else {
-//       alert("Authentication failed. Please check your credentials.");
+
+//       if (result?.ok) {
+//         // Force session update and verify admin status manually for immediate routing
+//         const sessionUpdate = await update();
+
+//         let sessionData = sessionUpdate;
+//         if (!sessionData?.user) {
+//           const res = await fetch("/api/auth/session");
+//           sessionData = await res.json();
+//         }
+
+//         const userEmail = sessionData?.user?.email || email;
+//         const isAdmin =
+//           sessionData?.user?.role === "admin" ||
+//           sessionData?.user?.isAdmin === true ||
+//           userEmail === "prodbysmig@gmail.com";
+
+//         if (typeof window !== "undefined") {
+//           sessionStorage.removeItem("redirectAfterLogin");
+//         }
+
+//         // Direct push to bypass any useEffect latency
+//         if (isAdmin) {
+//           await router.push("/admin");
+//         } else {
+//           await router.push(redirectTo);
+//         }
+
+//         router.refresh();
+//       }
+//     } catch (error) {
+//       console.error("Authentication error:", error);
+//       setError("An unexpected error occurred");
 //       setLoading(false);
 //     }
 //   };
 
 //   const socialSignIn = async (provider: string) => {
 //     setLoading(true);
+//     setError(null);
+
 //     try {
-//       // Use signIn with redirect: true and let the callback handle the redirect
 //       await signIn(provider, {
-//         callbackUrl: "/",
+//         callbackUrl: redirectTo,
 //         redirect: true,
 //       });
 //     } catch (error) {
 //       console.error("Social sign in error:", error);
+//       setError("Social sign in failed");
 //       setLoading(false);
 //     }
 //   };
 
-//   // Reusable Social Icons Component
 //   const SocialSection = () => (
 //     <div className="flex gap-4 mb-8">
 //       <button
@@ -128,11 +177,10 @@
 //     </div>
 //   );
 
-//   // Show loading state while checking session
 //   if (status === "loading") {
 //     return (
 //       <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8]">
-//         <div className="w-10 h-10 border-2 border-[#006241] border-t-transparent rounded-full animate-spin" />
+//         <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
 //       </div>
 //     );
 //   }
@@ -168,6 +216,12 @@
 //               </h1>
 
 //               <SocialSection />
+
+//               {error && (
+//                 <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+//                   {error}
+//                 </div>
+//               )}
 
 //               <div className="w-full space-y-4">
 //                 <div className="relative">
@@ -245,6 +299,12 @@
 
 //               <SocialSection />
 
+//               {error && (
+//                 <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+//                   {error}
+//                 </div>
+//               )}
+
 //               <div className="w-full space-y-4">
 //                 <div className="relative">
 //                   <User
@@ -304,7 +364,7 @@
 //               >
 //                 <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0" />
 //                 <span className="relative z-10 transition-colors duration-500 group-hover:text-[#006241]">
-//                   {loading ? "Creating..." : "Sign Up"}
+//                   {loading ? "Creating Account..." : "Sign Up"}
 //                 </span>
 //               </button>
 //             </form>
@@ -359,6 +419,8 @@
 //               alt="Pattern"
 //               fill
 //               className="object-cover"
+//               sizes="50vw"
+//               loading="eager"
 //             />
 //           </div>
 //         </div>
@@ -368,7 +430,6 @@
 // };
 
 // export default Login;
-// components/LoginPage.tsx
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -395,50 +456,42 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Get redirect URL from query params or sessionStorage
-  const redirectTo =
-    searchParams.get("callbackUrl") ||
-    sessionStorage.getItem("redirectAfterLogin") ||
-    "/";
+  // Safe client-side state for redirection
+  const [redirectTo, setRedirectTo] = useState("/");
+  const isNavigating = useRef(false);
 
-  // Clear the stored redirect after retrieving
   useEffect(() => {
-    if (redirectTo && redirectTo !== "/") {
-      // Don't remove yet - we'll remove after successful login
-      console.log("Redirect target:", redirectTo);
+    // This only runs on the client, fixing the ReferenceError: sessionStorage is not defined
+    if (typeof window !== "undefined") {
+      const callbackUrl = searchParams.get("callbackUrl");
+      const storedRedirect = sessionStorage.getItem("redirectAfterLogin");
+      setRedirectTo(callbackUrl || storedRedirect || "/");
     }
-  }, [redirectTo]);
+  }, [searchParams]);
 
-  // Check if user is already logged in and redirect accordingly
+  // Handle automatic redirect if session already exists
   useEffect(() => {
-    if (status === "loading") return;
+    if (status === "loading" || isNavigating.current) return;
 
     if (session?.user) {
+      isNavigating.current = true;
       const isAdmin =
         session.user.isAdmin ||
         session.user?.role === "admin" ||
         session.user?.email === "prodbysmig@gmail.com";
-      console.log(
-        "User already logged in, isAdmin:",
-        isAdmin,
-        "Email:",
-        session.user.email,
-      );
 
-      if (isAdmin) {
+      if (typeof window !== "undefined") {
         sessionStorage.removeItem("redirectAfterLogin");
-        router.replace("/admin");
-      } else {
-        sessionStorage.removeItem("redirectAfterLogin");
-        router.replace(redirectTo);
+        // We use window.location.href to force the browser to navigate immediately
+        // and show the native progress bar, which fixes the "stuck button" issue.
+        window.location.href = isAdmin ? "/admin" : redirectTo;
       }
     }
-  }, [session, status, router, redirectTo]);
+  }, [session, status, redirectTo]);
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
     setError(null);
-    // Clear form fields when toggling
     setEmail("");
     setPassword("");
     setName("");
@@ -446,104 +499,32 @@ const Login = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError(null);
 
     try {
-      // For credentials sign in/up
       const result = await signIn("credentials", {
         email,
         password,
-        ...(isSignUp && { name }), // Only send name for sign up
+        ...(isSignUp && { name }),
         redirect: false,
-        callbackUrl: redirectTo,
       });
 
-      console.log("Sign in result:", result);
-
       if (result?.error) {
-        setError(result.error);
+        setError(
+          result.error === "CredentialsSignin"
+            ? "Invalid email or password"
+            : result.error,
+        );
         setLoading(false);
         return;
       }
 
       if (result?.ok) {
-        // Instead of using update(), manually fetch the session with retries
-        let retries = 0;
-        const maxRetries = 15;
-        let sessionData = null;
-
-        while (retries < maxRetries) {
-          await new Promise((resolve) => setTimeout(resolve, 200));
-
-          try {
-            const response = await fetch("/api/auth/session", {
-              cache: "no-store",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            });
-
-            if (response.ok) {
-              sessionData = await response.json();
-
-              if (sessionData?.user) {
-                console.log("Session fetched successfully:", sessionData);
-                break;
-              }
-            }
-          } catch (err) {
-            console.log("Session fetch attempt", retries + 1, "failed");
-          }
-
-          retries++;
-        }
-
-        // Force update the session in the client
+        // Trigger a session update. The useEffect above will handle the redirect
+        // once the session is updated with user data.
         await update();
-
-        if (sessionData?.user) {
-          const isAdmin =
-            sessionData.user.isAdmin ||
-            sessionData.user.role === "admin" ||
-            sessionData.user.email === "prodbysmig@gmail.com";
-
-          console.log(
-            "User signed in, isAdmin:",
-            isAdmin,
-            "Email:",
-            sessionData.user.email,
-          );
-
-          // Force a router refresh to update server components
-          router.refresh();
-
-          // Add delay before redirect
-          await new Promise((resolve) => setTimeout(resolve, 300));
-
-          // Clear the stored redirect URL and redirect based on role
-          sessionStorage.removeItem("redirectAfterLogin");
-
-          if (isAdmin) {
-            console.log("Redirecting to admin...");
-            router.replace("/admin");
-          } else {
-            console.log("Redirecting to:", redirectTo);
-            router.replace(redirectTo);
-          }
-        } else {
-          // If we still don't have session after retries, try direct redirect based on email
-          console.log("No session after retries, redirecting based on email");
-
-          sessionStorage.removeItem("redirectAfterLogin");
-
-          // Since we know the email from the sign in, we can make a guess
-          if (email === "prodbysmig@gmail.com") {
-            router.replace("/admin");
-          } else {
-            router.replace(redirectTo);
-          }
-        }
       }
     } catch (error) {
       console.error("Authentication error:", error);
@@ -555,9 +536,7 @@ const Login = () => {
   const socialSignIn = async (provider: string) => {
     setLoading(true);
     setError(null);
-
     try {
-      // For social sign in, we let NextAuth handle the redirect
       await signIn(provider, {
         callbackUrl: redirectTo,
         redirect: true,
@@ -569,7 +548,6 @@ const Login = () => {
     }
   };
 
-  // Reusable Social Icons Component
   const SocialSection = () => (
     <div className="flex gap-4 mb-8">
       <button
@@ -608,11 +586,16 @@ const Login = () => {
     </div>
   );
 
-  // Show loading state while checking session
-  if (status === "loading") {
+  // Loading or Authenticated state splash
+  if (status === "loading" || (status === "authenticated" && !error)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8]">
-        <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-black">
+            Authenticating...
+          </p>
+        </div>
       </div>
     );
   }
@@ -621,10 +604,11 @@ const Login = () => {
     <div className="min-h-screen bg-[#f8f8f8] flex items-start md:items-center justify-center p-0 md:p-8 font-sans relative">
       <div
         ref={containerRef}
-        className="relative w-full max-w-250 mt-0 md:mt-0 min-h-screen md:min-h-0 md:h-162.5 bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"
+        className="relative w-full max-w-5xl mt-0 md:mt-0 min-h-screen md:min-h-0 md:h-[650px] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"
       >
+        {/* FORM SIDE */}
         <div className="grow md:flex-none md:w-full h-full relative bg-white order-1 md:order-2">
-          {/* SIGN IN FORM */}
+          {/* SIGN IN FORM CONTAINER */}
           <div
             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${
               isSignUp
@@ -650,7 +634,7 @@ const Login = () => {
               <SocialSection />
 
               {error && (
-                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider text-center rounded">
                   {error}
                 </div>
               )}
@@ -706,7 +690,7 @@ const Login = () => {
             </form>
           </div>
 
-          {/* SIGN UP FORM */}
+          {/* SIGN UP FORM CONTAINER */}
           <div
             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${
               !isSignUp
@@ -732,7 +716,7 @@ const Login = () => {
               <SocialSection />
 
               {error && (
-                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-[10px] font-bold uppercase tracking-wider text-center rounded">
                   {error}
                 </div>
               )}
@@ -803,7 +787,7 @@ const Login = () => {
           </div>
         </div>
 
-        {/* OVERLAY */}
+        {/* OVERLAY SECTION */}
         <div
           className={`relative md:absolute inset-y-0 w-full md:w-1/2 z-30 flex flex-col justify-center items-center text-white px-8 py-12 md:px-12 text-center transition-all duration-700 ease-in-out order-2 md:order-1 ${
             isSignUp ? "md:left-0" : "md:left-1/2"
@@ -851,6 +835,8 @@ const Login = () => {
               alt="Pattern"
               fill
               className="object-cover"
+              sizes="50vw"
+              loading="eager"
             />
           </div>
         </div>
