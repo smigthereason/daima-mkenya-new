@@ -1,3 +1,4 @@
+// // next.config.ts
 // import type { NextConfig } from "next";
 
 // const nextConfig: NextConfig = {
@@ -17,13 +18,12 @@
 //       },
 //       {
 //         protocol: "https",
-//         hostname: "ui-avatars.com", // The Placeholder API we just added
+//         hostname: "ui-avatars.com", // The Placeholder API
 //       },
 //     ],
 //   },
 // };
 
-// export { nextConfig };
 // export default nextConfig;
 // next.config.ts
 import type { NextConfig } from "next";
@@ -37,17 +37,22 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com", // Google Profile Images
+        hostname: "lh3.googleusercontent.com",
       },
       {
         protocol: "https",
-        hostname: "platform-lookaside.fbsbx.com", // Facebook Profile Images
+        hostname: "platform-lookaside.fbsbx.com",
       },
       {
         protocol: "https",
-        hostname: "ui-avatars.com", // The Placeholder API
+        hostname: "ui-avatars.com",
       },
     ],
+  },
+  // Production optimizations
+
+  compiler: {
+    removeConsole: process.env.NODE_ENV === "production",
   },
 };
 

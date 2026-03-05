@@ -7,7 +7,7 @@ import {
   ManHero,
   HeroStripe,
   Hero22,
-  Hero33,
+  Hero88,
   Hero44,
   Hero77,
 } from "@/public/assets";
@@ -164,7 +164,7 @@ export default function Hero() {
           className="absolute left-1/2 md:left-[60%] w-1/2 md:w-[20%] h-full top-0 opacity-0 pointer-events-none "
         >
           <Image
-            src={Hero33}
+            src={Hero88}
             alt="Inner Right"
             fill
             priority

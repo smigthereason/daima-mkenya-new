@@ -1,12 +1,13 @@
+// // components/LoginPage.tsx
 // "use client";
 
-// import React, { useState, useRef } from "react";
+// import React, { useState, useRef, useEffect } from "react";
 // import { Mail, Lock, User, ArrowLeft, Eye, EyeOff } from "lucide-react";
 // import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa6";
 // import Image from "next/image";
 // import Link from "next/link";
 // import { Logo, HeroImage2 } from "@/public/assets";
-// import { signIn } from "next-auth/react";
+// import { signIn, useSession } from "next-auth/react";
 // import { useRouter } from "next/navigation";
 
 // const Login = () => {
@@ -14,6 +15,7 @@
 //   const [showPassword, setShowPassword] = useState(false);
 //   const containerRef = useRef<HTMLDivElement>(null);
 //   const router = useRouter();
+//   const { data: session, status } = useSession();
 
 //   // Form States
 //   const [email, setEmail] = useState("");
@@ -21,11 +23,26 @@
 //   const [name, setName] = useState("");
 //   const [loading, setLoading] = useState(false);
 
+//   // Check if user is already logged in and redirect accordingly
+//   useEffect(() => {
+//     if (status === "loading") return;
+
+//     if (session?.user) {
+//       const isAdmin = session.user.isAdmin || session.user.role === "admin";
+//       console.log("User already logged in, isAdmin:", isAdmin);
+
+//       if (isAdmin) {
+//         router.push("/admin");
+//       } else {
+//         router.push("/");
+//       }
+//     }
+//   }, [session, status, router]);
+
 //   const toggleForm = () => {
 //     setIsSignUp(!isSignUp);
 //   };
 
-//   // Fix 1 & 5: Centralized Auth Redirecting to Home
 //   const handleAuth = async (e: React.FormEvent) => {
 //     e.preventDefault();
 //     setLoading(true);
@@ -34,11 +51,23 @@
 //       email,
 //       password,
 //       name,
-//       redirect: false, // Prevents flashing/automatic redirect to /profile
+//       redirect: false,
+//       callbackUrl: "/", // This will be overridden based on role
 //     });
 
 //     if (result?.ok) {
-//       router.push("/");
+//       // Get the updated session
+//       const updatedSession = await fetch("/api/auth/session").then((res) =>
+//         res.json(),
+//       );
+//       const isAdmin =
+//         updatedSession?.user?.isAdmin || updatedSession?.user?.role === "admin";
+
+//       if (isAdmin) {
+//         router.push("/admin");
+//       } else {
+//         router.push("/");
+//       }
 //       router.refresh();
 //     } else {
 //       alert("Authentication failed. Please check your credentials.");
@@ -46,17 +75,28 @@
 //     }
 //   };
 
-//   const socialSignIn = (provider: string) => {
-//     signIn(provider, { callbackUrl: "/" });
+//   const socialSignIn = async (provider: string) => {
+//     setLoading(true);
+//     try {
+//       // Use signIn with redirect: true and let the callback handle the redirect
+//       await signIn(provider, {
+//         callbackUrl: "/",
+//         redirect: true,
+//       });
+//     } catch (error) {
+//       console.error("Social sign in error:", error);
+//       setLoading(false);
+//     }
 //   };
 
-//   // Reusable Social Icons Component - Updated with uniform hover behavior
+//   // Reusable Social Icons Component
 //   const SocialSection = () => (
 //     <div className="flex gap-4 mb-8">
 //       <button
 //         type="button"
 //         onClick={() => socialSignIn("facebook")}
-//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110"
+//         disabled={loading}
+//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
 //       >
 //         <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
 //           <FaFacebook size={20} />
@@ -66,7 +106,8 @@
 //       <button
 //         type="button"
 //         onClick={() => socialSignIn("google")}
-//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110"
+//         disabled={loading}
+//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
 //       >
 //         <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
 //           <FaGoogle size={20} />
@@ -76,7 +117,8 @@
 //       <button
 //         type="button"
 //         onClick={() => socialSignIn("apple")}
-//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110"
+//         disabled={loading}
+//         className="group relative overflow-hidden p-3 border border-zinc-200 hover:border-black transition-all text-black hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
 //       >
 //         <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
 //           <FaApple size={20} />
@@ -86,8 +128,17 @@
 //     </div>
 //   );
 
+//   // Show loading state while checking session
+//   if (status === "loading") {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8]">
+//         <div className="w-10 h-10 border-2 border-[#006241] border-t-transparent rounded-full animate-spin" />
+//       </div>
+//     );
+//   }
+
 //   return (
-//     <div className="min-h-screen bg-[#f8f8f8] flex items-start md:items-center justify-center p-0 md:p-8 font-sans  relative">
+//     <div className="min-h-screen bg-[#f8f8f8] flex items-start md:items-center justify-center p-0 md:p-8 font-sans relative">
 //       <div
 //         ref={containerRef}
 //         className="relative w-full max-w-250 mt-0 md:mt-0 min-h-screen md:min-h-0 md:h-162.5 bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"
@@ -95,7 +146,11 @@
 //         <div className="grow md:flex-none md:w-full h-full relative bg-white order-1 md:order-2">
 //           {/* SIGN IN FORM */}
 //           <div
-//             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${isSignUp ? "opacity-0 invisible h-0 md:h-full overflow-hidden" : "opacity-100 visible h-auto md:h-full"} md:absolute md:left-0`}
+//             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${
+//               isSignUp
+//                 ? "opacity-0 invisible h-0 md:h-full overflow-hidden"
+//                 : "opacity-100 visible h-auto md:h-full"
+//             } md:absolute md:left-0`}
 //           >
 //             <form
 //               onSubmit={handleAuth}
@@ -112,7 +167,6 @@
 //                 Sign In
 //               </h1>
 
-//               {/* Fix 2: Social Icons on Sign In */}
 //               <SocialSection />
 
 //               <div className="w-full space-y-4">
@@ -143,7 +197,6 @@
 //                     placeholder="Password"
 //                     className="w-full bg-zinc-100 border-none py-4 pl-12 pr-12 outline-none text-black focus:ring-1 focus:ring-black/5"
 //                   />
-//                   {/* Fix 3: Eye Toggle */}
 //                   <button
 //                     type="button"
 //                     onClick={() => setShowPassword(!showPassword)}
@@ -157,7 +210,7 @@
 //               <button
 //                 type="submit"
 //                 disabled={loading}
-//                 className="group relative overflow-hidden border border-black bg-black px-12 py-4 text-[10px] font-bold tracking-[0.3em] uppercase text-white mt-8 w-full md:w-auto"
+//                 className="group relative overflow-hidden border border-black bg-black px-12 py-4 text-[10px] font-bold tracking-[0.3em] uppercase text-white mt-8 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
 //               >
 //                 <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0" />
 //                 <span className="relative z-10 transition-colors duration-500 group-hover:text-black">
@@ -169,7 +222,11 @@
 
 //           {/* SIGN UP FORM */}
 //           <div
-//             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${!isSignUp ? "opacity-0 invisible h-0 md:h-full overflow-hidden" : "opacity-100 visible h-auto md:h-full"} md:absolute md:right-0`}
+//             className={`w-full md:w-1/2 flex items-center justify-center p-8 transition-all duration-500 ease-in-out ${
+//               !isSignUp
+//                 ? "opacity-0 invisible h-0 md:h-full overflow-hidden"
+//                 : "opacity-100 visible h-auto md:h-full"
+//             } md:absolute md:right-0`}
 //           >
 //             <form
 //               onSubmit={handleAuth}
@@ -186,7 +243,6 @@
 //                 Create Account
 //               </h1>
 
-//               {/* Fix 2: Social Icons on Create Account */}
 //               <SocialSection />
 
 //               <div className="w-full space-y-4">
@@ -244,7 +300,7 @@
 //               <button
 //                 type="submit"
 //                 disabled={loading}
-//                 className="group relative overflow-hidden border border-[#006241] bg-[#006241] px-12 py-4 text-[10px] font-bold tracking-[0.3em] uppercase text-white mt-10 w-full md:w-auto"
+//                 className="group relative overflow-hidden border border-[#006241] bg-[#006241] px-12 py-4 text-[10px] font-bold tracking-[0.3em] uppercase text-white mt-10 w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
 //               >
 //                 <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0" />
 //                 <span className="relative z-10 transition-colors duration-500 group-hover:text-[#006241]">
@@ -257,7 +313,9 @@
 
 //         {/* OVERLAY */}
 //         <div
-//           className={`relative md:absolute inset-y-0 w-full md:w-1/2 z-30 flex flex-col justify-center items-center text-white px-8 py-12 md:px-12 text-center transition-all duration-700 ease-in-out order-2 md:order-1 ${isSignUp ? "md:left-0" : "md:left-1/2"}`}
+//           className={`relative md:absolute inset-y-0 w-full md:w-1/2 z-30 flex flex-col justify-center items-center text-white px-8 py-12 md:px-12 text-center transition-all duration-700 ease-in-out order-2 md:order-1 ${
+//             isSignUp ? "md:left-0" : "md:left-1/2"
+//           }`}
 //           style={{
 //             background: `linear-gradient(135deg, #000000 0%, #be1e2d 50%, #006241 100%)`,
 //           }}
@@ -320,83 +378,193 @@ import Image from "next/image";
 import Link from "next/link";
 import { Logo, HeroImage2 } from "@/public/assets";
 import { signIn, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const searchParams = useSearchParams();
+  const { data: session, status, update } = useSession();
 
   // Form States
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Get redirect URL from query params or sessionStorage
+  const redirectTo =
+    searchParams.get("callbackUrl") ||
+    sessionStorage.getItem("redirectAfterLogin") ||
+    "/";
+
+  // Clear the stored redirect after retrieving
+  useEffect(() => {
+    if (redirectTo && redirectTo !== "/") {
+      // Don't remove yet - we'll remove after successful login
+      console.log("Redirect target:", redirectTo);
+    }
+  }, [redirectTo]);
 
   // Check if user is already logged in and redirect accordingly
   useEffect(() => {
     if (status === "loading") return;
 
     if (session?.user) {
-      const isAdmin = session.user.isAdmin || session.user.role === "admin";
-      console.log("User already logged in, isAdmin:", isAdmin);
+      const isAdmin =
+        session.user.isAdmin ||
+        session.user?.role === "admin" ||
+        session.user?.email === "prodbysmig@gmail.com";
+      console.log(
+        "User already logged in, isAdmin:",
+        isAdmin,
+        "Email:",
+        session.user.email,
+      );
 
       if (isAdmin) {
-        router.push("/admin");
+        sessionStorage.removeItem("redirectAfterLogin");
+        router.replace("/admin");
       } else {
-        router.push("/");
+        sessionStorage.removeItem("redirectAfterLogin");
+        router.replace(redirectTo);
       }
     }
-  }, [session, status, router]);
+  }, [session, status, router, redirectTo]);
 
   const toggleForm = () => {
     setIsSignUp(!isSignUp);
+    setError(null);
+    // Clear form fields when toggling
+    setEmail("");
+    setPassword("");
+    setName("");
   };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      name,
-      redirect: false,
-      callbackUrl: "/", // This will be overridden based on role
-    });
+    try {
+      // For credentials sign in/up
+      const result = await signIn("credentials", {
+        email,
+        password,
+        ...(isSignUp && { name }), // Only send name for sign up
+        redirect: false,
+        callbackUrl: redirectTo,
+      });
 
-    if (result?.ok) {
-      // Get the updated session
-      const updatedSession = await fetch("/api/auth/session").then((res) =>
-        res.json(),
-      );
-      const isAdmin =
-        updatedSession?.user?.isAdmin || updatedSession?.user?.role === "admin";
+      console.log("Sign in result:", result);
 
-      if (isAdmin) {
-        router.push("/admin");
-      } else {
-        router.push("/");
+      if (result?.error) {
+        setError(result.error);
+        setLoading(false);
+        return;
       }
-      router.refresh();
-    } else {
-      alert("Authentication failed. Please check your credentials.");
+
+      if (result?.ok) {
+        // Instead of using update(), manually fetch the session with retries
+        let retries = 0;
+        const maxRetries = 15;
+        let sessionData = null;
+
+        while (retries < maxRetries) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+
+          try {
+            const response = await fetch("/api/auth/session", {
+              cache: "no-store",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            });
+
+            if (response.ok) {
+              sessionData = await response.json();
+
+              if (sessionData?.user) {
+                console.log("Session fetched successfully:", sessionData);
+                break;
+              }
+            }
+          } catch (err) {
+            console.log("Session fetch attempt", retries + 1, "failed");
+          }
+
+          retries++;
+        }
+
+        // Force update the session in the client
+        await update();
+
+        if (sessionData?.user) {
+          const isAdmin =
+            sessionData.user.isAdmin ||
+            sessionData.user.role === "admin" ||
+            sessionData.user.email === "prodbysmig@gmail.com";
+
+          console.log(
+            "User signed in, isAdmin:",
+            isAdmin,
+            "Email:",
+            sessionData.user.email,
+          );
+
+          // Force a router refresh to update server components
+          router.refresh();
+
+          // Add delay before redirect
+          await new Promise((resolve) => setTimeout(resolve, 300));
+
+          // Clear the stored redirect URL and redirect based on role
+          sessionStorage.removeItem("redirectAfterLogin");
+
+          if (isAdmin) {
+            console.log("Redirecting to admin...");
+            router.replace("/admin");
+          } else {
+            console.log("Redirecting to:", redirectTo);
+            router.replace(redirectTo);
+          }
+        } else {
+          // If we still don't have session after retries, try direct redirect based on email
+          console.log("No session after retries, redirecting based on email");
+
+          sessionStorage.removeItem("redirectAfterLogin");
+
+          // Since we know the email from the sign in, we can make a guess
+          if (email === "prodbysmig@gmail.com") {
+            router.replace("/admin");
+          } else {
+            router.replace(redirectTo);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      setError("An unexpected error occurred");
       setLoading(false);
     }
   };
 
   const socialSignIn = async (provider: string) => {
     setLoading(true);
+    setError(null);
+
     try {
-      // Use signIn with redirect: true and let the callback handle the redirect
+      // For social sign in, we let NextAuth handle the redirect
       await signIn(provider, {
-        callbackUrl: "/",
+        callbackUrl: redirectTo,
         redirect: true,
       });
     } catch (error) {
       console.error("Social sign in error:", error);
+      setError("Social sign in failed");
       setLoading(false);
     }
   };
@@ -444,7 +612,7 @@ const Login = () => {
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8f8f8]">
-        <div className="w-10 h-10 border-2 border-[#006241] border-t-transparent rounded-full animate-spin" />
+        <div className="w-10 h-10 border-2 border-black border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -480,6 +648,12 @@ const Login = () => {
               </h1>
 
               <SocialSection />
+
+              {error && (
+                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+                  {error}
+                </div>
+              )}
 
               <div className="w-full space-y-4">
                 <div className="relative">
@@ -557,6 +731,12 @@ const Login = () => {
 
               <SocialSection />
 
+              {error && (
+                <div className="w-full mb-4 p-3 bg-red-50 border border-red-200 text-red-600 text-xs text-center rounded">
+                  {error}
+                </div>
+              )}
+
               <div className="w-full space-y-4">
                 <div className="relative">
                   <User
@@ -616,7 +796,7 @@ const Login = () => {
               >
                 <span className="absolute inset-0 z-0 translate-y-full bg-white transition-transform duration-500 ease-[cubic-bezier(0.19,1,0.22,1)] group-hover:translate-y-0" />
                 <span className="relative z-10 transition-colors duration-500 group-hover:text-[#006241]">
-                  {loading ? "Creating..." : "Sign Up"}
+                  {loading ? "Creating Account..." : "Sign Up"}
                 </span>
               </button>
             </form>
