@@ -3,6 +3,7 @@ import { type SchemaTypeDefinition } from "sanity";
 import { user, account, session, verificationToken } from "./user";
 import order from "./order";
 import { cart } from "./cart";
+import oneOff from "./oneOff"; // New import for one-off limited editions
 
 const product: SchemaTypeDefinition = {
   name: "product",
@@ -113,5 +114,14 @@ const product: SchemaTypeDefinition = {
 };
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [product, user, account, session, verificationToken, order, cart],
+  types: [
+    product,
+    user,
+    account,
+    session,
+    verificationToken,
+    order,
+    cart,
+    oneOff,
+  ], // Added oneOff here
 };

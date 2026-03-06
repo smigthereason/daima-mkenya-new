@@ -781,5 +781,77 @@
     "name": "cart",
     "type": "document",
     "title": "Shopping Cart"
+  },
+  {
+    "fields": [
+      {
+        "name": "name",
+        "type": "string",
+        "title": "Piece Name"
+      },
+      {
+        "options": {
+          "source": "name"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "initialValue": "1 of 1",
+        "description": "e.g., 1 of 1, Limited Run of 3",
+        "name": "editionInfo",
+        "type": "string",
+        "title": "Edition Details"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "description",
+        "type": "array",
+        "title": "Concept Narrative"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Main Image"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Available for Inquiry",
+              "value": "available"
+            },
+            {
+              "title": "Private Collection (Sold)",
+              "value": "sold"
+            }
+          ]
+        },
+        "initialValue": "available",
+        "name": "status",
+        "type": "string",
+        "title": "Current Status"
+      }
+    ],
+    "name": "oneOff",
+    "type": "document",
+    "title": "One-Off Archive"
   }
 ]

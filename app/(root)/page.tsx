@@ -1,21 +1,5 @@
-// import AfricaDottedMap from "@/components/landing-page/AfricaDottedMap";
-// import Hero from "@/components/landing-page/Hero";
-// import NewArrivals from "@/components/landing-page/NewArrivals";
-// import SdgCommitment from "@/components/landing-page/SDGCommitment";
-
-// export default function Home() {
-//   return (
-//     <main className="relative">
-//       <Hero />
-//       <NewArrivals />
-
-//       <AfricaDottedMap />
-
-//       <SdgCommitment />
-//     </main>
-//   );
-// }
 // app/(root)/page.tsx
+
 "use client";
 
 import { useSession } from "next-auth/react";
@@ -25,6 +9,7 @@ import AfricaDottedMap from "@/components/landing-page/AfricaDottedMap";
 import Hero from "@/components/landing-page/Hero";
 import NewArrivals from "@/components/landing-page/NewArrivals";
 import SdgCommitment from "@/components/landing-page/SDGCommitment";
+import OneOffArchive from "@/components/landing-page/OneOffArchive";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -33,14 +18,12 @@ export default function Home() {
   useEffect(() => {
     if (status === "loading") return;
 
-    // If user is admin, redirect to admin panel
+    // Redirect admins away from the landing page
     if (session?.user?.isAdmin || session?.user?.role === "admin") {
-      console.log("Admin detected on home page, redirecting...");
       router.replace("/admin");
     }
   }, [session, status, router]);
 
-  // Don't render anything while checking session
   if (status === "loading") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#e8e8e8]">
@@ -49,32 +32,19 @@ export default function Home() {
     );
   }
 
-  // Only render home page for non-admin users
-  if (
-    session?.user &&
-    !(session.user.isAdmin || session.user.role === "admin")
-  ) {
-    return (
-      <main className="relative">
-        <Hero />
-        <NewArrivals />
-        <AfricaDottedMap />
-        <SdgCommitment />
-      </main>
-    );
+  // Prevent admin users from seeing the landing page content briefly before redirect
+  if (session?.user?.isAdmin || session?.user?.role === "admin") {
+    return null;
   }
 
-  // If no session, show home page
-  if (!session) {
-    return (
-      <main className="relative">
-        <Hero />
-        <NewArrivals />
-        <AfricaDottedMap />
-        <SdgCommitment />
-      </main>
-    );
-  }
+  return (
+    <main className="relative">
+      <Hero />
+      <NewArrivals />
+      <AfricaDottedMap />
 
-  return null;
+      <OneOffArchive />
+      <SdgCommitment />
+    </main>
+  );
 }
