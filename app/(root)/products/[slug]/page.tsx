@@ -5,14 +5,16 @@ import { getProductBySlug } from "@/types/Product";
 
 const baseUrl = "https://daimamkenyaafrica.com";
 
+// Update the type - params is now a Promise
 type PageProps = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
-  const { slug } = params;
+  // Add await here
+  const { slug } = await params;
   const product = await getProductBySlug(slug);
 
   const url = `${baseUrl}/products/${slug}`;
@@ -79,7 +81,8 @@ export async function generateMetadata({
 }
 
 export default async function Page({ params }: PageProps) {
-  const { slug } = params;
+  // Add await here
+  const { slug } = await params;
   const product = await getProductBySlug(slug);
 
   const url = `${baseUrl}/products/${slug}`;
