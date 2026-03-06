@@ -11,26 +11,27 @@ export default {
       title: "Order Number",
       type: "string",
       readOnly: true,
-      description: "Internal reference (e.g., ORD-2026-X)",
     },
     {
       name: "user",
       title: "User",
       type: "reference",
       to: [{ type: "user" }],
-      description: "The user who placed this order",
     },
     {
       name: "userEmail",
       title: "User Email",
       type: "string",
-      description: "Email of the user who placed the order",
     },
     {
       name: "pesapalOrderTrackingId",
       title: "PesaPal Tracking ID",
       type: "string",
-      description: "The ID returned by PesaPal once the order is registered",
+    },
+    {
+      name: "transactionId",
+      title: "Transaction ID",
+      type: "string",
     },
     {
       name: "status",
@@ -43,7 +44,7 @@ export default {
           { title: "Failed", value: "failed" },
         ],
       },
-      initialValue: "completed",
+      initialValue: "pending",
     },
     {
       name: "paymentStatus",
@@ -52,11 +53,11 @@ export default {
       options: {
         list: [
           { title: "Paid", value: "paid" },
-          { title: "Unpaid", value: "unpaid" },
+          { title: "Pending", value: "pending" },
           { title: "Refunded", value: "refunded" },
         ],
       },
-      initialValue: "paid",
+      initialValue: "paid", // Changed from "pending" to "paid"
     },
     {
       name: "paymentMethod",
@@ -73,84 +74,68 @@ export default {
       name: "paymentDate",
       title: "Payment Date",
       type: "datetime",
-      initialValue: () => new Date().toISOString(),
-    },
-    {
-      name: "transactionId",
-      title: "Transaction ID",
-      type: "string",
-      description: "PesaPal transaction ID",
     },
     {
       name: "paymentDetails",
       title: "Payment Details",
       type: "object",
       fields: [
-        {
-          name: "status_code",
-          title: "Status Code",
-          type: "number",
-          description: "PesaPal status code (1 = success)",
-        },
-        {
-          name: "status",
-          title: "Status",
-          type: "string",
-          description: "PesaPal status message",
-        },
-        {
-          name: "payment_status_description",
-          title: "Payment Status Description",
-          type: "string",
-          description: "Description of payment status (e.g., 'Completed')",
-        },
-        {
-          name: "payment_method",
-          title: "Payment Method",
-          type: "string",
-          description: "Method used (e.g., 'MpesaKE')",
-        },
-        {
-          name: "amount",
-          title: "Amount",
-          type: "number",
-          description: "Payment amount",
-        },
-        {
-          name: "currency",
-          title: "Currency",
-          type: "string",
-          description: "Payment currency (e.g., 'KES')",
-        },
-        {
-          name: "payment_account",
-          title: "Payment Account",
-          type: "string",
-          description:
-            "Phone number or account used for payment (e.g., '2547xxx98723')",
-        },
+        { name: "amount", title: "Amount", type: "number" },
         {
           name: "confirmation_code",
           title: "Confirmation Code",
           type: "string",
-          description: "M-Pesa confirmation code (e.g., 'UBS7F82T2V')",
         },
+        { name: "currency", title: "Currency", type: "string" },
+        { name: "payment_account", title: "Payment Account", type: "string" },
+        { name: "payment_method", title: "Payment Method", type: "string" },
+        {
+          name: "payment_status_description",
+          title: "Payment Status Description",
+          type: "string",
+        },
+        { name: "status", title: "Status", type: "string" },
+        { name: "status_code", title: "Status Code", type: "number" },
       ],
-      hidden: false,
     },
     {
       name: "customer",
-      title: "Customer Details",
+      title: "Customer Info",
       type: "object",
       fields: [
-        { name: "name", type: "string" },
-        { name: "email", type: "string" },
+        { name: "name", title: "Full Name", type: "string" },
+        { name: "phone", title: "Phone Number", type: "string" },
+        { name: "email", title: "Email", type: "string" },
+      ],
+    },
+    {
+      name: "deliveryDetails",
+      title: "Delivery Details",
+      type: "object",
+      fields: [
         {
-          name: "phone",
+          name: "method",
+          title: "Method",
           type: "string",
-          description: "Phone number for customer contact",
+          options: {
+            list: [
+              { title: "Home Delivery", value: "shipping" },
+              { title: "Pickup Station", value: "pickup" },
+            ],
+          },
         },
-        { name: "address", type: "string" },
+        { name: "city", title: "City/County", type: "string" },
+        {
+          name: "pickupStationName",
+          title: "Pickup Station Name",
+          type: "string",
+        },
+        { name: "pickupStationId", title: "Pickup Station ID", type: "string" },
+        {
+          name: "shippingAddress",
+          title: "Address/Building/Floor",
+          type: "string",
+        },
       ],
     },
     {
@@ -159,8 +144,13 @@ export default {
       type: "number",
     },
     {
+      name: "shippingFee",
+      title: "Shipping Fee",
+      type: "number",
+    },
+    {
       name: "items",
-      title: "Ordered Items",
+      title: "Order Items",
       type: "array",
       of: [
         {
@@ -171,45 +161,47 @@ export default {
               title: "Product",
               type: "reference",
               to: [{ type: "product" }],
-              description:
-                "Reference to the product (required for stock updates)",
-              validation: (Rule: any) => Rule.required(),
             },
-            { name: "productName", type: "string" },
-            { name: "quantity", type: "number" },
-            { name: "price", type: "string" },
-            { name: "size", type: "string" },
-            { name: "color", type: "string" },
-            {
-              name: "productImage",
-              title: "Product Image",
-              type: "object",
-              fields: [
-                {
-                  name: "hero",
-                  title: "Hero Image",
-                  type: "image",
-                  options: { hotspot: true },
-                },
-              ],
-            },
+            { name: "productName", title: "Product Name", type: "string" },
+            { name: "quantity", title: "Quantity", type: "number" },
+            { name: "price", title: "Price", type: "number" },
+            { name: "size", title: "Size", type: "string" },
+            { name: "color", title: "Color", type: "string" },
           ],
           preview: {
             select: {
               title: "productName",
               quantity: "quantity",
+              price: "price",
               size: "size",
               color: "color",
-              price: "price",
             },
-            prepare(selection: Record<string, any>) {
-              const { title, quantity, size, color, price } = selection;
+            prepare(selection: any) {
+              const { title, quantity, price, size, color } = selection;
               return {
                 title: title || "Unknown Product",
-                subtitle: `${price} | Qty: ${quantity} | Size: ${size} | Color: ${color}`,
+                subtitle: `Qty: ${quantity} | ${price} | ${size} | ${color}`,
               };
             },
           },
+        },
+      ],
+    },
+    {
+      name: "stockUpdates",
+      title: "Stock Update Log",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "productId", type: "string" },
+            { name: "productName", type: "string" },
+            { name: "previousStock", type: "number" },
+            { name: "newStock", type: "number" },
+            { name: "success", type: "boolean" },
+            { name: "error", type: "string" },
+          ],
         },
       ],
     },
@@ -224,53 +216,33 @@ export default {
     select: {
       title: "orderNumber",
       customerName: "customer.name",
-      customerPhone: "customer.phone",
-      status: "status",
-      paymentStatus: "paymentStatus",
       amount: "amount",
-      date: "createdAt",
-      userEmail: "userEmail",
+      status: "status",
+      method: "deliveryDetails.method",
+      station: "deliveryDetails.pickupStationName",
+      items: "items",
+      paymentStatus: "paymentStatus",
     },
-    prepare(selection: Record<string, any>): PreviewValue {
+    prepare(selection: any) {
       const {
         title,
         customerName,
-        customerPhone,
-        status,
-        paymentStatus,
         amount,
-        date,
-        userEmail,
+        status,
+        method,
+        station,
+        items,
+        paymentStatus,
       } = selection;
-
-      const statusColors: Record<string, string> = {
-        pending: "🟡",
-        completed: "🟢",
-        failed: "🔴",
-      };
-
-      const paymentIcon =
-        paymentStatus === "paid"
-          ? "✅"
-          : paymentStatus === "refunded"
-            ? "↩️"
-            : "⏳";
-      const phoneDisplay = customerPhone
-        ? `📞 ${customerPhone}`
-        : "📞 No phone";
-      const customer = customerName || userEmail || "No Customer";
-
+      const devIcon = method === "pickup" ? "🏪" : "🚚";
+      const statIcon =
+        status === "completed" ? "🟢" : status === "pending" ? "🟡" : "🔴";
+      const paymentIcon = paymentStatus === "paid" ? "✅" : "⏳";
+      const itemCount = items?.length || 0;
       return {
-        title: `${statusColors[status] || "⚪"} ${title || "No Order Number"} ${paymentIcon}`,
-        subtitle: `${customer} - ${phoneDisplay} - Ksh ${amount?.toLocaleString() || "0"} - ${date ? new Date(date).toLocaleDateString() : ""}`,
+        title: `${statIcon} ${title || "New Order"} ${paymentIcon}`,
+        subtitle: `${customerName || "No Name"} | ${devIcon} ${station || "Home Delivery"} | ${itemCount} item(s) | Ksh ${amount || 0}`,
       };
     },
   },
-  orderings: [
-    {
-      title: "Date Descending",
-      name: "dateDesc",
-      by: [{ field: "createdAt", direction: "desc" }],
-    },
-  ],
 };

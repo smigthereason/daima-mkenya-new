@@ -375,13 +375,11 @@
   {
     "fields": [
       {
-        "description": "Internal reference (e.g., ORD-2026-X)",
         "readOnly": true,
         "name": "orderNumber",
         "type": "string"
       },
       {
-        "description": "The user who placed this order",
         "to": [
           {
             "type": "user"
@@ -391,15 +389,18 @@
         "type": "reference"
       },
       {
-        "description": "Email of the user who placed the order",
         "name": "userEmail",
         "type": "string"
       },
       {
-        "description": "The ID returned by PesaPal once the order is registered",
         "name": "pesapalOrderTrackingId",
         "type": "string",
         "title": "PesaPal Tracking ID"
+      },
+      {
+        "name": "transactionId",
+        "type": "string",
+        "title": "Transaction ID"
       },
       {
         "options": {
@@ -418,7 +419,7 @@
             }
           ]
         },
-        "initialValue": "completed",
+        "initialValue": "pending",
         "name": "status",
         "type": "string",
         "title": "Order Status"
@@ -431,8 +432,8 @@
               "value": "paid"
             },
             {
-              "title": "Unpaid",
-              "value": "unpaid"
+              "title": "Pending",
+              "value": "pending"
             },
             {
               "title": "Refunded",
@@ -465,55 +466,40 @@
         "type": "datetime"
       },
       {
-        "description": "PesaPal transaction ID",
-        "name": "transactionId",
-        "type": "string",
-        "title": "Transaction ID"
-      },
-      {
         "fields": [
           {
-            "description": "PesaPal status code (1 = success)",
-            "name": "status_code",
-            "type": "number"
-          },
-          {
-            "description": "PesaPal status message",
-            "name": "status",
-            "type": "string"
-          },
-          {
-            "description": "Description of payment status (e.g., 'Completed')",
-            "name": "payment_status_description",
-            "type": "string"
-          },
-          {
-            "description": "Method used (e.g., 'MpesaKE')",
-            "name": "payment_method",
-            "type": "string"
-          },
-          {
-            "description": "Payment amount",
             "name": "amount",
             "type": "number"
           },
           {
-            "description": "Payment currency (e.g., 'KES')",
+            "name": "confirmation_code",
+            "type": "string"
+          },
+          {
             "name": "currency",
             "type": "string"
           },
           {
-            "description": "Phone number or account used for payment (e.g., '2547xxx98723')",
             "name": "payment_account",
             "type": "string"
           },
           {
-            "description": "M-Pesa confirmation code (e.g., 'UBS7F82T2V')",
-            "name": "confirmation_code",
+            "name": "payment_method",
             "type": "string"
+          },
+          {
+            "name": "payment_status_description",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "status_code",
+            "type": "number"
           }
         ],
-        "hidden": false,
         "name": "paymentDetails",
         "type": "object"
       },
@@ -521,25 +507,63 @@
         "fields": [
           {
             "name": "name",
-            "type": "string"
+            "type": "string",
+            "title": "Full Name"
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "title": "Phone Number"
           },
           {
             "name": "email",
-            "type": "string"
-          },
-          {
-            "description": "Phone number for customer contact",
-            "name": "phone",
-            "type": "string"
-          },
-          {
-            "name": "address",
             "type": "string"
           }
         ],
         "name": "customer",
         "type": "object",
-        "title": "Customer Details"
+        "title": "Customer Info"
+      },
+      {
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Home Delivery",
+                  "value": "shipping"
+                },
+                {
+                  "title": "Pickup Station",
+                  "value": "pickup"
+                }
+              ]
+            },
+            "name": "method",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string",
+            "title": "City/County"
+          },
+          {
+            "name": "pickupStationName",
+            "type": "string"
+          },
+          {
+            "name": "pickupStationId",
+            "type": "string",
+            "title": "Pickup Station ID"
+          },
+          {
+            "name": "shippingAddress",
+            "type": "string",
+            "title": "Address/Building/Floor"
+          }
+        ],
+        "name": "deliveryDetails",
+        "type": "object"
       },
       {
         "name": "amount",
@@ -547,22 +571,14 @@
         "title": "Total Amount"
       },
       {
+        "name": "shippingFee",
+        "type": "number"
+      },
+      {
         "of": [
           {
             "fields": [
               {
-                "validation": [
-                  {
-                    "rules": [
-                      {
-                        "flag": "presence",
-                        "constraint": "required"
-                      }
-                    ],
-                    "level": "error"
-                  }
-                ],
-                "description": "Reference to the product (required for stock updates)",
                 "to": [
                   {
                     "type": "product"
@@ -581,7 +597,7 @@
               },
               {
                 "name": "price",
-                "type": "string"
+                "type": "number"
               },
               {
                 "name": "size",
@@ -590,20 +606,6 @@
               {
                 "name": "color",
                 "type": "string"
-              },
-              {
-                "fields": [
-                  {
-                    "options": {
-                      "hotspot": true
-                    },
-                    "name": "hero",
-                    "type": "image",
-                    "title": "Hero Image"
-                  }
-                ],
-                "name": "productImage",
-                "type": "object"
               }
             ],
             "type": "object"
@@ -611,7 +613,43 @@
         ],
         "name": "items",
         "type": "array",
-        "title": "Ordered Items"
+        "title": "Order Items"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "productId",
+                "type": "string"
+              },
+              {
+                "name": "productName",
+                "type": "string"
+              },
+              {
+                "name": "previousStock",
+                "type": "number"
+              },
+              {
+                "name": "newStock",
+                "type": "number"
+              },
+              {
+                "name": "success",
+                "type": "boolean"
+              },
+              {
+                "name": "error",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "stockUpdates",
+        "type": "array",
+        "title": "Stock Update Log"
       },
       {
         "name": "createdAt",

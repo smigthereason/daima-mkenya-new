@@ -13,20 +13,38 @@ export default async function OrderManagementPage() {
       orderNumber,
       status,
       paymentStatus,
+      paymentMethod,
       amount,
+      shippingFee,
       _createdAt,
-      "customer": customer {
+      pesapalOrderTrackingId,
+      transactionId,
+      customer {
         name,
         phone,
+        email
+      },
+      deliveryDetails {
+        method,
         city,
-        address
+        pickupStationName,
+        pickupStationId,
+        shippingAddress
+      },
+      items[] {
+        productName,
+        quantity,
+        price,
+        size,
+        color
       }
     }`,
   );
 
+  console.log("Fetched orders:", JSON.stringify(orders, null, 2)); // For debugging
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn">
-      {/* Header */}
       <div className="border-b border-neutral-100 pb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl md:text-5xl font-light tracking-tighter uppercase leading-[0.9]">

@@ -1,6 +1,6 @@
 // "use client";
 
-// import React, { useState, useEffect } from "react";
+// import React, { useState, useEffect, useMemo, useRef } from "react";
 // import Image from "next/image";
 // import Script from "next/script";
 // import {
@@ -16,12 +16,12 @@
 // import { useSession } from "next-auth/react";
 // import { useRouter, useSearchParams } from "next/navigation";
 // import { urlFor } from "@/sanity/lib/image";
+// import Link from "next/link";
 
 // interface CheckOutPageProps {
 //   onBack: () => void;
 // }
 
-// // Ensure TypeScript recognizes the PesaPal global object
 // declare global {
 //   interface Window {
 //     PesaPal?: {
@@ -31,125 +31,251 @@
 // }
 
 // export default function CheckOutPage({ onBack }: CheckOutPageProps) {
-//   // ALL HOOKS MUST BE AT THE TOP - BEFORE ANY CONDITIONAL RETURNS
 //   const { data: session, status } = useSession();
-//   const { cartItems, removeFromCart, updateQuantity, clearCart, loading } =
-//     useCart();
+//   const { cartItems, removeFromCart, updateQuantity, loading } = useCart();
 //   const router = useRouter();
 //   const searchParams = useSearchParams();
 
 //   const [isProcessing, setIsProcessing] = useState(false);
 //   const [directCheckoutItem, setDirectCheckoutItem] = useState<any>(null);
-//   const [shouldRedirect, setShouldRedirect] = useState(false);
-//   const [isDirectCheckoutChecked, setIsDirectCheckoutChecked] = useState(false);
+//   const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
 
-//   // Shipping form state
+//   // Local optimistic state for quantities
+//   const [localQuantities, setLocalQuantities] = useState<
+//     Record<string, number>
+//   >({});
+
+//   // Track pending removals to prevent flickering
+//   const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(
+//     new Set(),
+//   );
+
+//   // Refs to prevent infinite loops
+//   const isFirstRender = useRef(true);
+//   const prevCartItemsRef = useRef(cartItems);
+//   const prevDirectItemRef = useRef(directCheckoutItem);
+
 //   const [fullName, setFullName] = useState("");
 //   const [email, setEmail] = useState("");
 //   const [phoneNumber, setPhoneNumber] = useState("");
 //   const [shippingAddress, setShippingAddress] = useState("");
 
-//   // Check for direct purchase
+//   const isDirectRoute = searchParams.get("direct") === "true";
+
 //   useEffect(() => {
-//     const isDirect = searchParams.get("direct") === "true";
-//     console.log("isDirect:", isDirect);
-
-//     if (isDirect) {
+//     if (isDirectRoute) {
 //       const storedItem = sessionStorage.getItem("directCheckout");
-//       console.log("storedItem:", storedItem);
-
 //       if (storedItem) {
 //         try {
 //           const parsedItem = JSON.parse(storedItem);
-//           console.log("parsedItem:", parsedItem);
 //           setDirectCheckoutItem(parsedItem);
-//           // Clear it from sessionStorage after reading
 //           sessionStorage.removeItem("directCheckout");
 //         } catch (e) {
 //           console.error("Error parsing direct checkout item:", e);
 //         }
 //       }
 //     }
+//     setIsInitialCheckDone(true);
+//   }, [isDirectRoute]);
 
-//     // Mark that we've checked for direct checkout
-//     setIsDirectCheckoutChecked(true);
-//   }, [searchParams]);
-
-//   // Handle redirect logic in useEffect instead of during render
+//   // Fixed: Sync local quantities with items without causing infinite loop
 //   useEffect(() => {
-//     // Wait for loading to complete and for direct checkout to be checked
-//     if (loading || !isDirectCheckoutChecked) return;
+//     // Skip first render
+//     if (isFirstRender.current) {
+//       isFirstRender.current = false;
 
-//     const hasItems = directCheckoutItem ? true : cartItems.length > 0;
-
-//     // Only redirect if we're sure there are no items AND no direct checkout item
-//     if (!hasItems && !directCheckoutItem) {
-//       setShouldRedirect(true);
+//       // Initialize local quantities
+//       const initialQuantities: Record<string, number> = {};
+//       cartItems.forEach((item) => {
+//         initialQuantities[item.cartId] = item.quantity;
+//       });
+//       if (directCheckoutItem) {
+//         initialQuantities["direct"] = directCheckoutItem.quantity || 1;
+//       }
+//       setLocalQuantities(initialQuantities);
+//       return;
 //     }
-//   }, [directCheckoutItem, cartItems, loading, isDirectCheckoutChecked]);
 
-//   // Perform the actual redirect
-//   useEffect(() => {
-//     if (shouldRedirect) {
-//       router.push("/cart");
+//     // Check if cartItems actually changed
+//     const prevCartItems = prevCartItemsRef.current;
+//     const cartItemsChanged =
+//       prevCartItems.length !== cartItems.length ||
+//       cartItems.some((item, index) => {
+//         const prevItem = prevCartItems[index];
+//         return (
+//           !prevItem ||
+//           prevItem.cartId !== item.cartId ||
+//           prevItem.quantity !== item.quantity
+//         );
+//       });
+
+//     // Check if direct item changed
+//     const directItemChanged =
+//       JSON.stringify(prevDirectItemRef.current) !==
+//       JSON.stringify(directCheckoutItem);
+
+//     if (cartItemsChanged || directItemChanged) {
+//       setLocalQuantities((prev) => {
+//         const newQuantities = { ...prev };
+
+//         // Update cart items
+//         cartItems.forEach((item) => {
+//           if (!pendingRemovals.has(item.cartId)) {
+//             newQuantities[item.cartId] = item.quantity;
+//           }
+//         });
+
+//         // Update direct item
+//         if (directCheckoutItem && !pendingRemovals.has("direct")) {
+//           newQuantities["direct"] = directCheckoutItem.quantity || 1;
+//         }
+
+//         // Remove items that are no longer in cart
+//         const currentCartIds = new Set(cartItems.map((item) => item.cartId));
+//         Object.keys(newQuantities).forEach((cartId) => {
+//           if (
+//             cartId !== "direct" &&
+//             !currentCartIds.has(cartId) &&
+//             !pendingRemovals.has(cartId)
+//           ) {
+//             delete newQuantities[cartId];
+//           }
+//         });
+
+//         return newQuantities;
+//       });
 //     }
-//   }, [shouldRedirect, router]);
 
-//   // Pre-fill form with session data
+//     // Update refs
+//     prevCartItemsRef.current = cartItems;
+//     prevDirectItemRef.current = directCheckoutItem;
+//   }, [cartItems, directCheckoutItem, pendingRemovals]);
+
+//   const displayItems = useMemo(() => {
+//     if (isDirectRoute) {
+//       return directCheckoutItem ? [directCheckoutItem] : [];
+//     }
+//     // Filter out pending removals
+//     return cartItems.filter((item) => !pendingRemovals.has(item.cartId));
+//   }, [isDirectRoute, directCheckoutItem, cartItems, pendingRemovals]);
+
+//   const totalAmount = useMemo(() => {
+//     return displayItems.reduce((acc, item) => {
+//       const price = parseFloat(item.product.price.replace(/[^0-9.]/g, ""));
+//       // Use local quantity if available
+//       const quantity =
+//         localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1;
+//       return acc + (isNaN(price) ? 0 : price * quantity);
+//     }, 0);
+//   }, [displayItems, localQuantities]);
+
 //   useEffect(() => {
 //     if (session?.user?.email) {
-//       setFullName(session?.user?.name || "");
-//       setEmail(session?.user?.email || "");
+//       setFullName(session.user.name || "");
+//       setEmail(session.user.email || "");
 //     }
 //   }, [session]);
 
-//   // Handle unauthenticated redirect
 //   useEffect(() => {
 //     if (status === "unauthenticated") {
 //       router.push("/login");
 //     }
 //   }, [status, router]);
 
-//   // Determine which items to display
-//   const displayItems = directCheckoutItem ? [directCheckoutItem] : cartItems;
+//   useEffect(() => {
+//     if (
+//       isInitialCheckDone &&
+//       !loading &&
+//       displayItems.length === 0 &&
+//       !directCheckoutItem
+//     ) {
+//       router.push("/cart");
+//     }
+//   }, [
+//     isInitialCheckDone,
+//     loading,
+//     displayItems.length,
+//     directCheckoutItem,
+//     router,
+//   ]);
 
-//   console.log("displayItems:", displayItems);
-//   console.log("directCheckoutItem:", directCheckoutItem);
+//   const handleIncrement = (cartId: string, currentQuantity: number) => {
+//     if (pendingRemovals.has(cartId)) return;
 
-//   // NOW WE CAN HAVE CONDITIONAL RETURNS - AFTER ALL HOOKS
-//   // If cart is loading, show loading state
-//   if (loading && !directCheckoutItem) {
+//     const newQuantity = currentQuantity + 1;
+
+//     // Update local state immediately
+//     setLocalQuantities((prev) => ({ ...prev, [cartId]: newQuantity }));
+
+//     // Update server in background
+//     updateQuantity(cartId, newQuantity).catch(() => {
+//       // Revert on error
+//       setLocalQuantities((prev) => ({ ...prev, [cartId]: currentQuantity }));
+//     });
+//   };
+
+//   const handleDecrement = (cartId: string, currentQuantity: number) => {
+//     if (pendingRemovals.has(cartId)) return;
+//     if (currentQuantity <= 1) return;
+
+//     const newQuantity = currentQuantity - 1;
+
+//     // Update local state immediately
+//     setLocalQuantities((prev) => ({ ...prev, [cartId]: newQuantity }));
+
+//     // Update server in background
+//     updateQuantity(cartId, newQuantity).catch(() => {
+//       // Revert on error
+//       setLocalQuantities((prev) => ({ ...prev, [cartId]: currentQuantity }));
+//     });
+//   };
+
+//   const handleRemove = (cartId: string) => {
+//     // Mark as pending removal
+//     setPendingRemovals((prev) => new Set(prev).add(cartId));
+
+//     // Remove from local state
+//     setLocalQuantities((prev) => {
+//       const newState = { ...prev };
+//       delete newState[cartId];
+//       return newState;
+//     });
+
+//     // Remove from server
+//     removeFromCart(cartId)
+//       .catch(() => {
+//         // If server removal fails, remove from pending
+//         setPendingRemovals((prev) => {
+//           const newSet = new Set(prev);
+//           newSet.delete(cartId);
+//           return newSet;
+//         });
+//       })
+//       .finally(() => {
+//         setPendingRemovals((prev) => {
+//           const newSet = new Set(prev);
+//           newSet.delete(cartId);
+//           return newSet;
+//         });
+//       });
+//   };
+
+//   const handleRemoveDirect = () => {
+//     setPendingRemovals((prev) => new Set(prev).add("direct"));
+//     setDirectCheckoutItem(null);
+//     router.push("/products");
+//   };
+
+//   if (
+//     status === "loading" ||
+//     (loading && displayItems.length === 0 && !isDirectRoute)
+//   ) {
 //     return (
 //       <div className="min-h-screen flex items-center justify-center">
 //         <Loader2 className="w-8 h-8 animate-spin" />
 //       </div>
 //     );
 //   }
-
-//   // If we're redirecting, show nothing
-//   if (shouldRedirect) {
-//     return null;
-//   }
-
-//   // If no items to display and not loading, show empty state (but don't redirect during render)
-//   if (displayItems.length === 0 && !loading) {
-//     return (
-//       <div className="min-h-screen flex flex-col items-center justify-center uppercase tracking-[0.5em] text-gray-400">
-//         Your bag is empty
-//         <button
-//           onClick={() => router.push("/products")}
-//           className="mt-10 text-black font-bold border-b border-black"
-//         >
-//           Continue Shopping
-//         </button>
-//       </div>
-//     );
-//   }
-
-//   const totalAmount = displayItems.reduce((acc, item) => {
-//     const price = parseFloat(item.product.price.replace(/[^0-9.]/g, ""));
-//     return acc + price * (item.quantity || 1);
-//   }, 0);
 
 //   const getImageUrl = (source: any) => {
 //     if (!source) return "/assets/placeholder.png";
@@ -164,90 +290,55 @@
 //     e.preventDefault();
 //     setIsProcessing(true);
 
-//     // Format items correctly for the API - ensure product._id is included
-//     const formattedItems = displayItems.map((item) => ({
+//     // Use local quantities for the final amount
+//     const itemsWithLocalQty = displayItems.map((item) => ({
+//       ...item,
+//       quantity: localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1,
+//     }));
+
+//     const formattedItems = itemsWithLocalQty.map((item) => ({
 //       product: {
-//         _id: item.product._id, // CRITICAL: This must be included
+//         _id: item.product._id,
 //         name: item.product.name,
 //         price: item.product.price,
 //       },
-//       quantity: item.quantity || 1,
+//       quantity: item.quantity,
 //       selectedSize: item.selectedSize,
-//       selectedColor: {
-//         label: item.selectedColor.label,
-//         hex: item.selectedColor.hex,
-//       },
+//       selectedColor: item.selectedColor,
 //     }));
-
-//     console.log(
-//       "Sending items with product IDs:",
-//       formattedItems.map((i) => ({
-//         productId: i.product._id,
-//         name: i.product.name,
-//       })),
-//     );
-
-//     const requestData = {
-//       amount: totalAmount,
-//       email: email,
-//       name: fullName,
-//       phoneNumber: phoneNumber,
-//       items: formattedItems,
-//       shippingAddress: shippingAddress,
-//     };
 
 //     try {
 //       const response = await fetch("/api/pesapal/register-order", {
 //         method: "POST",
 //         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(requestData),
+//         body: JSON.stringify({
+//           amount: totalAmount,
+//           email,
+//           name: fullName,
+//           phoneNumber,
+//           items: formattedItems,
+//           shippingAddress,
+//         }),
 //       });
-
 //       const data = await response.json();
-
-//       if (!response.ok) {
-//         console.error("API Error:", data);
-//         alert(`Error: ${data.error || "Could not initiate payment."}`);
-//         setIsProcessing(false);
-//         return;
-//       }
-
 //       if (data.redirect_url) {
-//         // Store order ID in session storage to clear cart after successful payment
 //         sessionStorage.setItem("pendingOrderId", data.orderId);
-
-//         if (window.PesaPal) {
-//           window.PesaPal.pay(data.redirect_url);
-//           setIsProcessing(false);
-//         } else {
-//           window.location.href = data.redirect_url;
-//         }
-//       } else {
-//         alert(`Error: ${data.message || "Could not initiate payment."}`);
-//         setIsProcessing(false);
+//         window.location.href = data.redirect_url;
 //       }
 //     } catch (error) {
-//       console.error("Payment Error:", error);
 //       alert("A network error occurred.");
+//     } finally {
 //       setIsProcessing(false);
 //     }
 //   };
 
-//   // Custom remove function for direct checkout items
-//   const handleRemoveDirectItem = () => {
-//     setDirectCheckoutItem(null);
-//     router.push("/products");
-//   };
-
 //   return (
 //     <div className="min-h-screen bg-white text-black antialiased mt-20 md:mt-32 border-t border-neutral-200">
-//       {/* ── PESAPAL V3 SDK ── */}
 //       <Script
 //         src="https://cybqa.pesapal.com/v3/js/pesapal.js"
 //         strategy="afterInteractive"
 //       />
 
-//       {/* ── TOP NAVIGATION ── */}
 //       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-6 md:px-12 lg:px-16 py-5 border-b border-gray-100">
 //         <button
 //           onClick={onBack}
@@ -268,7 +359,7 @@
 
 //       <div className="max-w-[1800px] mx-auto w-full">
 //         <div className="flex flex-col xl:flex-row">
-//           {/* ── ORDER SUMMARY (Left Column) ── */}
+//           {/* Left Column */}
 //           <div className="w-full xl:w-[40%] p-6 md:p-10 lg:p-16 xl:p-20 bg-[#F9F9F9] border-b xl:border-b-0 xl:border-r border-gray-100">
 //             <div className="flex justify-between items-center mb-8">
 //               <span className="text-[10px] uppercase tracking-[0.5em] text-gray-400 font-bold">
@@ -283,33 +374,38 @@
 
 //             <div className="space-y-8 mb-10 max-h-none xl:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
 //               {displayItems.map((item, index) => {
+//                 const itemId = item.cartId || "direct";
+//                 const displayQuantity =
+//                   localQuantities[itemId] ?? item.quantity ?? 1;
+//                 const isPending = pendingRemovals.has(itemId);
 //                 const titleParts = item.product.name.split(" ");
 //                 const titleLine1 = titleParts.slice(0, 2).join(" ");
 //                 const titleLine2 = titleParts.slice(2).join(" ");
 
 //                 return (
 //                   <div
-//                     key={directCheckoutItem ? `direct-${index}` : item.cartId}
-//                     className="group relative border-b border-gray-200 pb-8 last:border-0"
+//                     key={item.cartId || `direct-${index}`}
+//                     className={`group relative border-b border-gray-200 pb-8 last:border-0 transition-opacity duration-200 ${
+//                       isPending ? "opacity-50" : ""
+//                     }`}
 //                   >
-//                     {/* Quantity Controls - FIXED: Removed the !directCheckoutItem condition that was hiding them */}
-//                     {item.cartId && (
+//                     {item.cartId && !isPending && (
 //                       <div className="absolute top-0 right-0 flex items-center border border-gray-200 bg-white z-10">
 //                         <button
 //                           onClick={() =>
-//                             updateQuantity(item.cartId, item.quantity - 1)
+//                             handleDecrement(item.cartId, displayQuantity)
 //                           }
 //                           className="p-2 hover:bg-gray-50 disabled:opacity-30"
-//                           disabled={item.quantity <= 1}
+//                           disabled={displayQuantity <= 1}
 //                         >
 //                           <Minus size={12} />
 //                         </button>
 //                         <span className="w-8 text-center text-[11px] font-bold">
-//                           {item.quantity}
+//                           {displayQuantity}
 //                         </span>
 //                         <button
 //                           onClick={() =>
-//                             updateQuantity(item.cartId, item.quantity + 1)
+//                             handleIncrement(item.cartId, displayQuantity)
 //                           }
 //                           className="p-2 hover:bg-gray-50"
 //                         >
@@ -318,22 +414,21 @@
 //                       </div>
 //                     )}
 
-//                     {/* Remove button - Different behavior for direct vs cart items */}
-//                     {directCheckoutItem ? (
-//                       <button
-//                         onClick={handleRemoveDirectItem}
-//                         className="absolute top-0 right-0 text-gray-300 hover:text-[#be1e2d] p-2"
-//                       >
+//                     <button
+//                       onClick={() =>
+//                         isDirectRoute
+//                           ? handleRemoveDirect()
+//                           : handleRemove(item.cartId)
+//                       }
+//                       disabled={isPending}
+//                       className={`absolute ${item.cartId ? "top-12" : "top-0"} right-0 text-gray-300 hover:text-[#be1e2d] p-2 disabled:opacity-50 disabled:cursor-not-allowed`}
+//                     >
+//                       {isPending ? (
+//                         <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+//                       ) : (
 //                         <Trash2 size={14} />
-//                       </button>
-//                     ) : (
-//                       <button
-//                         onClick={() => removeFromCart(item.cartId)}
-//                         className="absolute top-12 right-0 text-gray-300 hover:text-[#be1e2d] p-2"
-//                       >
-//                         <Trash2 size={14} />
-//                       </button>
-//                     )}
+//                       )}
+//                     </button>
 
 //                     <div className="flex flex-row gap-5 md:gap-8 mt-12">
 //                       <div className="relative w-24 h-32 md:w-32 md:h-44 bg-white shadow-sm border border-gray-100 shrink-0">
@@ -383,7 +478,7 @@
 //                               {item.product.price}
 //                             </p>
 //                           </div>
-//                           {(item.quantity || 1) > 1 && (
+//                           {displayQuantity > 1 && (
 //                             <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-dashed border-gray-200">
 //                               <span className="text-[9px] font-bold uppercase text-gray-400">
 //                                 Subtotal
@@ -393,7 +488,7 @@
 //                                 {(
 //                                   parseFloat(
 //                                     item.product.price.replace(/[^0-9.]/g, ""),
-//                                   ) * (item.quantity || 1)
+//                                   ) * displayQuantity
 //                                 ).toLocaleString()}
 //                               </p>
 //                             </div>
@@ -426,137 +521,113 @@
 //             </div>
 //           </div>
 
-//           {/* ── CHECKOUT FORM (Right Column) ── */}
+//           {/* Right Column: Form */}
 //           <div className="w-full xl:w-[60%] p-6 md:p-10 lg:p-16 xl:p-20 bg-white">
-//             <div className="xl:sticky xl:top-32">
-//               <form
-//                 onSubmit={handleCompletePurchase}
-//                 className="max-w-2xl mx-auto xl:ml-0 space-y-16"
-//               >
-//                 {/* Shipping Section */}
-//                 <section>
-//                   <h3 className="text-[12px] md:text-[14px] uppercase tracking-[0.4em] font-black mb-10 pb-4 border-b border-black w-fit">
-//                     02. Shipping & Contact
-//                   </h3>
-//                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-//                     <div className="flex flex-col gap-2">
-//                       <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
-//                         Full Name
-//                       </label>
-//                       <input
-//                         required
-//                         type="text"
-//                         value={fullName}
-//                         onChange={(e) => setFullName(e.target.value)}
-//                         className="border-b border-gray-200 py-3 focus:border-black outline-none transition-colors text-sm"
-//                         placeholder="John Doe"
-//                       />
-//                     </div>
-//                     <div className="flex flex-col gap-2">
-//                       <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
-//                         Email Address
-//                       </label>
-//                       <input
-//                         required
-//                         type="email"
-//                         value={email}
-//                         onChange={(e) => setEmail(e.target.value)}
-//                         className="border-b border-gray-200 py-3 focus:border-black outline-none transition-colors text-sm"
-//                         placeholder="john@example.com"
-//                       />
-//                     </div>
-
-//                     {/* Phone Number Field - REQUIRED */}
-//                     <div className="flex flex-col gap-2 md:col-span-2">
-//                       <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400 flex items-center gap-2">
-//                         <Phone size={12} /> Phone Number{" "}
-//                         <span className="text-red-500">*</span>
-//                       </label>
-//                       <input
-//                         required
-//                         type="tel"
-//                         value={phoneNumber}
-//                         onChange={(e) => setPhoneNumber(e.target.value)}
-//                         className="border-b border-gray-200 py-3 focus:border-black outline-none transition-colors text-sm"
-//                         placeholder="0712 345 678"
-//                       />
-//                       <p className="text-[8px] text-gray-400 mt-1">
-//                         For M-Pesa payment confirmation and order updates
-//                       </p>
-//                     </div>
-
-//                     <div className="flex flex-col gap-2 md:col-span-2">
-//                       <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
-//                         Shipping Address
-//                       </label>
-//                       <input
-//                         required
-//                         type="text"
-//                         value={shippingAddress}
-//                         onChange={(e) => setShippingAddress(e.target.value)}
-//                         className="border-b border-gray-200 py-3 focus:border-black outline-none transition-colors text-sm"
-//                         placeholder="123 Main Street, Nairobi"
-//                       />
-//                     </div>
+//             <form
+//               onSubmit={handleCompletePurchase}
+//               className="max-w-2xl mx-auto xl:ml-0 space-y-16"
+//             >
+//               <section>
+//                 <h3 className="text-[12px] md:text-[14px] uppercase tracking-[0.4em] font-black mb-10 pb-4 border-b border-black w-fit">
+//                   02. Shipping & Contact
+//                 </h3>
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+//                   <div className="flex flex-col gap-2">
+//                     <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
+//                       Full Name
+//                     </label>
+//                     <input
+//                       required
+//                       type="text"
+//                       value={fullName}
+//                       onChange={(e) => setFullName(e.target.value)}
+//                       className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
+//                       placeholder="John Doe"
+//                     />
 //                   </div>
-//                 </section>
-
-//                 {/* REMOVED: Section 3 Payment Method - Now just the button */}
-
-//                 <div className="pt-8">
-//                   <button
-//                     type="submit"
-//                     disabled={
-//                       isProcessing ||
-//                       displayItems.length === 0 ||
-//                       !phoneNumber.trim()
-//                     }
-//                     className="group relative w-full overflow-hidden bg-black text-white py-7 md:py-9 text-[13px] md:text-[15px] font-black uppercase tracking-[0.6em] transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-black hover:bg-white hover:text-black"
-//                   >
-//                     {/* Removed the white overlay span that was causing hover issues */}
-//                     <span className="relative z-10 flex items-center justify-center gap-4">
-//                       {isProcessing ? (
-//                         <>
-//                           <Loader2 className="animate-spin" size={20} />
-//                           Processing...
-//                         </>
-//                       ) : (
-//                         <>
-//                           Complete Purchase
-//                           <ArrowRight
-//                             size={20}
-//                             className="transition-transform group-hover:translate-x-2"
-//                           />
-//                         </>
-//                       )}
-//                     </span>
-//                   </button>
-
-//                   {/* Security notice */}
-//                   <p className="text-[8px] text-center text-gray-400 mt-4 uppercase tracking-wider">
-//                     🔒 256-bit SSL Secure Payment • Your information is
-//                     encrypted
-//                   </p>
+//                   <div className="flex flex-col gap-2">
+//                     <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
+//                       Email Address
+//                     </label>
+//                     <input
+//                       required
+//                       type="email"
+//                       value={email}
+//                       onChange={(e) => setEmail(e.target.value)}
+//                       className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
+//                       placeholder="john@example.com"
+//                     />
+//                   </div>
+//                   <div className="flex flex-col gap-2 md:col-span-2">
+//                     <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400 flex items-center gap-2">
+//                       <Phone size={12} /> Phone Number{" "}
+//                       <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       required
+//                       type="tel"
+//                       value={phoneNumber}
+//                       onChange={(e) => setPhoneNumber(e.target.value)}
+//                       className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
+//                       placeholder="0712 345 678"
+//                     />
+//                   </div>
+//                   <div className="flex flex-col gap-2 md:col-span-2">
+//                     <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
+//                       Shipping Address
+//                     </label>
+//                     <input
+//                       required
+//                       type="text"
+//                       value={shippingAddress}
+//                       onChange={(e) => setShippingAddress(e.target.value)}
+//                       className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
+//                       placeholder="123 Main Street, Nairobi"
+//                     />
+//                   </div>
 //                 </div>
-//               </form>
-//             </div>
+//               </section>
+
+//               <button
+//                 type="submit"
+//                 disabled={
+//                   isProcessing ||
+//                   displayItems.length === 0 ||
+//                   !phoneNumber.trim() ||
+//                   !fullName.trim() ||
+//                   !email.trim() ||
+//                   !shippingAddress.trim()
+//                 }
+//                 className="group relative w-full overflow-hidden bg-black text-white py-9 text-[15px] font-black uppercase tracking-[0.6em] transition-all border-2 border-black hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+//               >
+//                 <span className="relative z-10 flex items-center justify-center gap-4">
+//                   {isProcessing ? (
+//                     <>
+//                       <Loader2 className="animate-spin" size={20} />
+//                       Processing...
+//                     </>
+//                   ) : (
+//                     "Complete Purchase"
+//                   )}
+//                   {!isProcessing && (
+//                     <ArrowRight
+//                       size={20}
+//                       className="transition-transform group-hover:translate-x-2"
+//                     />
+//                   )}
+//                 </span>
+//               </button>
+//             </form>
 //           </div>
 //         </div>
 //       </div>
-
 //       <style jsx>{`
 //         .custom-scrollbar::-webkit-scrollbar {
 //           width: 3px;
 //         }
-//         .custom-scrollbar::-webkit-scrollbar-track {
-//           background: transparent;
-//         }
 //         .custom-scrollbar::-webkit-scrollbar-thumb {
 //           background: #e5e5e5;
 //           border-radius: 10px;
-//         }
-//         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-//           background: #d1d1d1;
 //         }
 //       `}</style>
 //     </div>
@@ -575,12 +646,23 @@ import {
   Minus,
   Plus,
   Phone,
+  MapPin,
+  ChevronDown,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { urlFor } from "@/sanity/lib/image";
-import Link from "next/link";
+import { PICKUP_LOCATIONS } from "@/data/pickupPoints";
+
+const SHIPPING_RATES = {
+  Nairobi: 1,
+  Mombasa: 450,
+  Kisumu: 450,
+  Nakuru: 450,
+  Eldoret: 450,
+  Kiambu: 350,
+};
 
 interface CheckOutPageProps {
   onBack: () => void;
@@ -595,37 +677,62 @@ declare global {
 }
 
 export default function CheckOutPage({ onBack }: CheckOutPageProps) {
+  // 1. ALL HOOKS FIRST (useSession, useCart, useRouter, useSearchParams)
   const { data: session, status } = useSession();
   const { cartItems, removeFromCart, updateQuantity, loading } = useCart();
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  // 2. ALL useState hooks
   const [isProcessing, setIsProcessing] = useState(false);
   const [directCheckoutItem, setDirectCheckoutItem] = useState<any>(null);
   const [isInitialCheckDone, setIsInitialCheckDone] = useState(false);
 
-  // Local optimistic state for quantities
-  const [localQuantities, setLocalQuantities] = useState<
-    Record<string, number>
-  >({});
-
-  // Track pending removals to prevent flickering
-  const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(
-    new Set(),
-  );
-
-  // Refs to prevent infinite loops
-  const isFirstRender = useRef(true);
-  const prevCartItemsRef = useRef(cartItems);
-  const prevDirectItemRef = useRef(directCheckoutItem);
-
+  // Form State
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
 
+  // Pickup State
+  const [selectedCity, setSelectedCity] =
+    useState<keyof typeof PICKUP_LOCATIONS>("Nairobi");
+  const [selectedPickupPoint, setSelectedPickupPoint] = useState(
+    PICKUP_LOCATIONS.Nairobi[0],
+  );
+
+  const [localQuantities, setLocalQuantities] = useState<
+    Record<string, number>
+  >({});
+  const [pendingRemovals, setPendingRemovals] = useState<Set<string>>(
+    new Set(),
+  );
+
+  // 3. ALL useRef hooks
+  const isFirstRender = useRef(true);
   const isDirectRoute = searchParams.get("direct") === "true";
 
+  // 4. ALL useMemo hooks (BEFORE any useEffect that depends on them)
+  const displayItems = useMemo(() => {
+    if (isDirectRoute) return directCheckoutItem ? [directCheckoutItem] : [];
+    return cartItems.filter((item) => !pendingRemovals.has(item.cartId));
+  }, [isDirectRoute, directCheckoutItem, cartItems, pendingRemovals]);
+
+  const subtotal = useMemo(() => {
+    return displayItems.reduce((acc, item) => {
+      const priceStr = item.product.price || "0";
+      const price = parseFloat(priceStr.replace(/[^0-9.]/g, ""));
+      const quantity =
+        localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1;
+      return acc + (isNaN(price) ? 0 : price * quantity);
+    }, 0);
+  }, [displayItems, localQuantities]);
+
+  const shippingFee = SHIPPING_RATES[selectedCity] || 450;
+  const totalAmount = subtotal + shippingFee;
+
+  // 5. ALL useEffect hooks (AFTER all useMemo)
+  // Load direct checkout item
   useEffect(() => {
     if (isDirectRoute) {
       const storedItem = sessionStorage.getItem("directCheckout");
@@ -633,119 +740,32 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
         try {
           const parsedItem = JSON.parse(storedItem);
           setDirectCheckoutItem(parsedItem);
+          // Clear it immediately after loading
           sessionStorage.removeItem("directCheckout");
         } catch (e) {
-          console.error("Error parsing direct checkout item:", e);
+          console.error(e);
         }
       }
     }
     setIsInitialCheckDone(true);
   }, [isDirectRoute]);
 
-  // Fixed: Sync local quantities with items without causing infinite loop
+  // Set user info from session
   useEffect(() => {
-    // Skip first render
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-
-      // Initialize local quantities
-      const initialQuantities: Record<string, number> = {};
-      cartItems.forEach((item) => {
-        initialQuantities[item.cartId] = item.quantity;
-      });
-      if (directCheckoutItem) {
-        initialQuantities["direct"] = directCheckoutItem.quantity || 1;
-      }
-      setLocalQuantities(initialQuantities);
-      return;
-    }
-
-    // Check if cartItems actually changed
-    const prevCartItems = prevCartItemsRef.current;
-    const cartItemsChanged =
-      prevCartItems.length !== cartItems.length ||
-      cartItems.some((item, index) => {
-        const prevItem = prevCartItems[index];
-        return (
-          !prevItem ||
-          prevItem.cartId !== item.cartId ||
-          prevItem.quantity !== item.quantity
-        );
-      });
-
-    // Check if direct item changed
-    const directItemChanged =
-      JSON.stringify(prevDirectItemRef.current) !==
-      JSON.stringify(directCheckoutItem);
-
-    if (cartItemsChanged || directItemChanged) {
-      setLocalQuantities((prev) => {
-        const newQuantities = { ...prev };
-
-        // Update cart items
-        cartItems.forEach((item) => {
-          if (!pendingRemovals.has(item.cartId)) {
-            newQuantities[item.cartId] = item.quantity;
-          }
-        });
-
-        // Update direct item
-        if (directCheckoutItem && !pendingRemovals.has("direct")) {
-          newQuantities["direct"] = directCheckoutItem.quantity || 1;
-        }
-
-        // Remove items that are no longer in cart
-        const currentCartIds = new Set(cartItems.map((item) => item.cartId));
-        Object.keys(newQuantities).forEach((cartId) => {
-          if (
-            cartId !== "direct" &&
-            !currentCartIds.has(cartId) &&
-            !pendingRemovals.has(cartId)
-          ) {
-            delete newQuantities[cartId];
-          }
-        });
-
-        return newQuantities;
-      });
-    }
-
-    // Update refs
-    prevCartItemsRef.current = cartItems;
-    prevDirectItemRef.current = directCheckoutItem;
-  }, [cartItems, directCheckoutItem, pendingRemovals]);
-
-  const displayItems = useMemo(() => {
-    if (isDirectRoute) {
-      return directCheckoutItem ? [directCheckoutItem] : [];
-    }
-    // Filter out pending removals
-    return cartItems.filter((item) => !pendingRemovals.has(item.cartId));
-  }, [isDirectRoute, directCheckoutItem, cartItems, pendingRemovals]);
-
-  const totalAmount = useMemo(() => {
-    return displayItems.reduce((acc, item) => {
-      const price = parseFloat(item.product.price.replace(/[^0-9.]/g, ""));
-      // Use local quantity if available
-      const quantity =
-        localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1;
-      return acc + (isNaN(price) ? 0 : price * quantity);
-    }, 0);
-  }, [displayItems, localQuantities]);
-
-  useEffect(() => {
-    if (session?.user?.email) {
+    if (session?.user) {
       setFullName(session.user.name || "");
       setEmail(session.user.email || "");
     }
   }, [session]);
 
+  // Redirect if not authenticated
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
+  // Redirect if cart is empty (NOW displayItems is defined before this useEffect)
   useEffect(() => {
     if (
       isInitialCheckDone &&
@@ -763,73 +783,132 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     router,
   ]);
 
-  const handleIncrement = (cartId: string, currentQuantity: number) => {
-    if (pendingRemovals.has(cartId)) return;
+  // Initialize local quantities
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      const initial: Record<string, number> = {};
+      cartItems.forEach((item) => {
+        initial[item.cartId] = item.quantity;
+      });
+      if (directCheckoutItem)
+        initial["direct"] = directCheckoutItem.quantity || 1;
+      setLocalQuantities(initial);
+      return;
+    }
 
-    const newQuantity = currentQuantity + 1;
-
-    // Update local state immediately
-    setLocalQuantities((prev) => ({ ...prev, [cartId]: newQuantity }));
-
-    // Update server in background
-    updateQuantity(cartId, newQuantity).catch(() => {
-      // Revert on error
-      setLocalQuantities((prev) => ({ ...prev, [cartId]: currentQuantity }));
+    // Update local quantities when cart changes
+    setLocalQuantities((prev) => {
+      const next = { ...prev };
+      cartItems.forEach((item) => {
+        if (!pendingRemovals.has(item.cartId))
+          next[item.cartId] = item.quantity;
+      });
+      return next;
     });
+  }, [cartItems, directCheckoutItem, pendingRemovals]);
+
+  // 6. Event handlers
+  const handleCityChange = (city: keyof typeof PICKUP_LOCATIONS) => {
+    setSelectedCity(city);
+    setSelectedPickupPoint(PICKUP_LOCATIONS[city][0]);
   };
 
-  const handleDecrement = (cartId: string, currentQuantity: number) => {
-    if (pendingRemovals.has(cartId)) return;
-    if (currentQuantity <= 1) return;
-
-    const newQuantity = currentQuantity - 1;
-
-    // Update local state immediately
-    setLocalQuantities((prev) => ({ ...prev, [cartId]: newQuantity }));
-
-    // Update server in background
-    updateQuantity(cartId, newQuantity).catch(() => {
-      // Revert on error
-      setLocalQuantities((prev) => ({ ...prev, [cartId]: currentQuantity }));
-    });
+  const handleUpdateQuantity = (cartId: string, newQty: number) => {
+    if (newQty < 1) return;
+    setLocalQuantities((prev) => ({ ...prev, [cartId]: newQty }));
+    if (cartId !== "direct") {
+      updateQuantity(cartId, newQty);
+    } else {
+      setDirectCheckoutItem((prev: any) => ({ ...prev, quantity: newQty }));
+    }
   };
 
   const handleRemove = (cartId: string) => {
-    // Mark as pending removal
-    setPendingRemovals((prev) => new Set(prev).add(cartId));
-
-    // Remove from local state
-    setLocalQuantities((prev) => {
-      const newState = { ...prev };
-      delete newState[cartId];
-      return newState;
-    });
-
-    // Remove from server
-    removeFromCart(cartId)
-      .catch(() => {
-        // If server removal fails, remove from pending
-        setPendingRemovals((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(cartId);
-          return newSet;
-        });
-      })
-      .finally(() => {
+    if (cartId === "direct") {
+      setDirectCheckoutItem(null);
+      router.push("/products");
+    } else {
+      setPendingRemovals((prev) => new Set(prev).add(cartId));
+      removeFromCart(cartId).finally(() => {
         setPendingRemovals((prev) => {
           const newSet = new Set(prev);
           newSet.delete(cartId);
           return newSet;
         });
       });
+    }
   };
 
-  const handleRemoveDirect = () => {
-    setPendingRemovals((prev) => new Set(prev).add("direct"));
-    setDirectCheckoutItem(null);
-    router.push("/products");
+  const handleCompletePurchase = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // VALIDATION: Ensure all required PesaPal fields are present
+    if (!fullName.trim() || !email.trim() || !phoneNumber.trim()) {
+      alert("Please fill in your Name, Email, and Phone Number.");
+      return;
+    }
+
+    setIsProcessing(true);
+
+    const formattedItems = displayItems.map((item) => ({
+      product: { _type: "reference", _ref: item.product._id },
+      productName: item.product.name,
+      quantity: localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1,
+      price: parseFloat(item.product.price.replace(/[^0-9.]/g, "")),
+      size: item.selectedSize,
+      color: item.selectedColor?.label || item.selectedColor,
+      image: item.product.images?.hero
+        ? urlFor(item.product.images.hero).url()
+        : "",
+    }));
+
+    try {
+      const response = await fetch("/api/pesapal/register-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: totalAmount,
+          customer: {
+            name: fullName.trim(),
+            phone: phoneNumber.trim(),
+            email: email.trim(),
+          },
+          email: email.trim(),
+          items: formattedItems,
+          deliveryDetails: {
+            method: "pickup",
+            city: selectedCity,
+            pickupStationName: selectedPickupPoint.name,
+            pickupStationId: selectedPickupPoint.id,
+            shippingAddress:
+              shippingAddress.trim() || "No specific building details",
+          },
+          shippingFee,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Server Error Detail:", data);
+        throw new Error(data.message || "Failed to register order");
+      }
+
+      if (data.redirect_url) {
+        sessionStorage.setItem("pendingOrderId", data.orderId);
+        window.location.href = data.redirect_url;
+      }
+    } catch (error: any) {
+      console.error("Payment Error:", error);
+      alert(error.message || "A network error occurred. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
+  // 7. Early returns (conditional rendering)
+  // Show loading state
   if (
     status === "loading" ||
     (loading && displayItems.length === 0 && !isDirectRoute)
@@ -841,61 +920,9 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
     );
   }
 
-  const getImageUrl = (source: any) => {
-    if (!source) return "/assets/placeholder.png";
-    try {
-      return urlFor(source).url();
-    } catch (error) {
-      return "/assets/placeholder.png";
-    }
-  };
+  if (!isInitialCheckDone) return null;
 
-  const handleCompletePurchase = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-
-    // Use local quantities for the final amount
-    const itemsWithLocalQty = displayItems.map((item) => ({
-      ...item,
-      quantity: localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1,
-    }));
-
-    const formattedItems = itemsWithLocalQty.map((item) => ({
-      product: {
-        _id: item.product._id,
-        name: item.product.name,
-        price: item.product.price,
-      },
-      quantity: item.quantity,
-      selectedSize: item.selectedSize,
-      selectedColor: item.selectedColor,
-    }));
-
-    try {
-      const response = await fetch("/api/pesapal/register-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: totalAmount,
-          email,
-          name: fullName,
-          phoneNumber,
-          items: formattedItems,
-          shippingAddress,
-        }),
-      });
-      const data = await response.json();
-      if (data.redirect_url) {
-        sessionStorage.setItem("pendingOrderId", data.orderId);
-        window.location.href = data.redirect_url;
-      }
-    } catch (error) {
-      alert("A network error occurred.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
+  // 8. JSX Return
   return (
     <div className="min-h-screen bg-white text-black antialiased mt-20 md:mt-32 border-t border-neutral-200">
       <Script
@@ -923,141 +950,98 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
       <div className="max-w-[1800px] mx-auto w-full">
         <div className="flex flex-col xl:flex-row">
-          {/* Left Column */}
           <div className="w-full xl:w-[40%] p-6 md:p-10 lg:p-16 xl:p-20 bg-[#F9F9F9] border-b xl:border-b-0 xl:border-r border-gray-100">
             <div className="flex justify-between items-center mb-8">
               <span className="text-[10px] uppercase tracking-[0.5em] text-gray-400 font-bold">
                 01. Review Order
               </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
-                {displayItems.length}{" "}
-                {displayItems.length === 1 ? "Item" : "Items"}
-                {directCheckoutItem && " (Direct Purchase)"}
+              <span className="text-[10px] uppercase tracking-widest font-bold">
+                {displayItems.length} Items
               </span>
             </div>
 
-            <div className="space-y-8 mb-10 max-h-none xl:max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-8 mb-10 max-h-[55vh] overflow-y-auto pr-4 custom-scrollbar">
               {displayItems.map((item, index) => {
-                const itemId = item.cartId || "direct";
-                const displayQuantity =
-                  localQuantities[itemId] ?? item.quantity ?? 1;
-                const isPending = pendingRemovals.has(itemId);
-                const titleParts = item.product.name.split(" ");
-                const titleLine1 = titleParts.slice(0, 2).join(" ");
-                const titleLine2 = titleParts.slice(2).join(" ");
+                const currentId = item.cartId || "direct";
+                const qty = localQuantities[currentId] || 1;
+                const isPending = pendingRemovals.has(currentId);
 
                 return (
                   <div
-                    key={item.cartId || `direct-${index}`}
-                    className={`group relative border-b border-gray-200 pb-8 last:border-0 transition-opacity duration-200 ${
+                    key={currentId}
+                    className={`flex gap-6 border-b border-gray-200 pb-8 last:border-0 group ${
                       isPending ? "opacity-50" : ""
                     }`}
                   >
-                    {item.cartId && !isPending && (
-                      <div className="absolute top-0 right-0 flex items-center border border-gray-200 bg-white z-10">
-                        <button
-                          onClick={() =>
-                            handleDecrement(item.cartId, displayQuantity)
-                          }
-                          className="p-2 hover:bg-gray-50 disabled:opacity-30"
-                          disabled={displayQuantity <= 1}
-                        >
-                          <Minus size={12} />
-                        </button>
-                        <span className="w-8 text-center text-[11px] font-bold">
-                          {displayQuantity}
-                        </span>
-                        <button
-                          onClick={() =>
-                            handleIncrement(item.cartId, displayQuantity)
-                          }
-                          className="p-2 hover:bg-gray-50"
-                        >
-                          <Plus size={12} />
-                        </button>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() =>
-                        isDirectRoute
-                          ? handleRemoveDirect()
-                          : handleRemove(item.cartId)
-                      }
-                      disabled={isPending}
-                      className={`absolute ${item.cartId ? "top-12" : "top-0"} right-0 text-gray-300 hover:text-[#be1e2d] p-2 disabled:opacity-50 disabled:cursor-not-allowed`}
-                    >
-                      {isPending ? (
-                        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <Trash2 size={14} />
-                      )}
-                    </button>
-
-                    <div className="flex flex-row gap-5 md:gap-8 mt-12">
-                      <div className="relative w-24 h-32 md:w-32 md:h-44 bg-white shadow-sm border border-gray-100 shrink-0">
+                    <div className="relative w-24 h-32 bg-white border border-gray-100 shrink-0 overflow-hidden">
+                      {item.product.images?.hero && (
                         <Image
-                          src={getImageUrl(item.product.images?.hero)}
+                          src={urlFor(item.product.images.hero).url()}
                           alt={item.product.name}
                           fill
+                          className="object-contain p-2 transition-transform duration-700 group-hover:scale-110"
                           unoptimized
-                          className="object-contain p-2 md:p-4 transition-transform duration-700 group-hover:scale-105"
                         />
+                      )}
+                    </div>
+
+                    <div className="flex-1 flex flex-col">
+                      <div className="flex justify-between items-start">
+                        <h2 className="text-[13px] font-black uppercase tracking-tighter leading-tight max-w-[180px]">
+                          {item.product.name}
+                        </h2>
+                        <button
+                          onClick={() => handleRemove(currentId)}
+                          disabled={isPending}
+                          className="text-gray-300 hover:text-black transition-colors p-1 disabled:opacity-50"
+                        >
+                          {isPending ? (
+                            <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                        </button>
                       </div>
 
-                      <div className="flex flex-col justify-between flex-1">
-                        <div>
-                          <h2 className="text-sm md:text-lg font-light tracking-tighter uppercase leading-tight">
-                            {titleLine1} <br />
-                            <span className="font-black text-zinc-900">
-                              {titleLine2}
-                            </span>
-                          </h2>
-                          <div className="flex flex-col gap-1.5 mt-3">
-                            <div className="flex items-center gap-2">
-                              <div
-                                className="w-2.5 h-2.5 rounded-full border border-black/10"
-                                style={{
-                                  backgroundColor: item.selectedColor.hex,
-                                }}
-                              />
-                              <span className="text-[9px] font-bold uppercase tracking-widest">
-                                {item.selectedColor.label}
-                              </span>
-                            </div>
-                            <div className="text-[9px] font-bold uppercase tracking-widest text-gray-500">
-                              Size:{" "}
-                              <span className="text-black">
-                                {item.selectedSize}
-                              </span>
-                            </div>
-                          </div>
+                      <div className="mt-2 space-y-1">
+                        <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest">
+                          Size: {item.selectedSize}
+                        </p>
+                        <p className="text-[9px] text-gray-400 uppercase font-bold tracking-widest">
+                          Color:{" "}
+                          {item.selectedColor?.label || item.selectedColor}
+                        </p>
+                      </div>
+
+                      <div className="mt-auto flex justify-between items-end">
+                        <div className="flex items-center border border-gray-200">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleUpdateQuantity(currentId, qty - 1)
+                            }
+                            disabled={isPending || qty <= 1}
+                            className="p-2 hover:bg-gray-50 transition-colors disabled:opacity-30"
+                          >
+                            <Minus size={10} />
+                          </button>
+                          <span className="text-[10px] font-bold w-8 text-center">
+                            {qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              handleUpdateQuantity(currentId, qty + 1)
+                            }
+                            disabled={isPending}
+                            className="p-2 hover:bg-gray-50 transition-colors disabled:opacity-30"
+                          >
+                            <Plus size={10} />
+                          </button>
                         </div>
-                        <div className="mt-4">
-                          <div className="flex justify-between items-baseline">
-                            <span className="text-[9px] font-bold uppercase text-gray-400">
-                              Unit Price
-                            </span>
-                            <p className="text-sm md:text-base font-light tracking-widest">
-                              {item.product.price}
-                            </p>
-                          </div>
-                          {displayQuantity > 1 && (
-                            <div className="flex justify-between items-baseline mt-2 pt-2 border-t border-dashed border-gray-200">
-                              <span className="text-[9px] font-bold uppercase text-gray-400">
-                                Subtotal
-                              </span>
-                              <p className="text-sm font-bold">
-                                Ksh{" "}
-                                {(
-                                  parseFloat(
-                                    item.product.price.replace(/[^0-9.]/g, ""),
-                                  ) * displayQuantity
-                                ).toLocaleString()}
-                              </p>
-                            </div>
-                          )}
-                        </div>
+                        <p className="text-sm font-black tracking-tight">
+                          {item.product.price}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1066,26 +1050,21 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
             </div>
 
             <div className="border-t border-gray-200 pt-8 space-y-4">
-              <div className="flex justify-between text-[11px] tracking-widest uppercase text-gray-500">
+              <div className="flex justify-between text-[11px] tracking-widest uppercase text-gray-500 font-bold">
                 <span>Subtotal</span>
-                <span className="text-black font-bold">
-                  Ksh {totalAmount.toLocaleString()}
-                </span>
+                <span>Ksh {subtotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-[11px] tracking-widest uppercase text-gray-500">
-                <span>Shipping</span>
-                <span className="text-black font-bold italic">
-                  Complimentary
-                </span>
+              <div className="flex justify-between text-[11px] tracking-widest uppercase text-gray-500 font-bold">
+                <span>Shipping ({selectedCity})</span>
+                <span>Ksh {shippingFee.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-lg tracking-[0.2em] font-black uppercase pt-6 border-t border-black">
+              <div className="flex justify-between text-xl tracking-[0.2em] font-black uppercase pt-6 border-t border-black mt-4">
                 <span>Total</span>
                 <span>Ksh {totalAmount.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
-          {/* Right Column: Form */}
           <div className="w-full xl:w-[60%] p-6 md:p-10 lg:p-16 xl:p-20 bg-white">
             <form
               onSubmit={handleCompletePurchase}
@@ -1093,11 +1072,12 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
             >
               <section>
                 <h3 className="text-[12px] md:text-[14px] uppercase tracking-[0.4em] font-black mb-10 pb-4 border-b border-black w-fit">
-                  02. Shipping & Contact
+                  02. Delivery Selection
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+                  <div className="flex flex-col gap-3">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
                       Full Name
                     </label>
                     <input
@@ -1105,12 +1085,12 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                       type="text"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
-                      placeholder="John Doe"
+                      className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px]  transition-colors"
+                      placeholder="YOUR NAME"
                     />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
+                  <div className="flex flex-col gap-3">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
                       Email Address
                     </label>
                     <input
@@ -1118,35 +1098,84 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
-                      placeholder="john@example.com"
+                      className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px]   transition-colors"
+                      placeholder="EMAIL@DOMAIN.COM"
                     />
                   </div>
-                  <div className="flex flex-col gap-2 md:col-span-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400 flex items-center gap-2">
-                      <Phone size={12} /> Phone Number{" "}
-                      <span className="text-red-500">*</span>
+                  <div className="flex flex-col gap-3 md:col-span-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 flex items-center gap-2">
+                      <Phone size={12} /> Contact Number
                     </label>
                     <input
                       required
                       type="tel"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
-                      placeholder="0712 345 678"
+                      className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] transition-colors"
+                      placeholder="0712 XXX XXX"
                     />
                   </div>
-                  <div className="flex flex-col gap-2 md:col-span-2">
-                    <label className="text-[9px] uppercase tracking-widest font-bold text-gray-400">
-                      Shipping Address
+
+                  <div className="flex flex-col gap-3 md:col-span-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
+                      Select City
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {Object.keys(PICKUP_LOCATIONS).map((city) => (
+                        <button
+                          key={city}
+                          type="button"
+                          onClick={() => handleCityChange(city as any)}
+                          className={`px-5 py-2.5 border text-[10px] uppercase font-black tracking-widest transition-all ${
+                            selectedCity === city
+                              ? "bg-black text-white border-black"
+                              : "text-gray-400 border-gray-200 hover:border-black"
+                          }`}
+                        >
+                          {city}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 md:col-span-2 relative">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 flex items-center gap-2">
+                      <MapPin size={12} /> Specific Pickup Station
+                    </label>
+                    <div className="relative">
+                      <select
+                        className="appearance-none w-full border-b-2 border-gray-100 py-4 outline-none text-[13px]  bg-transparent pr-10 focus:border-black transition-colors"
+                        value={selectedPickupPoint.id}
+                        onChange={(e) => {
+                          const point = PICKUP_LOCATIONS[selectedCity].find(
+                            (p) => p.id === e.target.value,
+                          );
+                          if (point) setSelectedPickupPoint(point);
+                        }}
+                      >
+                        {PICKUP_LOCATIONS[selectedCity].map((point) => (
+                          <option key={point.id} value={point.id}>
+                            {point.name} — {point.address}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown
+                        size={16}
+                        className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 md:col-span-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
+                      Building / Suite / Floor (Optional)
                     </label>
                     <input
-                      required
                       type="text"
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
-                      className="border-b border-gray-200 py-3 focus:border-black outline-none text-sm"
-                      placeholder="123 Main Street, Nairobi"
+                      className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] font-black uppercase transition-colors"
+                      placeholder="E.G. SUITE 302, 3RD FLOOR"
                     />
                   </div>
                 </div>
@@ -1154,21 +1183,14 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
               <button
                 type="submit"
-                disabled={
-                  isProcessing ||
-                  displayItems.length === 0 ||
-                  !phoneNumber.trim() ||
-                  !fullName.trim() ||
-                  !email.trim() ||
-                  !shippingAddress.trim()
-                }
+                disabled={isProcessing || displayItems.length === 0}
                 className="group relative w-full overflow-hidden bg-black text-white py-9 text-[15px] font-black uppercase tracking-[0.6em] transition-all border-2 border-black hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="relative z-10 flex items-center justify-center gap-4">
                   {isProcessing ? (
                     <>
                       <Loader2 className="animate-spin" size={20} />
-                      Processing...
+                      Processing
                     </>
                   ) : (
                     "Complete Purchase"
@@ -1185,6 +1207,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
           </div>
         </div>
       </div>
+
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 3px;
