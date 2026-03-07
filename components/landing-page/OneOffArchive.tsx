@@ -165,7 +165,7 @@ export default function OneOffArchive({
                     </p>
                   )}
                 </div>
-
+                {/*CTA BUTTON*/}
                 <div className="pt-4">
                   {piece.status === "sold" ? (
                     <div className="pt-4">
@@ -175,18 +175,20 @@ export default function OneOffArchive({
                     </div>
                   ) : (
                     <>
-                      <a
-                        href={getGmailUrl(piece.name)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group flex items-center gap-6 text-[11px] uppercase tracking-[0.3em] font-bold text-[#1A1A1A] pt-4"
-                      >
-                        Contact Us
-                        <div className="w-10 h-10 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-[#1A1A1A] group-hover:text-white transition-all duration-300">
-                          <ArrowRight size={14} strokeWidth={1.5} />
-                        </div>
-                      </a>
-                      <p className="text-[9px] text-gray-400 mt-4 uppercase tracking-widest">
+                      <div className="mt-6 md:mt-10">
+                        <a
+                          href={getGmailUrl(piece.name)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group relative inline-flex items-center gap-3 md:gap-4 lg:gap-6 xl:gap-8 py-4 md:py-5 lg:py-6 xl:py-8 px-8 md:px-10 lg:px-12 xl:px-16 border border-black/10 overflow-hidden transition-all hover:border-black"
+                        >
+                          <span className="relative z-10 text-[9px] md:text-[10px] lg:text-[11px] xl:text-[11px] font-bold uppercase tracking-[0.3em] md:tracking-[0.4em] lg:tracking-[0.5em] xl:tracking-[0.8em] group-hover:text-white transition-colors duration-500">
+                            Enquire on {piece.name}
+                          </span>
+                          <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]" />
+                        </a>
+                      </div>
+                      <p className="text-[9px] text-gray-400 mt-6 uppercase tracking-widest">
                         Inquiries: {CONTACT_EMAIL}
                       </p>
                     </>
