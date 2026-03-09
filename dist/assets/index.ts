@@ -34,7 +34,7 @@ export { default as Model8 } from "./traditional-kanga-wrap-set.webp";
 export { default as Model9 } from "./artisan-crafted-jewelry-showcase.webp";
 export { default as Model10 } from "./heritage-stripe-kaftan-gown-2.webp";
 export { default as Model11 } from "./vibrant-kenyan-textiles-editorial.webp";
-export { default as Model12 } from "./minimalist-african-aesthetic-model.webp";
+export { default as Model12 } from "./sd-replace.jpg";
 export { default as Model13 } from "./heritage-roots-lifestyle-photography.webp";
 export { default as Model14 } from "./daima-mkenya-unisex-collection.webp";
 export { default as Model15 } from "./leopard-shield-print-vest-2.webp";

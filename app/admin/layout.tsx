@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Menu,
   X,
+  MessageSquare,
 } from "lucide-react";
 import ProfileMenu from "../admin/components/profile/ProfileMenu";
 import AdminGuard from "../admin/components/auth/AdminGuard";
@@ -109,6 +110,13 @@ export default function AdminLayout({
               href="/admin/users"
               icon={<Users size={16} />}
               label="Customers"
+              onClick={() => setSidebarOpen(false)}
+            />
+            {/* Add Inquiries link here */}
+            <AdminNavLink
+              href="/admin/inquiries"
+              icon={<MessageSquare size={16} />}
+              label="Inquiries"
               onClick={() => setSidebarOpen(false)}
             />
             <AdminNavLink
