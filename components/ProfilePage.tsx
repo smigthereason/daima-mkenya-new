@@ -319,7 +319,7 @@ const ProfilePage = () => {
             </div>
           </div>
           <h1 className="text-3xl md:text-6xl font-light tracking-tighter uppercase leading-[0.9] mb-2 text-center break-words max-w-full">
-            {session?.user?.name} <span className="font-black">MKENYA</span>
+            {session?.user?.name}
           </h1>
           <p className="text-[9px] md:text-[10px] uppercase tracking-[0.5em] text-[#be1e2d] font-black">
             {session?.user?.role === "admin" ? "ADMINISTRATOR" : "MEMBER"}
