@@ -8,6 +8,8 @@ import { NextAuthProvider } from "./(root)/providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { Analytics } from "@vercel/analytics/next";
 
+// test for new deployment comment
+
 const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "700", "900"],
