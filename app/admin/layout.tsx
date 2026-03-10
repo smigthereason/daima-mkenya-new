@@ -18,6 +18,7 @@ import {
   Menu,
   X,
   MessageSquare,
+  MegaphoneIcon,
 } from "lucide-react";
 import ProfileMenu from "../admin/components/profile/ProfileMenu";
 import AdminGuard from "../admin/components/auth/AdminGuard";
@@ -123,6 +124,12 @@ export default function AdminLayout({
               href="/admin/transactions"
               icon={<CreditCard size={16} />}
               label="Financials"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <AdminNavLink
+              href="/admin/announcement-batches"
+              icon={<MegaphoneIcon size={16} />}
+              label="New Releases"
               onClick={() => setSidebarOpen(false)}
             />
           </nav>

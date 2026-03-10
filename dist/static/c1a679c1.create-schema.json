@@ -1201,5 +1201,81 @@
     "name": "priceInquiry",
     "type": "document",
     "title": "Price Inquiries"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "batchName",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 5
+              },
+              {
+                "flag": "max",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "of": [
+          {
+            "to": [
+              {
+                "type": "product"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to product"
+          }
+        ],
+        "name": "products",
+        "type": "array",
+        "title": "Products to Announce"
+      },
+      {
+        "initialValue": false,
+        "description": "Toggle this to 'True' and Publish to send emails.",
+        "name": "triggerEmail",
+        "type": "boolean",
+        "title": "Trigger Email Blast"
+      },
+      {
+        "initialValue": false,
+        "readOnly": true,
+        "name": "emailSent",
+        "type": "boolean",
+        "title": "Email Notification Sent"
+      },
+      {
+        "readOnly": true,
+        "name": "sentAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "productBatch",
+    "type": "document",
+    "title": "Product Announcement Batches"
   }
 ]

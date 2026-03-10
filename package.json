@@ -16,6 +16,7 @@
     "@gsap/react": "^2.1.2",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^4.22.0",
+    "@sanity/webhook": "^4.0.4",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/analytics": "^1.6.1",
     "bcryptjs": "^3.0.3",
