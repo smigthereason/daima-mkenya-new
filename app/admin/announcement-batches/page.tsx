@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { client } from "@/sanity/lib/client";
-import { upsertBatch, deleteBatch, triggerEmailBlast } from "./actions";
+import {
+  upsertBatch,
+  deleteBatch,
+  triggerEmailBlast,
+  resendEmailBlast,
+} from "./actions";
 import {
   Megaphone,
   Send,
@@ -15,11 +20,14 @@ import {
   BellRing,
   Save,
   Package,
+  Mail,
 } from "lucide-react";
 
 interface Product {
   _id: string;
   name: string;
+  _updatedAt?: string;
+  _createdAt?: string;
 }
 
 interface Batch {
@@ -37,6 +45,7 @@ export default function AnnouncementBatchesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -51,10 +60,18 @@ export default function AnnouncementBatchesPage() {
     try {
       const [b, p] = await Promise.all([
         client.fetch(`*[_type == "productBatch"] | order(_createdAt desc)`),
-        client.fetch(`*[_type == "product" && !disabled] { _id, name }`),
+        client.fetch(
+          `*[_type == "product" && !disabled] | order(_updatedAt desc) { _id, name, _updatedAt, _createdAt }`,
+        ),
       ]);
       setBatches(b);
-      setProducts(p);
+      // Sort products by most recently updated/created
+      const sortedProducts = p.sort((a: Product, b: Product) => {
+        const dateA = new Date(a._updatedAt || a._createdAt || 0).getTime();
+        const dateB = new Date(b._updatedAt || b._createdAt || 0).getTime();
+        return dateB - dateA;
+      });
+      setProducts(sortedProducts);
     } catch (error) {
       console.error("Error loading data:", error);
     }
@@ -63,6 +80,14 @@ export default function AnnouncementBatchesPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  // Auto-hide success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   const resetForm = () => {
     setFormData({
@@ -92,6 +117,7 @@ export default function AnnouncementBatchesPage() {
       setIsModalOpen(false);
       resetForm();
       await loadData();
+      setSuccessMessage("Batch saved successfully!");
     } catch (error) {
       console.error("Submission failed:", error);
     } finally {
@@ -105,8 +131,23 @@ export default function AnnouncementBatchesPage() {
     try {
       await triggerEmailBlast(id);
       await loadData();
+      setSuccessMessage("Email blast triggered successfully!");
     } catch (error) {
       console.error("Blast failed:", error);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  const handleResend = async (id: string) => {
+    if (!confirm("Resend this email blast to all customers?")) return;
+    setUpdatingId(id);
+    try {
+      await resendEmailBlast(id);
+      await loadData();
+      setSuccessMessage("Email blast resent successfully!");
+    } catch (error) {
+      console.error("Resend failed:", error);
     } finally {
       setUpdatingId(null);
     }
@@ -118,6 +159,7 @@ export default function AnnouncementBatchesPage() {
     try {
       await deleteBatch(id);
       await loadData();
+      setSuccessMessage("Batch deleted successfully!");
     } catch (error) {
       console.error("Deletion failed:", error);
     } finally {
@@ -145,7 +187,20 @@ export default function AnnouncementBatchesPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn pt-10 pb-20">
+    <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn pt-10 pb-20 relative">
+      {/* SUCCESS MESSAGE TOAST */}
+      {successMessage && (
+        <div className="fixed top-5 right-5 bg-black text-white px-6 py-4 text-xs font-bold uppercase tracking-widest shadow-2xl z-50 animate-slideIn">
+          {successMessage}
+          <button
+            onClick={() => setSuccessMessage(null)}
+            className="ml-4 text-white/50 hover:text-white"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
+
       {/* HEADER SECTION */}
       <div className="border-b border-neutral-100 pb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -232,22 +287,38 @@ export default function AnnouncementBatchesPage() {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center gap-3 self-center w-full lg:w-auto">
-                {!batch.emailSent && (
+              {/* Action Buttons - All styled as icons like Edit button */}
+              <div className="flex flex-row items-center gap-2 self-center w-full lg:w-auto">
+                {!batch.emailSent ? (
                   <button
                     onClick={() => handleTrigger(batch._id)}
                     disabled={updatingId === batch._id}
-                    className="group relative flex items-center justify-center gap-2 w-full lg:w-48 overflow-hidden border border-black py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-300 disabled:opacity-50"
+                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                    title="Send Blast"
                   >
                     <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                    <span className="relative z-10 flex items-center justify-center gap-2 text-black group-hover:text-white transition-colors duration-500">
+                    <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
                       {updatingId === batch._id ? (
-                        <Loader2 size={14} className="animate-spin" />
+                        <Loader2 size={16} className="animate-spin" />
                       ) : (
-                        <Send size={14} />
+                        <Send size={16} />
                       )}
-                      Send Blast
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleResend(batch._id)}
+                    disabled={updatingId === batch._id}
+                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                    title="Resend"
+                  >
+                    <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                    <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
+                      {updatingId === batch._id ? (
+                        <Loader2 size={16} className="animate-spin" />
+                      ) : (
+                        <Mail size={16} />
+                      )}
                     </span>
                   </button>
                 )}
@@ -265,22 +336,24 @@ export default function AnnouncementBatchesPage() {
                     });
                     setIsModalOpen(true);
                   }}
-                  className="group relative flex items-center justify-center gap-2 w-full lg:w-40 overflow-hidden border border-neutral-200 py-4 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-300"
+                  className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300"
+                  title="Edit"
                 >
                   <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                  <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
-                    Edit
+                  <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500 text-xs">
+                    ✎
                   </span>
                 </button>
 
                 <button
                   onClick={() => handleDelete(batch._id)}
                   disabled={updatingId === batch._id}
-                  className="group relative flex items-center justify-center gap-2 w-full lg:w-16 overflow-hidden border border-red-100 py-4 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                  className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-red-100 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                  title="Delete"
                 >
                   <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
                   <span className="relative z-10 text-red-500 group-hover:text-white transition-colors duration-500">
-                    <Trash2 size={14} />
+                    <Trash2 size={16} />
                   </span>
                 </button>
               </div>
@@ -291,7 +364,7 @@ export default function AnnouncementBatchesPage() {
 
       {/* MODAL SECTION */}
       {isModalOpen && (
-        <div className="fixed inset-0  backdrop-blur-xs flex items-center justify-center p-4 z-[100]">
+        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center p-4 z-[100]">
           <div className="bg-white w-full max-w-2xl p-8 md:p-12 shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={() => setIsModalOpen(false)}
@@ -379,7 +452,7 @@ export default function AnnouncementBatchesPage() {
               <div className="space-y-2">
                 <div className="flex justify-between items-end">
                   <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
-                    Selection (Select 5)
+                    Selection (Select 5) - Latest Products First
                   </label>
                   <span
                     className={`text-[10px] font-bold uppercase ${
@@ -413,9 +486,15 @@ export default function AnnouncementBatchesPage() {
                             handleCheckboxChange(p._id, e.target.checked)
                           }
                         />
-                        <span className="text-xs font-bold uppercase">
+                        <span className="text-xs font-bold uppercase flex-1">
                           {p.name}
                         </span>
+                        {p._updatedAt && (
+                          <span className="text-[8px] text-neutral-400 uppercase">
+                            Updated:{" "}
+                            {new Date(p._updatedAt).toLocaleDateString()}
+                          </span>
+                        )}
                       </label>
                     );
                   })}
@@ -432,7 +511,9 @@ export default function AnnouncementBatchesPage() {
                 ) : (
                   <div className="flex items-center gap-2">
                     <Save size={14} />
-                    <span>Create Batch</span>
+                    <span>
+                      {formData._id ? "Update Batch" : "Create Batch"}
+                    </span>
                   </div>
                 )}
               </button>

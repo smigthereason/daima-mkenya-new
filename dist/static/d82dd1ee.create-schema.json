@@ -1229,7 +1229,7 @@
               },
               {
                 "flag": "min",
-                "constraint": 5
+                "constraint": 3
               },
               {
                 "flag": "max",
@@ -1239,6 +1239,7 @@
             "level": "error"
           }
         ],
+        "description": "Select between 3 to 5 new products to announce.",
         "of": [
           {
             "to": [
@@ -1256,7 +1257,7 @@
       },
       {
         "initialValue": false,
-        "description": "Toggle this to 'True' and Publish to send emails.",
+        "description": "Toggle to 'True' and Publish to send to customers with previous purchases.",
         "name": "triggerEmail",
         "type": "boolean",
         "title": "Trigger Email Blast"
@@ -1272,6 +1273,12 @@
         "readOnly": true,
         "name": "sentAt",
         "type": "datetime"
+      },
+      {
+        "readOnly": true,
+        "name": "recipientCount",
+        "type": "number",
+        "title": "Number of Recipients"
       }
     ],
     "name": "productBatch",
