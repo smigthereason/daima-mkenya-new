@@ -25,12 +25,8 @@ function generateEmailHTML(batchName: string, products: any[]) {
   <meta name="supported-color-schemes" content="light only">
   <title>New Collection: ${batchName}</title>
   <style>
-    /* Force white background everywhere */
-    * {
-      background-color: #ffffff !important;
-    }
-
-    body, table, td, div, p, a, span, h1, h2, h3, .email-wrapper, .email-container {
+    /* Force white background on major containers only */
+    body, table, td, div, p, .email-wrapper, .email-container, .product-info, .color-swatches {
       background-color: #ffffff !important;
     }
 
@@ -64,7 +60,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       font-weight: 700;
       margin: 0 0 6px 0;
       display: block;
-      background-color: transparent !important;
     }
 
     .product-name {
@@ -76,7 +71,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       line-height: 1.3;
       margin: 6px 0 4px 0;
       text-decoration: none;
-      background-color: transparent !important;
     }
 
     .product-price {
@@ -85,7 +79,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       letter-spacing: 0.1em;
       color: #111111 !important;
       margin: 4px 0;
-      background-color: transparent !important;
     }
 
     .section-title {
@@ -97,7 +90,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       margin-bottom: 15px;
       text-align: center;
       display: block;
-      background-color: transparent !important;
     }
 
     .collection-title {
@@ -108,7 +100,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       color: #111111 !important;
       text-align: center;
       margin: 15px 0 8px 0;
-      background-color: transparent !important;
     }
 
     /* Product grid - fixed layout */
@@ -155,7 +146,7 @@ function generateEmailHTML(batchName: string, products: any[]) {
       background-color: #ffffff !important;
     }
 
-    /* Color swatches */
+    /* Color swatches - IMPORTANT: preserve original colors */
     .color-swatches {
       margin-top: 8px;
       text-align: center;
@@ -170,6 +161,7 @@ function generateEmailHTML(batchName: string, products: any[]) {
       margin: 0 3px;
       border: 1px solid rgba(0,0,0,0.1);
       box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+      /* Remove background-color override - let the inline style handle it */
     }
 
     /* Buttons */
@@ -203,7 +195,6 @@ function generateEmailHTML(batchName: string, products: any[]) {
       text-transform: uppercase;
       text-align: center;
       margin: 20px 0 8px 0;
-      background-color: transparent !important;
     }
 
     /* Responsive */
@@ -240,13 +231,13 @@ function generateEmailHTML(batchName: string, products: any[]) {
 
       <!-- Header Section -->
       <div style="text-align: center; padding: 30px 0 15px 0; border-bottom: 2px solid #e0e0e0; background-color: #ffffff;">
-        <span class="section-title" style="font-size: 11px; letter-spacing: 0.5em; color: #999999; font-weight: 700; display: block; margin-bottom: 12px; background-color: transparent;">
+        <span class="section-title" style="font-size: 11px; letter-spacing: 0.5em; color: #999999; font-weight: 700; display: block; margin-bottom: 12px;">
           THE SELECTION
         </span>
-        <h1 class="collection-title" style="font-size: 22px; font-weight: 900; letter-spacing: 0.2em; color: #111111; text-transform: uppercase; margin: 0 0 8px 0; background-color: transparent;">
+        <h1 class="collection-title" style="font-size: 22px; font-weight: 900; letter-spacing: 0.2em; color: #111111; text-transform: uppercase; margin: 0 0 8px 0;">
           ${batchName}
         </h1>
-        <p style="font-size: 11px; color: #666666; letter-spacing: 0.1em; margin: 8px 0; background-color: transparent;">
+        <p style="font-size: 11px; color: #666666; letter-spacing: 0.1em; margin: 8px 0;">
           A first look at our newest additions
         </p>
       </div>
@@ -273,15 +264,15 @@ function generateEmailHTML(batchName: string, products: any[]) {
 
                     <!-- Product Info -->
                     <div class="product-info" style="text-align: center; padding: 0 5px; background-color: #ffffff;">
-                      <span class="product-category" style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px; background-color: transparent;">
+                      <span class="product-category" style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px;">
                         ${products[i].category || "NEW ARRIVAL"}
                       </span>
                       <a href="https://daimamkenyaafrica.com/products/${products[i].slug}" style="text-decoration: none;">
-                        <h3 class="product-name" style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0; background-color: transparent;">
+                        <h3 class="product-name" style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0;">
                           ${products[i].name}
                         </h3>
                       </a>
-                      <p class="product-price" style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0; background-color: transparent;">
+                      <p class="product-price" style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
                         KSH ${products[i].price}
                       </p>
                     </div>
@@ -294,10 +285,10 @@ function generateEmailHTML(batchName: string, products: any[]) {
                               .slice(0, 4)
                               .map(
                                 (color: any) =>
-                                  `<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"}; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
+                                  `<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"} !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
                               )
                               .join("")
-                          : '<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000; border: 1px solid rgba(0,0,0,0.1);"></span>'
+                          : '<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000 !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>'
                       }
                     </div>
                   </div>
@@ -320,15 +311,15 @@ function generateEmailHTML(batchName: string, products: any[]) {
 
                     <!-- Product Info -->
                     <div class="product-info" style="text-align: center; padding: 0 5px; background-color: #ffffff;">
-                      <span class="product-category" style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px; background-color: transparent;">
+                      <span class="product-category" style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px;">
                         ${products[i + 1].category || "NEW ARRIVAL"}
                       </span>
                       <a href="https://daimamkenyaafrica.com/products/${products[i + 1].slug}" style="text-decoration: none;">
-                        <h3 class="product-name" style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0; background-color: transparent;">
+                        <h3 class="product-name" style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0;">
                           ${products[i + 1].name}
                         </h3>
                       </a>
-                      <p class="product-price" style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0; background-color: transparent;">
+                      <p class="product-price" style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
                         KSH ${products[i + 1].price}
                       </p>
                     </div>
@@ -342,10 +333,10 @@ function generateEmailHTML(batchName: string, products: any[]) {
                               .slice(0, 4)
                               .map(
                                 (color: any) =>
-                                  `<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"}; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
+                                  `<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"} !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
                               )
                               .join("")
-                          : '<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000; border: 1px solid rgba(0,0,0,0.1);"></span>'
+                          : '<span class="color-swatch" style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000 !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>'
                       }
                     </div>
                   </div>
@@ -373,10 +364,10 @@ function generateEmailHTML(batchName: string, products: any[]) {
 
       <!-- Footer -->
       <div style="text-align: center; padding: 20px 0 15px 0; border-top: 1px solid #e0e0e0; background-color: #ffffff;">
-        <p class="footer-text" style="font-size: 10px; color: #999999; letter-spacing: 0.2em; text-transform: uppercase; margin: 5px 0; background-color: transparent;">
+        <p class="footer-text" style="font-size: 10px; color: #999999; letter-spacing: 0.2em; text-transform: uppercase; margin: 5px 0;">
           Daima Mkenya · Nairobi, Kenya
         </p>
-        <p style="font-size: 9px; color: #cccccc; margin: 8px 0; background-color: transparent;">
+        <p style="font-size: 9px; color: #cccccc; margin: 8px 0;">
           © ${new Date().getFullYear()} Daima Mkenya. All rights reserved.
         </p>
       </div>

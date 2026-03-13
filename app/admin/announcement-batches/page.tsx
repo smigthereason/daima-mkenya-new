@@ -40,6 +40,7 @@ interface Batch {
   sentAt?: string;
   scheduledFor?: string;
   recipientCount?: number;
+  emailError?: string;
 }
 
 export default function AnnouncementBatchesPage() {
@@ -64,12 +65,36 @@ export default function AnnouncementBatchesPage() {
   const loadData = async () => {
     try {
       const [b, p] = await Promise.all([
-        client.fetch(`*[_type == "productBatch"] | order(_createdAt desc)`),
+        // Explicitly fetch all fields including triggerEmail
+        client.fetch(`
+          *[_type == "productBatch"] | order(_createdAt desc) {
+            _id,
+            batchName,
+            products[] { _ref },
+            triggerEmail,
+            emailSent,
+            sentAt,
+            scheduledFor,
+            recipientCount,
+            emailError
+          }
+        `),
         client.fetch(
           `*[_type == "product" && !disabled] | order(_updatedAt desc) { _id, name, _updatedAt, _createdAt }`,
         ),
       ]);
+
+      console.log(
+        "Fetched batches with triggerEmail:",
+        b.map((batch: Batch) => ({
+          id: batch._id,
+          name: batch.batchName,
+          triggerEmail: batch.triggerEmail,
+        })),
+      );
+
       setBatches(b);
+
       const sortedProducts = p.sort((a: Product, b: Product) => {
         const dateA = new Date(a._updatedAt || a._createdAt || 0).getTime();
         const dateB = new Date(b._updatedAt || b._createdAt || 0).getTime();
@@ -105,6 +130,24 @@ export default function AnnouncementBatchesPage() {
     });
   };
 
+  // Function to auto-select 5 newest products
+  const selectNewestProducts = () => {
+    if (products.length >= 5) {
+      const newestProductIds = products.slice(0, 5).map((p) => p._id);
+      setFormData((prev) => ({
+        ...prev,
+        selectedProducts: newestProductIds,
+      }));
+    }
+  };
+
+  // When modal opens for new batch (no _id), auto-select newest products
+  useEffect(() => {
+    if (isModalOpen && !formData._id && products.length > 0) {
+      selectNewestProducts();
+    }
+  }, [isModalOpen, products, formData._id]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (formData.selectedProducts.length !== 5) {
@@ -122,7 +165,7 @@ export default function AnnouncementBatchesPage() {
       });
       setIsModalOpen(false);
       resetForm();
-      await loadData();
+      await loadData(); // Reload to get updated triggerEmail status
       setSuccessMessage("Batch saved successfully!");
     } catch (error) {
       console.error("Submission failed:", error);
@@ -271,6 +314,10 @@ export default function AnnouncementBatchesPage() {
                       </h2>
                       <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest">
                         ID: {batch._id.slice(-8)}
+                      </p>
+                      {/* Debug: Show triggerEmail status */}
+                      <p className="text-[8px] text-blue-400">
+                        Trigger: {batch.triggerEmail ? "ON" : "OFF"}
                       </p>
                     </div>
                   </div>
@@ -584,6 +631,11 @@ export default function AnnouncementBatchesPage() {
                     );
                   })}
                 </div>
+                {!formData._id && products.length >= 5 && (
+                  <p className="text-[8px] text-green-600 uppercase tracking-widest text-right">
+                    ✦ Auto-selected 5 newest products
+                  </p>
+                )}
               </div>
 
               <button

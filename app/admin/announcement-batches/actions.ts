@@ -30,7 +30,7 @@ export async function upsertBatch(formData: {
       _ref: id,
       _key: Math.random().toString(36).substring(7),
     })),
-    triggerEmail: formData.triggerEmail,
+    triggerEmail: formData.triggerEmail, // This will now be saved
     scheduledFor: formData.scheduledFor || null,
   };
 
