@@ -273,7 +273,7 @@ function generateEmailHTML(batchName: string, products: any[]) {
                         </h3>
                       </a>
                       <p class="product-price" style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
-                        KSH ${products[i].price}
+                       ${products[i].price}
                       </p>
                     </div>
 
