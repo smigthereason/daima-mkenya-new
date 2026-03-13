@@ -1,0 +1,1352 @@
+[
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "options": {
+          "source": "name"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g., Ksh 8,500",
+        "name": "price",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            "Accessories",
+            "Streetwear",
+            "Sets",
+            "Shirts",
+            "Tops",
+            "Skirts",
+            "Dresses",
+            "Jackets",
+            "Trousers",
+            "Knitwear"
+          ]
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "Accessories",
+                  "Streetwear",
+                  "Sets",
+                  "Shirts",
+                  "Tops",
+                  "Skirts",
+                  "Dresses",
+                  "Jackets",
+                  "Trousers",
+                  "Knitwear"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "category",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "description",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "name": "material",
+            "type": "string"
+          },
+          {
+            "name": "care",
+            "type": "string"
+          },
+          {
+            "name": "origin",
+            "type": "string"
+          }
+        ],
+        "name": "details",
+        "type": "object"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "label",
+                "type": "string"
+              },
+              {
+                "name": "hex",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "colors",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "sizes",
+        "type": "array"
+      },
+      {
+        "fields": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "name": "hero",
+            "type": "image",
+            "title": "Hero Image"
+          },
+          {
+            "of": [
+              {
+                "options": {
+                  "hotspot": true
+                },
+                "type": "image"
+              }
+            ],
+            "name": "thumbnails",
+            "type": "array"
+          }
+        ],
+        "name": "images",
+        "type": "object"
+      },
+      {
+        "initialValue": false,
+        "name": "isNew",
+        "type": "boolean",
+        "title": "Is New Arrival"
+      },
+      {
+        "initialValue": 0,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "min",
+                "constraint": 0
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Current inventory count. Shows \"Low Stock\" when 5 or less, \"Out of Stock\" when 0.",
+        "name": "stock",
+        "type": "number",
+        "title": "Stock Quantity"
+      },
+      {
+        "initialValue": false,
+        "description": "When enabled, this product will not appear in the store (useful for editing or temporary removal)",
+        "name": "disabled",
+        "type": "boolean",
+        "title": "Disable Product"
+      }
+    ],
+    "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "name",
+        "type": "string"
+      },
+      {
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "uri",
+                "constraint": {
+                  "options": {
+                    "scheme": [
+                      "/^http$/",
+                      "/^https$/"
+                    ],
+                    "allowRelative": false,
+                    "relativeOnly": false,
+                    "allowCredentials": false
+                  }
+                }
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "image",
+        "type": "url"
+      },
+      {
+        "hidden": true,
+        "name": "password",
+        "type": "string"
+      },
+      {
+        "name": "emailVerified",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Customer",
+              "value": "customer"
+            },
+            {
+              "title": "Admin",
+              "value": "admin"
+            },
+            {
+              "title": "Manager",
+              "value": "manager"
+            }
+          ],
+          "layout": "dropdown"
+        },
+        "initialValue": "customer",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "valid",
+                "constraint": [
+                  "customer",
+                  "admin",
+                  "manager"
+                ]
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Determines user permissions and access level",
+        "name": "role",
+        "type": "string",
+        "title": "User Role"
+      },
+      {
+        "initialValue": false,
+        "description": "Grant full administrative access",
+        "name": "isAdmin",
+        "type": "boolean"
+      },
+      {
+        "hidden": true,
+        "name": "resetToken",
+        "type": "string"
+      },
+      {
+        "hidden": true,
+        "name": "resetTokenExpiry",
+        "type": "datetime"
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "user",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "provider",
+        "type": "string"
+      },
+      {
+        "name": "providerAccountId",
+        "type": "string"
+      },
+      {
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "name": "access_token",
+        "type": "string"
+      },
+      {
+        "name": "token_type",
+        "type": "string"
+      },
+      {
+        "name": "expires_at",
+        "type": "number"
+      },
+      {
+        "name": "refresh_token",
+        "type": "string"
+      },
+      {
+        "name": "scope",
+        "type": "string"
+      },
+      {
+        "name": "id_token",
+        "type": "string"
+      },
+      {
+        "name": "session_state",
+        "type": "string"
+      },
+      {
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      }
+    ],
+    "name": "account",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "sessionToken",
+        "type": "string"
+      },
+      {
+        "name": "userId",
+        "type": "string"
+      },
+      {
+        "name": "expires",
+        "type": "datetime"
+      },
+      {
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      }
+    ],
+    "name": "session",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "name": "identifier",
+        "type": "string"
+      },
+      {
+        "name": "token",
+        "type": "string"
+      },
+      {
+        "name": "expires",
+        "type": "datetime"
+      }
+    ],
+    "name": "verificationToken",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "readOnly": true,
+        "name": "orderNumber",
+        "type": "string"
+      },
+      {
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      },
+      {
+        "name": "userEmail",
+        "type": "string"
+      },
+      {
+        "name": "pesapalOrderTrackingId",
+        "type": "string",
+        "title": "PesaPal Tracking ID"
+      },
+      {
+        "name": "transactionId",
+        "type": "string",
+        "title": "Transaction ID"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Completed",
+              "value": "completed"
+            },
+            {
+              "title": "Pending",
+              "value": "pending"
+            },
+            {
+              "title": "Failed",
+              "value": "failed"
+            }
+          ]
+        },
+        "initialValue": "pending",
+        "name": "status",
+        "type": "string",
+        "title": "Order Status"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Paid",
+              "value": "paid"
+            },
+            {
+              "title": "Pending",
+              "value": "pending"
+            },
+            {
+              "title": "Refunded",
+              "value": "refunded"
+            }
+          ]
+        },
+        "initialValue": "paid",
+        "name": "paymentStatus",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "PesaPal",
+              "value": "pesapal"
+            },
+            {
+              "title": "M-Pesa",
+              "value": "mpesa"
+            }
+          ]
+        },
+        "name": "paymentMethod",
+        "type": "string"
+      },
+      {
+        "name": "paymentDate",
+        "type": "datetime"
+      },
+      {
+        "fields": [
+          {
+            "name": "amount",
+            "type": "number"
+          },
+          {
+            "name": "confirmation_code",
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "type": "string"
+          },
+          {
+            "name": "payment_account",
+            "type": "string"
+          },
+          {
+            "name": "payment_method",
+            "type": "string"
+          },
+          {
+            "name": "payment_status_description",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "string"
+          },
+          {
+            "name": "status_code",
+            "type": "number"
+          }
+        ],
+        "name": "paymentDetails",
+        "type": "object"
+      },
+      {
+        "fields": [
+          {
+            "name": "name",
+            "type": "string",
+            "title": "Full Name"
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "title": "Phone Number"
+          },
+          {
+            "name": "email",
+            "type": "string"
+          }
+        ],
+        "name": "customer",
+        "type": "object",
+        "title": "Customer Info"
+      },
+      {
+        "fields": [
+          {
+            "options": {
+              "list": [
+                {
+                  "title": "Home Delivery",
+                  "value": "shipping"
+                },
+                {
+                  "title": "Pickup Station",
+                  "value": "pickup"
+                }
+              ]
+            },
+            "name": "method",
+            "type": "string"
+          },
+          {
+            "name": "city",
+            "type": "string",
+            "title": "City/County"
+          },
+          {
+            "name": "pickupStationName",
+            "type": "string"
+          },
+          {
+            "name": "pickupStationId",
+            "type": "string",
+            "title": "Pickup Station ID"
+          },
+          {
+            "name": "shippingAddress",
+            "type": "string",
+            "title": "Address/Building/Floor"
+          }
+        ],
+        "name": "deliveryDetails",
+        "type": "object"
+      },
+      {
+        "name": "amount",
+        "type": "number",
+        "title": "Total Amount"
+      },
+      {
+        "name": "shippingFee",
+        "type": "number"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "product",
+                "type": "reference"
+              },
+              {
+                "name": "productName",
+                "type": "string"
+              },
+              {
+                "name": "quantity",
+                "type": "number"
+              },
+              {
+                "name": "price",
+                "type": "number"
+              },
+              {
+                "name": "size",
+                "type": "string"
+              },
+              {
+                "name": "color",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Order Items"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "productId",
+                "type": "string"
+              },
+              {
+                "name": "productName",
+                "type": "string"
+              },
+              {
+                "name": "previousStock",
+                "type": "number"
+              },
+              {
+                "name": "newStock",
+                "type": "number"
+              },
+              {
+                "name": "success",
+                "type": "boolean"
+              },
+              {
+                "name": "error",
+                "type": "string"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "stockUpdates",
+        "type": "array",
+        "title": "Stock Update Log"
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "order",
+    "type": "document",
+    "title": "Orders"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "The user who owns this cart",
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Email of the user who owns this cart",
+        "name": "userEmail",
+        "type": "string"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "description": "Unique identifier for this cart item",
+                "name": "cartId",
+                "type": "string",
+                "title": "Cart Item ID"
+              },
+              {
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "presence",
+                        "constraint": "required"
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "to": [
+                  {
+                    "type": "product"
+                  }
+                ],
+                "name": "product",
+                "type": "reference"
+              },
+              {
+                "description": "Denormalized product name",
+                "name": "productName",
+                "type": "string"
+              },
+              {
+                "description": "Denormalized product price",
+                "name": "productPrice",
+                "type": "string"
+              },
+              {
+                "initialValue": 1,
+                "validation": [
+                  {
+                    "rules": [
+                      {
+                        "flag": "min",
+                        "constraint": 1
+                      }
+                    ],
+                    "level": "error"
+                  }
+                ],
+                "name": "quantity",
+                "type": "number"
+              },
+              {
+                "name": "selectedSize",
+                "type": "string"
+              },
+              {
+                "fields": [
+                  {
+                    "name": "label",
+                    "type": "string"
+                  },
+                  {
+                    "name": "hex",
+                    "type": "string"
+                  }
+                ],
+                "name": "selectedColor",
+                "type": "object"
+              },
+              {
+                "fields": [
+                  {
+                    "options": {
+                      "hotspot": true
+                    },
+                    "name": "hero",
+                    "type": "image",
+                    "title": "Hero Image"
+                  }
+                ],
+                "name": "productImage",
+                "type": "object"
+              },
+              {
+                "name": "addedAt",
+                "type": "datetime"
+              }
+            ],
+            "type": "object",
+            "name": "cartItem"
+          }
+        ],
+        "name": "items",
+        "type": "array",
+        "title": "Cart Items"
+      },
+      {
+        "name": "lastUpdated",
+        "type": "datetime"
+      }
+    ],
+    "name": "cart",
+    "type": "document",
+    "title": "Shopping Cart"
+  },
+  {
+    "fields": [
+      {
+        "name": "name",
+        "type": "string",
+        "title": "Piece Name"
+      },
+      {
+        "options": {
+          "source": "name"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "initialValue": "1 of 1",
+        "description": "e.g., 1 of 1, Limited Run of 3",
+        "name": "editionInfo",
+        "type": "string",
+        "title": "Edition Details"
+      },
+      {
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "description",
+        "type": "array",
+        "title": "Concept Narrative"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Main Image"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Available for Inquiry",
+              "value": "available"
+            },
+            {
+              "title": "Private Collection (Sold)",
+              "value": "sold"
+            }
+          ]
+        },
+        "initialValue": "available",
+        "name": "status",
+        "type": "string",
+        "title": "Current Status"
+      }
+    ],
+    "name": "oneOff",
+    "type": "document",
+    "title": "One-Off Archive"
+  },
+  {
+    "fields": [
+      {
+        "description": "Auto-generated unique inquiry identifier",
+        "readOnly": true,
+        "name": "inquiryNumber",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "to": [
+          {
+            "type": "oneOff"
+          }
+        ],
+        "name": "piece",
+        "type": "reference",
+        "title": "One-Off Piece"
+      },
+      {
+        "description": "Denormalized piece name for easy reference",
+        "name": "pieceName",
+        "type": "string"
+      },
+      {
+        "fields": [
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "name",
+            "type": "string",
+            "title": "Full Name"
+          },
+          {
+            "validation": [
+              {
+                "rules": [
+                  {
+                    "flag": "presence",
+                    "constraint": "required"
+                  }
+                ],
+                "level": "error"
+              }
+            ],
+            "name": "email",
+            "type": "string",
+            "title": "Email Address"
+          },
+          {
+            "name": "phone",
+            "type": "string",
+            "title": "Phone Number"
+          },
+          {
+            "rows": 3,
+            "name": "message",
+            "type": "text",
+            "title": "Additional Message"
+          }
+        ],
+        "name": "customer",
+        "type": "object",
+        "title": "Customer Information"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "New",
+              "value": "new"
+            },
+            {
+              "title": "In Review",
+              "value": "reviewing"
+            },
+            {
+              "title": "Quote Sent",
+              "value": "quoted"
+            },
+            {
+              "title": "Follow-up",
+              "value": "followup"
+            },
+            {
+              "title": "Converted to Sale",
+              "value": "converted"
+            },
+            {
+              "title": "Closed/No Interest",
+              "value": "closed"
+            }
+          ]
+        },
+        "initialValue": "new",
+        "name": "status",
+        "type": "string",
+        "title": "Inquiry Status"
+      },
+      {
+        "description": "Link to registered user if they have an account",
+        "to": [
+          {
+            "type": "user"
+          }
+        ],
+        "name": "user",
+        "type": "reference",
+        "title": "Registered User (if applicable)"
+      },
+      {
+        "description": "Email for quick lookup",
+        "name": "userEmail",
+        "type": "string"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "One-Off Archive Page",
+              "value": "oneoff_archive"
+            },
+            {
+              "title": "Direct Link",
+              "value": "direct"
+            },
+            {
+              "title": "Email",
+              "value": "email"
+            },
+            {
+              "title": "Phone",
+              "value": "phone"
+            },
+            {
+              "title": "Social Media",
+              "value": "social"
+            }
+          ]
+        },
+        "initialValue": "oneoff_archive",
+        "name": "inquirySource",
+        "type": "string"
+      },
+      {
+        "description": "Price quoted to customer (e.g., Ksh 450,000)",
+        "name": "quotedPrice",
+        "type": "string"
+      },
+      {
+        "description": "Private notes for staff",
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "note",
+                "type": "text"
+              },
+              {
+                "name": "addedBy",
+                "type": "string"
+              },
+              {
+                "name": "addedAt",
+                "type": "datetime"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "internalNotes",
+        "type": "array"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "options": {
+                  "list": [
+                    {
+                      "title": "Email Sent",
+                      "value": "email_sent"
+                    },
+                    {
+                      "title": "Email Received",
+                      "value": "email_received"
+                    },
+                    {
+                      "title": "Phone Call",
+                      "value": "phone_call"
+                    },
+                    {
+                      "title": "WhatsApp",
+                      "value": "whatsapp"
+                    },
+                    {
+                      "title": "Meeting",
+                      "value": "meeting"
+                    }
+                  ]
+                },
+                "name": "type",
+                "type": "string"
+              },
+              {
+                "name": "date",
+                "type": "datetime"
+              },
+              {
+                "name": "summary",
+                "type": "text"
+              },
+              {
+                "name": "followupDate",
+                "type": "datetime",
+                "title": "Follow-up Date"
+              }
+            ],
+            "type": "object"
+          }
+        ],
+        "name": "communicationLog",
+        "type": "array"
+      },
+      {
+        "name": "createdAt",
+        "type": "datetime",
+        "title": "Inquiry Date"
+      },
+      {
+        "name": "lastUpdated",
+        "type": "datetime"
+      }
+    ],
+    "name": "priceInquiry",
+    "type": "document",
+    "title": "Price Inquiries"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "batchName",
+        "type": "string"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 3
+              },
+              {
+                "flag": "max",
+                "constraint": 5
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Select between 3 to 5 new products to announce.",
+        "of": [
+          {
+            "to": [
+              {
+                "type": "product"
+              }
+            ],
+            "type": "reference",
+            "title": "Reference to product"
+          }
+        ],
+        "name": "products",
+        "type": "array",
+        "title": "Products to Announce"
+      },
+      {
+        "description": "Optional: Set a future date/time for the email blast",
+        "name": "scheduledFor",
+        "type": "datetime",
+        "title": "Schedule For"
+      },
+      {
+        "initialValue": false,
+        "description": "Toggle to 'True' and Publish to send to customers with previous purchases.",
+        "name": "triggerEmail",
+        "type": "boolean",
+        "title": "Trigger Email Blast"
+      },
+      {
+        "initialValue": false,
+        "readOnly": true,
+        "name": "emailSent",
+        "type": "boolean",
+        "title": "Email Notification Sent"
+      },
+      {
+        "readOnly": true,
+        "name": "sentAt",
+        "type": "datetime"
+      },
+      {
+        "readOnly": true,
+        "name": "recipientCount",
+        "type": "number",
+        "title": "Number of Recipients"
+      },
+      {
+        "rows": 2,
+        "readOnly": true,
+        "name": "emailError",
+        "type": "text"
+      }
+    ],
+    "name": "productBatch",
+    "type": "document",
+    "title": "Product Announcement Batches"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "readOnly": true,
+        "name": "subscribedAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Website Footer",
+              "value": "website_footer"
+            },
+            {
+              "title": "Popup",
+              "value": "popup"
+            },
+            {
+              "title": "Landing Page",
+              "value": "landing_page"
+            }
+          ]
+        },
+        "name": "source",
+        "type": "string"
+      },
+      {
+        "readOnly": true,
+        "name": "unsubscribedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "newsletter",
+    "type": "document",
+    "title": "Newsletter Subscribers"
+  }
+]

@@ -1296,5 +1296,80 @@
     "name": "productBatch",
     "type": "document",
     "title": "Product Announcement Batches"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "readOnly": true,
+        "name": "subscribedAt",
+        "type": "datetime"
+      },
+      {
+        "readOnly": true,
+        "name": "unsubscribedAt",
+        "type": "datetime"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Active",
+              "value": "active"
+            },
+            {
+              "title": "Unsubscribed",
+              "value": "unsubscribed"
+            }
+          ]
+        },
+        "initialValue": "active",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "initialValue": true,
+        "readOnly": true,
+        "name": "isActive",
+        "type": "boolean"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Website Footer",
+              "value": "website_footer"
+            },
+            {
+              "title": "Popup",
+              "value": "popup"
+            },
+            {
+              "title": "Landing Page",
+              "value": "landing_page"
+            }
+          ]
+        },
+        "name": "source",
+        "type": "string"
+      }
+    ],
+    "name": "newsletter",
+    "type": "document",
+    "title": "Newsletter Subscribers"
   }
 ]

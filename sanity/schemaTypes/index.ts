@@ -5,7 +5,8 @@ import order from "./order";
 import { cart } from "./cart";
 import oneOff from "./oneOff";
 import priceInquiry from "./priceInquiry";
-import productBatch from "./productBatch"; // Added import
+import productBatch from "./productBatch";
+import newsletter from "./newsletter";
 
 const product: SchemaTypeDefinition = {
   name: "product",
@@ -168,6 +169,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     cart,
     oneOff,
     priceInquiry,
-    productBatch, // Added to the exported schema types
+    productBatch,
+    newsletter,
   ],
 };
