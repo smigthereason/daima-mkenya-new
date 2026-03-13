@@ -20,7 +20,8 @@ import {
   BellRing,
   Save,
   Package,
-  Mail,
+  RefreshCw,
+  Calendar,
 } from "lucide-react";
 
 interface Product {
@@ -37,6 +38,8 @@ interface Batch {
   triggerEmail: boolean;
   emailSent: boolean;
   sentAt?: string;
+  scheduledFor?: string;
+  recipientCount?: number;
 }
 
 export default function AnnouncementBatchesPage() {
@@ -54,6 +57,8 @@ export default function AnnouncementBatchesPage() {
     triggerEmail: false,
     emailSent: false,
     sentAt: "",
+    scheduledFor: "",
+    recipientCount: 0,
   });
 
   const loadData = async () => {
@@ -65,7 +70,6 @@ export default function AnnouncementBatchesPage() {
         ),
       ]);
       setBatches(b);
-      // Sort products by most recently updated/created
       const sortedProducts = p.sort((a: Product, b: Product) => {
         const dateA = new Date(a._updatedAt || a._createdAt || 0).getTime();
         const dateB = new Date(b._updatedAt || b._createdAt || 0).getTime();
@@ -81,7 +85,6 @@ export default function AnnouncementBatchesPage() {
     loadData();
   }, []);
 
-  // Auto-hide success message after 3 seconds
   useEffect(() => {
     if (successMessage) {
       const timer = setTimeout(() => setSuccessMessage(null), 3000);
@@ -97,6 +100,8 @@ export default function AnnouncementBatchesPage() {
       triggerEmail: false,
       emailSent: false,
       sentAt: "",
+      scheduledFor: "",
+      recipientCount: 0,
     });
   };
 
@@ -113,6 +118,7 @@ export default function AnnouncementBatchesPage() {
         batchName: formData.batchName,
         products: formData.selectedProducts,
         triggerEmail: formData.triggerEmail,
+        scheduledFor: formData.scheduledFor || undefined,
       });
       setIsModalOpen(false);
       resetForm();
@@ -186,6 +192,16 @@ export default function AnnouncementBatchesPage() {
     });
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn pt-10 pb-20 relative">
       {/* SUCCESS MESSAGE TOAST */}
@@ -230,136 +246,171 @@ export default function AnnouncementBatchesPage() {
 
       {/* BATCH LIST */}
       <div className="grid grid-cols-1 gap-6">
-        {batches.map((batch) => (
-          <div
-            key={batch._id}
-            className="border border-neutral-100 bg-white p-6 md:p-8 hover:border-neutral-300 transition-all shadow-sm group/card"
-          >
-            <div className="flex flex-col lg:flex-row justify-between gap-8">
-              <div className="space-y-4 flex-1">
-                <div className="flex items-center gap-3">
-                  <div className="bg-neutral-100 p-2 group-hover/card:bg-black group-hover/card:text-white transition-colors">
-                    <Megaphone size={20} />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold uppercase tracking-tight">
-                      {batch.batchName}
-                    </h2>
-                    <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest">
-                      ID: {batch._id.slice(-8)}
-                    </p>
-                  </div>
-                </div>
+        {batches.map((batch) => {
+          const isScheduled =
+            batch.scheduledFor && new Date(batch.scheduledFor) > new Date();
+          const scheduledDate = batch.scheduledFor
+            ? formatDate(batch.scheduledFor)
+            : null;
+          const sentDate = batch.sentAt ? formatDate(batch.sentAt) : null;
 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-2">
-                  <div>
-                    <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
-                      Status
-                    </p>
-                    {batch.emailSent ? (
-                      <span className="text-[10px] font-black uppercase text-green-600 flex items-center gap-1">
-                        <CheckCircle size={12} /> Dispatched
-                      </span>
-                    ) : (
-                      <span className="text-[10px] font-black uppercase text-amber-500 flex items-center gap-1">
-                        <Clock size={12} /> Pending
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
-                      Items
-                    </p>
-                    <p className="text-sm font-bold uppercase flex items-center gap-1">
-                      <Package size={12} /> {batch.products?.length || 0}
-                    </p>
-                  </div>
-                  {batch.sentAt && (
-                    <div className="col-span-2">
-                      <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
-                        Sent Date
-                      </p>
-                      <p className="text-[11px] font-bold uppercase">
-                        {new Date(batch.sentAt).toLocaleString()}
+          return (
+            <div
+              key={batch._id}
+              className="border border-neutral-100 bg-white p-6 md:p-8 hover:border-neutral-300 transition-all shadow-sm group/card"
+            >
+              <div className="flex flex-col lg:flex-row justify-between gap-8">
+                <div className="space-y-4 flex-1">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-neutral-100 p-2 group-hover/card:bg-black group-hover/card:text-white transition-colors">
+                      <Megaphone size={20} />
+                    </div>
+                    <div>
+                      <h2 className="text-lg font-bold uppercase tracking-tight">
+                        {batch.batchName}
+                      </h2>
+                      <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest">
+                        ID: {batch._id.slice(-8)}
                       </p>
                     </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-2">
+                    <div>
+                      <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
+                        Status
+                      </p>
+                      {batch.emailSent ? (
+                        <span className="text-[10px] font-black uppercase text-green-600 flex items-center gap-1">
+                          <CheckCircle size={12} /> Dispatched
+                        </span>
+                      ) : isScheduled ? (
+                        <span className="text-[10px] font-black uppercase text-blue-600 flex items-center gap-1">
+                          <Calendar size={12} /> Scheduled
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-black uppercase text-amber-500 flex items-center gap-1">
+                          <Clock size={12} /> Pending
+                        </span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
+                        Items
+                      </p>
+                      <p className="text-sm font-bold uppercase flex items-center gap-1">
+                        <Package size={12} /> {batch.products?.length || 0}
+                      </p>
+                    </div>
+                    {batch.recipientCount ? (
+                      <div>
+                        <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
+                          Recipients
+                        </p>
+                        <p className="text-sm font-bold uppercase">
+                          {batch.recipientCount}
+                        </p>
+                      </div>
+                    ) : null}
+                    {isScheduled && scheduledDate && (
+                      <div className="col-span-2">
+                        <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
+                          Scheduled For
+                        </p>
+                        <p className="text-[11px] font-bold uppercase">
+                          {scheduledDate}
+                        </p>
+                      </div>
+                    )}
+                    {sentDate && (
+                      <div className="col-span-2">
+                        <p className="text-[10px] text-neutral-400 uppercase font-bold tracking-widest mb-1">
+                          Sent Date
+                        </p>
+                        <p className="text-[11px] font-bold uppercase">
+                          {sentDate}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-row items-center gap-2 self-center w-full lg:w-auto">
+                  {!batch.emailSent ? (
+                    <button
+                      onClick={() => handleTrigger(batch._id)}
+                      disabled={updatingId === batch._id}
+                      className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                      title="Send Blast"
+                    >
+                      <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                      <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
+                        {updatingId === batch._id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <Send size={16} />
+                        )}
+                      </span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleResend(batch._id)}
+                      disabled={updatingId === batch._id}
+                      className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                      title="Resend"
+                    >
+                      <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                      <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
+                        {updatingId === batch._id ? (
+                          <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                          <RefreshCw size={16} />
+                        )}
+                      </span>
+                    </button>
                   )}
+
+                  <button
+                    onClick={() => {
+                      setFormData({
+                        _id: batch._id,
+                        batchName: batch.batchName,
+                        selectedProducts:
+                          batch.products?.map((p: any) => p._ref) || [],
+                        triggerEmail: batch.triggerEmail || false,
+                        emailSent: batch.emailSent,
+                        sentAt: batch.sentAt || "",
+                        scheduledFor: batch.scheduledFor || "",
+                        recipientCount: batch.recipientCount || 0,
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300"
+                    title="Edit"
+                  >
+                    <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                    <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500 text-xs">
+                      ✎
+                    </span>
+                  </button>
+
+                  <button
+                    onClick={() => handleDelete(batch._id)}
+                    disabled={updatingId === batch._id}
+                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-red-100 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
+                    title="Delete"
+                  >
+                    <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
+                    <span className="relative z-10 text-red-500 group-hover:text-white transition-colors duration-500">
+                      <Trash2 size={16} />
+                    </span>
+                  </button>
                 </div>
               </div>
-
-              {/* Action Buttons - All styled as icons like Edit button */}
-              <div className="flex flex-row items-center gap-2 self-center w-full lg:w-auto">
-                {!batch.emailSent ? (
-                  <button
-                    onClick={() => handleTrigger(batch._id)}
-                    disabled={updatingId === batch._id}
-                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
-                    title="Send Blast"
-                  >
-                    <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                    <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
-                      {updatingId === batch._id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Send size={16} />
-                      )}
-                    </span>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleResend(batch._id)}
-                    disabled={updatingId === batch._id}
-                    className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
-                    title="Resend"
-                  >
-                    <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                    <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500">
-                      {updatingId === batch._id ? (
-                        <Loader2 size={16} className="animate-spin" />
-                      ) : (
-                        <Mail size={16} />
-                      )}
-                    </span>
-                  </button>
-                )}
-
-                <button
-                  onClick={() => {
-                    setFormData({
-                      _id: batch._id,
-                      batchName: batch.batchName,
-                      selectedProducts:
-                        batch.products?.map((p: any) => p._ref) || [],
-                      triggerEmail: batch.triggerEmail || false,
-                      emailSent: batch.emailSent,
-                      sentAt: batch.sentAt || "",
-                    });
-                    setIsModalOpen(true);
-                  }}
-                  className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-neutral-200 text-[10px] font-black uppercase transition-all duration-300"
-                  title="Edit"
-                >
-                  <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                  <span className="relative z-10 text-black group-hover:text-white transition-colors duration-500 text-xs">
-                    ✎
-                  </span>
-                </button>
-
-                <button
-                  onClick={() => handleDelete(batch._id)}
-                  disabled={updatingId === batch._id}
-                  className="group relative flex items-center justify-center w-12 h-12 overflow-hidden border border-red-100 text-[10px] font-black uppercase transition-all duration-300 disabled:opacity-50"
-                  title="Delete"
-                >
-                  <div className="absolute inset-0 bg-red-600 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-                  <span className="relative z-10 text-red-500 group-hover:text-white transition-colors duration-500">
-                    <Trash2 size={16} />
-                  </span>
-                </button>
-              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* MODAL SECTION */}
@@ -394,6 +445,29 @@ export default function AnnouncementBatchesPage() {
                   }
                   required
                 />
+              </div>
+
+              {/* Schedule Date */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+                  Schedule For (Optional)
+                </label>
+                <input
+                  type="datetime-local"
+                  className="w-full border-b-2 border-neutral-100 py-3 text-sm font-bold outline-none focus:border-black transition-colors"
+                  value={
+                    formData.scheduledFor
+                      ? formData.scheduledFor.slice(0, 16)
+                      : ""
+                  }
+                  onChange={(e) =>
+                    setFormData({ ...formData, scheduledFor: e.target.value })
+                  }
+                  min={new Date().toISOString().slice(0, 16)}
+                />
+                <p className="text-[8px] text-neutral-400 uppercase tracking-widest">
+                  Leave empty for immediate send when triggered
+                </p>
               </div>
 
               <div className="bg-neutral-50 p-6 space-y-4 border border-neutral-100">
@@ -443,7 +517,18 @@ export default function AnnouncementBatchesPage() {
                       Successfully Dispatched
                     </span>
                     <span className="text-[10px] font-bold text-neutral-500">
-                      {new Date(formData.sentAt).toLocaleString()}
+                      {formatDate(formData.sentAt)}
+                    </span>
+                  </div>
+                )}
+
+                {formData.scheduledFor && !formData.emailSent && (
+                  <div className="pt-4 border-t border-neutral-200 flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase text-blue-600">
+                      Scheduled For
+                    </span>
+                    <span className="text-[10px] font-bold text-neutral-500">
+                      {formatDate(formData.scheduledFor)}
                     </span>
                   </div>
                 )}

@@ -16,6 +16,7 @@ export async function upsertBatch(formData: {
   batchName: string;
   products: string[];
   triggerEmail: boolean;
+  scheduledFor?: string;
 }) {
   // Validation: Between 3-5 products required
   if (formData.products.length < 3 || formData.products.length > 5) {
@@ -30,19 +31,37 @@ export async function upsertBatch(formData: {
       _key: Math.random().toString(36).substring(7),
     })),
     triggerEmail: formData.triggerEmail,
+    scheduledFor: formData.scheduledFor || null,
   };
 
   try {
     let result;
     if (formData._id) {
-      // When updating, preserve emailSent and sentAt if they exist
-      result = await serverClient.patch(formData._id).set(docData).commit();
+      // Get current batch to preserve emailSent status
+      const currentBatch = await serverClient.fetch(
+        `*[_type == "productBatch" && _id == $id][0]`,
+        { id: formData._id },
+      );
+
+      // When updating, only reset emailSent if we're triggering a new email
+      const updateData = {
+        ...docData,
+        // Only reset emailSent if we're triggering a new email
+        emailSent: formData.triggerEmail
+          ? false
+          : currentBatch?.emailSent || false,
+        sentAt: formData.triggerEmail ? null : currentBatch?.sentAt || null,
+        recipientCount: currentBatch?.recipientCount || 0,
+      };
+
+      result = await serverClient.patch(formData._id).set(updateData).commit();
       console.log(`✅ Updated batch: ${formData._id}`);
     } else {
       result = await serverClient.create({
         _type: "productBatch",
         ...docData,
         emailSent: false,
+        recipientCount: 0,
       });
       console.log(`✅ Created new batch: ${result._id}`);
     }
@@ -79,13 +98,13 @@ export async function triggerEmailBlast(id: string) {
       throw new Error("Email already sent for this batch. Use resend instead.");
     }
 
-    // Set triggerEmail to true - this will fire the webhook
+    // Set triggerEmail to true and clear scheduledFor if it exists
     await serverClient
       .patch(id)
       .set({
         triggerEmail: true,
-        // Clear any previous errors
-        emailError: "",
+        scheduledFor: null, // Clear scheduled date for immediate send
+        emailError: "", // Clear any previous errors
       })
       .commit();
 
@@ -102,12 +121,21 @@ export async function triggerEmailBlast(id: string) {
 
 export async function resendEmailBlast(id: string) {
   try {
-    // Set triggerEmail to true - this will fire the webhook
+    // Get current batch
+    const batch = await serverClient.fetch(
+      `*[_type == "productBatch" && _id == $id][0]`,
+      { id },
+    );
+
+    // Reset emailSent status and trigger new email
     await serverClient
       .patch(id)
       .set({
-        triggerEmail: true,
-        // Don't clear emailSent - webhook will update if successful
+        emailSent: false, // Reset so webhook can send again
+        triggerEmail: true, // Trigger the webhook
+        scheduledFor: null, // Clear any scheduled date
+        sentAt: null, // Clear previous sent date
+        emailError: "", // Clear any previous errors
       })
       .commit();
 
@@ -123,7 +151,6 @@ export async function resendEmailBlast(id: string) {
   }
 }
 
-// New function to check webhook status
 export async function checkWebhookStatus() {
   try {
     const response = await fetch(

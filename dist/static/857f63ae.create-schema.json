@@ -1256,6 +1256,12 @@
         "title": "Products to Announce"
       },
       {
+        "description": "Optional: Set a future date/time for the email blast",
+        "name": "scheduledFor",
+        "type": "datetime",
+        "title": "Schedule For"
+      },
+      {
         "initialValue": false,
         "description": "Toggle to 'True' and Publish to send to customers with previous purchases.",
         "name": "triggerEmail",
@@ -1279,6 +1285,12 @@
         "name": "recipientCount",
         "type": "number",
         "title": "Number of Recipients"
+      },
+      {
+        "rows": 2,
+        "readOnly": true,
+        "name": "emailError",
+        "type": "text"
       }
     ],
     "name": "productBatch",
