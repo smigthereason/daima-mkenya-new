@@ -646,71 +646,82 @@ const client = createClient({
 function generateEmailHTML(batchName: string, products: any[]) {
   // Function to render a product card
   const renderProductCard = (product: any) => {
-    if (!product) return null;
-
     return `
-      <div style="background-color: #ffffff; width: 100%;">
-        <!-- Image Container -->
-        <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none; display: block;">
-          <div style="width: 100%; aspect-ratio: 1/1; background-color: #F9F9F9; margin-bottom: 12px; border: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: center; overflow: hidden;">
-            ${product.imageUrl ? `<img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: contain; padding: 15px; box-sizing: border-box; display: block;" />` : ""}
-          </div>
-        </a>
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; width: 100%;">
+        <tr>
+          <td style="background-color: #ffffff; padding: 0;">
+            <!-- Image Container -->
+            <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none; display: block;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9F9F9; border: 1px solid #f0f0f0;">
+                <tr>
+                  <td style="background-color: #F9F9F9; padding: 15px; text-align: center;">
+                    ${
+                      product.imageUrl
+                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="100%" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />`
+                        : '<div style="height: 150px;"></div>'
+                    }
+                  </td>
+                </tr>
+              </table>
+            </a>
 
-        <!-- Product Info -->
-        <div style="text-align: center; padding: 0 5px; background-color: #ffffff;">
-          <span style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px;">
-            ${product.category || "NEW ARRIVAL"}
-          </span>
-          <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none;">
-            <h3 style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0;">
-              ${product.name}
-            </h3>
-          </a>
-          <p style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
-            ${product.price}
-          </p>
-        </div>
+            <!-- Product Info -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 12px;">
+              <tr>
+                <td style="background-color: #ffffff; text-align: center; padding: 0 5px;">
+                  <span style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px;">
+                    ${product.category || "NEW ARRIVAL"}
+                  </span>
+                  <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none;">
+                    <h3 style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0;">
+                      ${product.name}
+                    </h3>
+                  </a>
+                  <p style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
+                    ${product.price}
+                  </p>
+                </td>
+              </tr>
+            </table>
 
-        <!-- Color Swatches -->
-        <div style="margin-top: 8px; text-align: center; background-color: #ffffff;">
-          ${
-            product.colors && product.colors.length > 0
-              ? product.colors
-                  .slice(0, 4)
-                  .map(
-                    (color: any) =>
-                      `<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"} !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
-                  )
-                  .join("")
-              : '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000 !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>'
-          }
-        </div>
-      </div>
+            <!-- Color Swatches -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 8px;">
+              <tr>
+                <td style="background-color: #ffffff; text-align: center;">
+                  ${
+                    product.colors && product.colors.length > 0
+                      ? product.colors
+                          .slice(0, 4)
+                          .map(
+                            (color: any) =>
+                              `<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: ${color.hex || "#000000"} !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>`,
+                          )
+                          .join("")
+                      : '<span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 3px; background-color: #000000 !important; border: 1px solid rgba(0,0,0,0.1); box-shadow: 0 1px 2px rgba(0,0,0,0.1);"></span>'
+                  }
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
     `;
   };
 
-  // Build the grid using a table with proper structure
+  // Build the grid using nested tables for perfect alignment
   let gridHTML = "";
 
   for (let i = 0; i < products.length; i += 2) {
-    gridHTML += '<tr style="background-color: #ffffff;">';
-
-    // First column
     gridHTML += `
-      <td style="width: 50%; padding: 12px; vertical-align: top; background-color: #ffffff;" align="center">
-        ${products[i] ? renderProductCard(products[i]) : '<div style="height: 0;"></div>'}
-      </td>
+      <tr>
+        <td style="width: 50%; vertical-align: top; background-color: #ffffff;" valign="top">
+          ${products[i] ? renderProductCard(products[i]) : ""}
+        </td>
+        <td style="width: 50%; vertical-align: top; background-color: #ffffff;" valign="top">
+          ${products[i + 1] ? renderProductCard(products[i + 1]) : ""}
+        </td>
+      </tr>
     `;
-
-    // Second column
-    gridHTML += `
-      <td style="width: 50%; padding: 12px; vertical-align: top; background-color: #ffffff;" align="center">
-        ${products[i + 1] ? renderProductCard(products[i + 1]) : '<div style="height: 0;"></div>'}
-      </td>
-    `;
-
-    gridHTML += "</tr>";
   }
 
   return `
@@ -784,9 +795,9 @@ function generateEmailHTML(batchName: string, products: any[]) {
       background-color: #ffffff !important;
     }
 
-    /* Ensure all product cards have equal width */
-    .product-grid table {
-      width: 100%;
+    /* Remove padding from empty cells */
+    .product-grid td:empty {
+      padding: 0 !important;
     }
 
     /* Buttons */
@@ -838,16 +849,16 @@ function generateEmailHTML(batchName: string, products: any[]) {
       }
 
       .product-grid td {
-        padding: 20px 0 !important;
+        padding: 15px 0 !important;
       }
 
       .collection-title {
         font-size: 18px;
       }
 
-      .image-container {
-        max-width: 280px;
-        margin: 0 auto;
+      img {
+        max-width: 100% !important;
+        height: auto !important;
       }
     }
   </style>
@@ -869,8 +880,8 @@ function generateEmailHTML(batchName: string, products: any[]) {
         </p>
       </div>
 
-      <!-- Product Grid - Fixed Layout -->
-      <table class="product-grid" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; margin: 20px 0; background-color: #ffffff;">
+      <!-- Product Grid - Fixed Layout with Proper Alignment -->
+      <table class="product-grid" width="100%" cellpadding="12" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; margin: 20px 0; background-color: #ffffff;">
         <tbody>
           ${gridHTML}
         </tbody>
