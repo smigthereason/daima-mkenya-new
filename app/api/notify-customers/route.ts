@@ -644,50 +644,50 @@ const client = createClient({
 
 // Function to generate the email HTML with fixed grid layout
 function generateEmailHTML(batchName: string, products: any[]) {
-  // Function to render a product card
+  // Function to render a product card with fixed dimensions
   const renderProductCard = (product: any) => {
     return `
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; width: 100%;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; width: 100%; table-layout: fixed;">
         <tr>
           <td style="background-color: #ffffff; padding: 0;">
-            <!-- Image Container -->
+            <!-- Image Container - Fixed height 200px -->
             <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none; display: block;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9F9F9; border: 1px solid #f0f0f0;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9F9F9; border: 1px solid #f0f0f0; height: 200px;">
                 <tr>
-                  <td style="background-color: #F9F9F9; padding: 15px; text-align: center;">
+                  <td style="background-color: #F9F9F9; padding: 15px; text-align: center; vertical-align: middle; height: 200px;">
                     ${
                       product.imageUrl
-                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="100%" style="max-width: 100%; height: auto; display: block; margin: 0 auto;" />`
-                        : '<div style="height: 150px;"></div>'
+                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="100%" style="max-width: 100%; max-height: 170px; width: auto; height: auto; display: block; margin: 0 auto;" />`
+                        : '<div style="height: 170px; width: 100%; background-color: #F9F9F9;"></div>'
                     }
                   </td>
                 </tr>
               </table>
             </a>
 
-            <!-- Product Info -->
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 12px;">
+            <!-- Product Info - Fixed height 100px -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 12px; height: 80px;">
               <tr>
-                <td style="background-color: #ffffff; text-align: center; padding: 0 5px;">
-                  <span style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px;">
-                    ${product.category || "NEW ARRIVAL"}
+                <td style="background-color: #ffffff; text-align: center; padding: 0 5px; vertical-align: top;">
+                  <span style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #999999; font-weight: 700; display: block; margin-bottom: 6px; line-height: 12px;">
+                    ${product.category ? product.category.substring(0, 20) : "NEW ARRIVAL"}
                   </span>
                   <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="text-decoration: none;">
-                    <h3 style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0;">
-                      ${product.name}
+                    <h3 style="font-size: 13px; font-weight: 900; letter-spacing: 0.1em; text-transform: uppercase; color: #111111; line-height: 1.3; margin: 6px 0 4px 0; max-height: 34px; overflow: hidden;">
+                      ${product.name ? product.name.substring(0, 30) : "Product Name"}
                     </h3>
                   </a>
-                  <p style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0;">
-                    ${product.price}
+                  <p style="font-size: 14px; font-weight: 500; letter-spacing: 0.1em; color: #111111; margin: 4px 0; line-height: 16px;">
+                    ${product.price || "Price"}
                   </p>
                 </td>
               </tr>
             </table>
 
-            <!-- Color Swatches -->
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 8px;">
+            <!-- Color Swatches - Fixed height 30px -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; margin-top: 8px; height: 24px;">
               <tr>
-                <td style="background-color: #ffffff; text-align: center;">
+                <td style="background-color: #ffffff; text-align: center; vertical-align: top;">
                   ${
                     product.colors && product.colors.length > 0
                       ? product.colors
@@ -714,11 +714,11 @@ function generateEmailHTML(batchName: string, products: any[]) {
   for (let i = 0; i < products.length; i += 2) {
     gridHTML += `
       <tr>
-        <td style="width: 50%; vertical-align: top; background-color: #ffffff;" valign="top">
-          ${products[i] ? renderProductCard(products[i]) : ""}
+        <td style="width: 50%; vertical-align: top; background-color: #ffffff; padding: 12px;" valign="top">
+          ${products[i] ? renderProductCard(products[i]) : '<div style="height: 0;"></div>'}
         </td>
-        <td style="width: 50%; vertical-align: top; background-color: #ffffff;" valign="top">
-          ${products[i + 1] ? renderProductCard(products[i + 1]) : ""}
+        <td style="width: 50%; vertical-align: top; background-color: #ffffff; padding: 12px;" valign="top">
+          ${products[i + 1] ? renderProductCard(products[i + 1]) : '<div style="height: 0;"></div>'}
         </td>
       </tr>
     `;
@@ -788,16 +788,18 @@ function generateEmailHTML(batchName: string, products: any[]) {
       border-collapse: collapse;
       margin: 20px 0;
       background-color: #ffffff !important;
+      table-layout: fixed;
     }
 
     .product-grid td {
-      padding: 12px;
       background-color: #ffffff !important;
+      padding: 12px;
+      vertical-align: top;
     }
 
-    /* Remove padding from empty cells */
-    .product-grid td:empty {
-      padding: 0 !important;
+    /* Ensure all product cards have equal height */
+    .product-grid table {
+      table-layout: fixed;
     }
 
     /* Buttons */
@@ -831,6 +833,12 @@ function generateEmailHTML(batchName: string, products: any[]) {
       text-transform: uppercase;
       text-align: center;
       margin: 20px 0 8px 0;
+    }
+
+    /* Fix image alignment */
+    img {
+      display: block;
+      margin: 0 auto;
     }
 
     /* Responsive */
@@ -880,8 +888,8 @@ function generateEmailHTML(batchName: string, products: any[]) {
         </p>
       </div>
 
-      <!-- Product Grid - Fixed Layout with Proper Alignment -->
-      <table class="product-grid" width="100%" cellpadding="12" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; margin: 20px 0; background-color: #ffffff;">
+      <!-- Product Grid - Fixed Layout with Equal Heights -->
+      <table class="product-grid" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse: collapse; width: 100%; margin: 20px 0; background-color: #ffffff; table-layout: fixed;">
         <tbody>
           ${gridHTML}
         </tbody>
