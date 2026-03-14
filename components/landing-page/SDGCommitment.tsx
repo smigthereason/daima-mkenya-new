@@ -129,8 +129,10 @@ const SdgCommitment = () => {
       {/* Brand Statement */}
       <div className="max-w-3xl mx-auto text-center px-6 mt-64 mb-20">
         <p className="text-xl md:text-2xl text-neutral-800 font-light leading-relaxed italic font-serif">
-          "Identity is a story best worn. Born in Kenya, destined for the
-          world."
+          Identity is a story best worn. <br /> Ours is written in the bold
+          colours of Kenya.
+          <br /> A powerful expression of who we are. <br /> Let it speak before
+          you do.
         </p>
         <div className="mt-16 h-24 w-px bg-neutral-500 mx-auto" />
       </div>
