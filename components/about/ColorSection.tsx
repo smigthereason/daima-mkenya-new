@@ -21,19 +21,21 @@ const ColorSection = ({ serifSubheader, serifBody }: ColorSectionProps) => {
             <div className="w-6 md:w-8 lg:w-10 xl:w-12 h-px bg-black" />
             <h2 className={serifSubheader}>Meaningful Color</h2>
           </div>
-          
+
           {/* Fixed text sizes: text-base sm, md:text-lg lg, xl:text-2xl to match Hero/Quality */}
-          <p className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl text-[#1d1d1d]`}>
-            Our color palette draws inspiration from the colors of the Kenyan
+          <p
+            className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl text-[#1d1d1d]`}
+          >
+            Our color palette draws inspiration from the colors of Kenya&apos;s
             flag — our symbol of unity and pride. Its colors are rich with
             meaning: <span className="text-black font-black">black</span>{" "}
             represents the people,{" "}
             <span className="text-[#be1e2d] font-black">red</span> symbolizes
             the struggle for freedom,
-            <span className="text-[#006241] font-black"> green</span>{" "}
-            celebrates our land and natural wealth, and{" "}
-            <span className="italic font-bold">white</span> stands for peace
-            and unity. Together, they reflect the spirit and pride of Kenya.
+            <span className="text-[#006241] font-black"> green</span> celebrates
+            our land and natural wealth, and{" "}
+            <span className="italic font-bold">white</span> stands for peace and
+            unity. Together, they reflect the spirit and pride of Kenya.
           </p>
         </div>
 

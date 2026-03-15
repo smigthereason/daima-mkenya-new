@@ -7,8 +7,7 @@ const pageUrl = `${baseUrl}/about`;
 const ogImage = "https://www.daimamkenyaafrica.com/assets/4.4.webp";
 
 export const metadata: Metadata = {
-  title:
-    "About Daima Mkenya Africa – Kenyan Heritage Fashion & National Identity",
+  title: "About Daima Mkenya Africa –  Heritage Fashion & Identity",
   description:
     "Daima Mkenya Africa is a Kenyan-owned apparel brand from Nairobi, crafting premium clothing inspired by the Kenyan flag, local artisans, and national identity.",
   alternates: {
@@ -23,8 +22,7 @@ export const metadata: Metadata = {
     "Made in Kenya clothing",
   ],
   openGraph: {
-    title:
-      "About Daima Mkenya Africa – Kenyan Heritage Fashion & National Identity",
+    title: "About Daima Mkenya Africa – Heritage Fashion &  Identity",
     description:
       "Learn about Daima Mkenya Africa, a Kenyan-owned apparel brand celebrating identity, flag colors, and craftsmanship with clothing born in Kenya and worn everywhere.",
     url: pageUrl,
@@ -41,8 +39,7 @@ export const metadata: Metadata = {
     type: "website",
   },
   twitter: {
-    title:
-      "About Daima Mkenya Africa – Kenyan Heritage Fashion & National Identity",
+    title: "About Daima Mkenya Africa – Heritage Fashion &  Identity",
     description:
       "Discover the story behind Daima Mkenya Africa, a Nairobi-based clothing brand celebrating Kenyan identity, craftsmanship, and meaningful color.",
     card: "summary_large_image",
