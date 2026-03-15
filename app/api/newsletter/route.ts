@@ -1,6 +1,8 @@
+// app/api/newsletter/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@sanity/client";
 import { Resend } from "resend";
+import { getActiveLogo, urlFor } from "@/lib/sanity/logo";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -16,7 +18,6 @@ export async function POST(req: Request) {
   try {
     const { email } = await req.json();
 
-    // Validate email
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return NextResponse.json(
         { error: "Valid email is required" },
@@ -24,7 +25,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if already subscribed
     const existing = await client.fetch(
       `*[_type == "newsletter" && email == $email][0]`,
       { email },
@@ -37,7 +37,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // Save to Sanity
     await client.create({
       _type: "newsletter",
       email,
@@ -45,7 +44,19 @@ export async function POST(req: Request) {
       source: "website_footer",
     });
 
-    // High-End White Editorial Welcome Email
+    // Normalized Base URL
+    const baseUrl = (
+      process.env.NEXT_PUBLIC_BASE_URL || "https://daimamkenyaafrica.com"
+    ).replace(/\/$/, "");
+
+    // Get active logo from Sanity
+    const activeLogo = await getActiveLogo();
+    const logoUrl = activeLogo?.imageUrl
+      ? urlFor(activeLogo.imageUrl).width(200).url()
+      : `${baseUrl}/assets/Logo_no-bg.png`; // Fallback to local asset
+
+    const logoAlt = activeLogo?.alt || "Daima Mkenya Africa Logo";
+
     await resend.emails.send({
       from: "Daima Mkenya <info@daimamkenyaafrica.com>",
       to: email,
@@ -53,86 +64,66 @@ export async function POST(req: Request) {
       html: `
         <!DOCTYPE html>
         <html>
+          <head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head>
           <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Times New Roman', Times, serif;">
             <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff;">
               <tr>
                 <td align="center" style="padding: 60px 20px;">
                   <table role="presentation" width="100%" style="max-width: 600px; background-color: #ffffff; border: 1px solid #eeeeee;" cellspacing="0" cellpadding="0" border="0">
-
-                    <tr>
-                      <td height="4" style="background-color: #be1e2d;"></td>
-                    </tr>
-
+                    <tr><td height="4" style="background-color: #be1e2d;"></td></tr>
                     <tr>
                       <td style="padding: 80px 40px;">
-
                         <table width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td align="center" style="padding-bottom: 60px;">
-                              <p style="margin: 0; color: #000000; font-size: 15px; letter-spacing: 0.9em; text-transform: uppercase; font-weight: bold;">
-                                DAIMA MKENYA AFRICA
-                              </p>
-
+                              <img src="${logoUrl}"
+                                   alt="${logoAlt}"
+                                   width="200"
+                                   quality="100"
+                                   priority
+                                   style="display: block; width: 200px; height: auto; margin: 0 auto; border: 0;" />
                             </td>
                           </tr>
                         </table>
-
-                        <h1 style="margin: 0; color: #000000; font-size: 42px; line-height: 0.95; font-weight: normal; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid #f5f5f5; padding-bottom: 40px;">
+                        <h1 style="margin: 0 0 30px 0; color: #000000; font-size: 42px; line-height: 1.1; font-weight: normal; text-align: center; text-transform: uppercase; letter-spacing: 0.05em;">
                           Welcome to <br/>
-                          <span>DAIMA MKENYA AFRICA</span>
+                          <span style="display: inline-block; margin-top: 10px;">DAIMA MKENYA AFRICA</span>
                         </h1>
-
                         <table width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
-                            <td style="padding: 50px 0;">
+                            <td style="padding: 20px 0 40px;">
                               <p style="margin: 0 auto; color: #444444; font-size: 16px; line-height: 1.8; text-align: center; letter-spacing: 0.02em; max-width: 450px;">
-                              Thank you for subscribing to our newsletter. You'll now receive updates on new collections, exclusive offers, and events.
+                                Thank you for subscribing to our newsletter. You'll now receive updates on new collections, exclusive offers, and events.
                               </p>
                             </td>
                           </tr>
                         </table>
-
                         <table width="100%" cellspacing="0" cellpadding="0" border="0">
                           <tr>
                             <td align="center">
-                              <a href="${process.env.NEXT_PUBLIC_BASE_URL}/products"
+                              <a href="${baseUrl}/products"
                                  style="display: inline-block; background-color: #000000; color: #ffffff; padding: 22px 60px; text-decoration: none; font-size: 11px; font-weight: bold; letter-spacing: 0.5em; text-transform: uppercase;">
                                 SHOP FULL COLLECTION
                               </a>
                             </td>
                           </tr>
                         </table>
-
-                        <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin-top: 100px; border-top: 1px solid #f5f5f5; padding-top: 30px;">
-                          <tr>
-                            <td style="text-align: left;">
-                              <p style="margin: 0; color: #999999; font-size: 9px; text-transform: uppercase; letter-spacing: 0.3em;">Est. 2026</p>
-                            </td>
-                            <td style="text-align: right;">
-                              <p style="margin: 0; color: #999999; font-size: 9px; text-transform: uppercase; letter-spacing: 0.3em;">@DaimaMkenyaAfrica</p>
-                            </td>
-                          </tr>
-                        </table>
-
                       </td>
                     </tr>
-
                     <tr>
                       <td style="padding: 0 40px 60px 40px; text-align: center;">
-                        <a href="${process.env.NEXT_PUBLIC_BASE_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}"
+                        <a href="${baseUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(email)}"
                            style="color: #bcbcbc; font-size: 9px; text-decoration: underline; text-transform: uppercase; letter-spacing: 0.2em;">
                           UNSUBSCRIBE FROM NEWSLETTER
                         </a>
                       </td>
                     </tr>
-
                   </table>
                 </td>
               </tr>
             </table>
           </body>
-        </html>
-      `,
+        </html>`,
     });
 
     return NextResponse.json(

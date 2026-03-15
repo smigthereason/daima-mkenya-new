@@ -1371,5 +1371,91 @@
     "name": "newsletter",
     "type": "document",
     "title": "Newsletter Subscribers"
+  },
+  {
+    "fields": [
+      {
+        "initialValue": "Main Logo",
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "title",
+        "type": "string"
+      },
+      {
+        "options": {
+          "hotspot": true,
+          "accept": "image/png, image/jpeg, image/svg+xml"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "Upload your logo (PNG with transparent background recommended)",
+        "fields": [
+          {
+            "initialValue": "Daima Mkenya Africa Logo",
+            "description": "Alternative text for accessibility",
+            "name": "alt",
+            "type": "string",
+            "title": "Alt Text"
+          }
+        ],
+        "name": "logoImage",
+        "type": "image"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Email & Website",
+              "value": "email_website"
+            },
+            {
+              "title": "Email Only",
+              "value": "email_only"
+            },
+            {
+              "title": "Website Only",
+              "value": "website_only"
+            }
+          ]
+        },
+        "initialValue": "email_website",
+        "description": "Where this logo should be used",
+        "name": "logoFor",
+        "type": "string",
+        "title": "Usage"
+      },
+      {
+        "initialValue": true,
+        "description": "Only one active logo will be used",
+        "name": "isActive",
+        "type": "boolean",
+        "title": "Active"
+      },
+      {
+        "name": "updatedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "logo",
+    "type": "document",
+    "title": "Logo & Branding"
   }
 ]
