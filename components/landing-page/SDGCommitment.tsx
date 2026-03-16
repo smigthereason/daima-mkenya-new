@@ -1,19 +1,33 @@
 // /* eslint-disable react/no-unescaped-entities */
 // "use client";
-// import React from "react";
+// import React, { useEffect, useState } from "react";
 // import Image from "next/image";
+// import Link from "next/link";
+// import { client } from "@/sanity/lib/client";
+// import { urlFor } from "@/sanity/lib/image";
 // // Importing assets from the centralized index
-// import {
-//   SDG1,
-//   Hero33,
-//   Hero77,
-//   Hero55,
-//   Model12,
-//   Model15,
-//   HeroImage4,
-// } from "@/public/assets";
+// import { SDG1, Hero33, Hero77, Hero55 } from "@/public/assets";
+
+// // Define Product type
+// interface Product {
+//   _id: string;
+//   name: string;
+//   slug: {
+//     current: string;
+//   };
+//   images?: {
+//     hero?: {
+//       asset?: {
+//         url?: string;
+//       };
+//     };
+//   };
+// }
 
 // const SdgCommitment = () => {
+//   const [products, setProducts] = useState<Product[]>([]);
+//   const [loading, setLoading] = useState(true);
+
 //   const essentials = [
 //     {
 //       title: "ELEGANT",
@@ -41,11 +55,48 @@
 //     },
 //   ];
 
-//   const secondaryGallery = [
-//     { src: Model12, alt: "Heritage Collection Model 13" },
-//     { src: Model15, alt: "Heritage Collection Model 15" },
-//     { src: HeroImage4, alt: "Heritage Collection Lady White" },
+//   const productSlugs = [
+//     "one-love-polo",
+//     "kenyan-leopard",
+//     "theluji-oversized-shirt",
 //   ];
+
+//   useEffect(() => {
+//     const fetchProducts = async () => {
+//       try {
+//         const query = `*[_type == "product" && slug.current in $slugs] {
+//           _id,
+//           name,
+//           slug,
+//           images {
+//             hero {
+//               asset-> {
+//                 url
+//               }
+//             }
+//           }
+//         }`;
+
+//         const fetchedProducts = await client.fetch(query, {
+//           slugs: productSlugs,
+//         });
+
+//         const sortedProducts = productSlugs
+//           .map((slug) =>
+//             fetchedProducts.find((p: Product) => p.slug.current === slug),
+//           )
+//           .filter(Boolean);
+
+//         setProducts(sortedProducts);
+//       } catch (error) {
+//         console.error("Error fetching products:", error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchProducts();
+//   }, []);
 
 //   return (
 //     <section className="bg-[#e8e8e8] py-24 overflow-hidden border-b border-neutral-300">
@@ -66,7 +117,6 @@
 //             key={idx}
 //             className="group relative aspect-4/5 sm:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center overflow-hidden"
 //           >
-//             {/* Background Image with Next Image */}
 //             <div className="absolute inset-0 z-0 overflow-hidden">
 //               <Image
 //                 src={
@@ -79,17 +129,14 @@
 //                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
 //                 className="object-cover transition-all duration-1000 group-hover:scale-105 opacity-60 group-hover:opacity-80"
 //                 priority={idx < 2}
+//                 unoptimized
 //               />
 //             </div>
-
-//             {/* Text Content */}
 //             <div className="relative z-10 text-center px-4">
 //               <h3 className="text-xl md:text-3xl font-serif tracking-[0.2em] text-white uppercase wrap-break-words">
 //                 {item.title}
 //               </h3>
 //             </div>
-
-//             {/* Animated color bar at the bottom */}
 //             <div
 //               className="absolute bottom-0 left-0 w-full h-1.5 transition-transform duration-700 scale-x-0 group-hover:scale-x-100 origin-left z-20"
 //               style={{ backgroundColor: item.color }}
@@ -98,32 +145,44 @@
 //         ))}
 //       </div>
 
-//       {/* Heritage Gallery - Staggered Layout */}
-//       <div className="max-w-7xl mx-auto px-6">
-//         <div className="text-center mt-10 mb-16">
+//       {/* Heritage Gallery - Full Width High-Portrait Uniform Grid */}
+//       <div className="w-full px-2 sm:px-4">
+//         <div className="text-center mt-32 mb-32">
 //           <span className="text-[18px] tracking-[0.6em] text-neutral-800 uppercase">
 //             The Heritage Collection
 //           </span>
 //         </div>
-//         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-//           {secondaryGallery.map((item, i) => (
-//             <div
-//               key={i}
-//               className={`relative overflow-hidden transition-all duration-1000 ${i === 1 ? "md:translate-y-20" : ""}`}
-//             >
-//               <div className="relative w-full h-[70vh] overflow-hidden">
-//                 <Image
-//                   src={typeof item.src === "string" ? item.src : item.src.src}
-//                   alt={item.alt}
-//                   fill
-//                   sizes="(max-width: 768px) 100vw, 33vw"
-//                   className="object-contain hover:scale-105 transition-transform duration-1000"
-//                   priority={i === 0} // Prioritize loading first image
-//                 />
-//               </div>
-//             </div>
-//           ))}
-//         </div>
+
+//         {loading ? (
+//           <div className="flex justify-center items-center h-[70vh]">
+//             <div className="w-10 h-10 border-2 border-[#008000] border-t-transparent rounded-full animate-spin" />
+//           </div>
+//         ) : (
+//           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-0">
+//             {products.map((product, i) => (
+//               <Link
+//                 key={product._id}
+//                 href={`/products/${product.slug.current}`}
+//                 className="group relative aspect-4/5 overflow-hidden block cursor-pointer "
+//               >
+//                 <div className="relative w-full h-full">
+//                   {product.images?.hero?.asset?.url && (
+//                     <Image
+//                       src={urlFor(product.images.hero).url()}
+//                       alt={product.name}
+//                       fill
+//                       sizes="(max-width: 768px) 100vw, 33vw"
+//                       // object-contain + aspect-[3/4] ensures the full height product is shown without being cropped
+//                       className="object-contain  transition-transform duration-[2s] ease-out group-hover:scale-105"
+//                       priority={i === 0}
+//                       unoptimized
+//                     />
+//                   )}
+//                 </div>
+//               </Link>
+//             ))}
+//           </div>
+//         )}
 //       </div>
 
 //       {/* Brand Statement */}
@@ -198,17 +257,15 @@ const SdgCommitment = () => {
     },
   ];
 
-  // Define product slugs for the heritage gallery
   const productSlugs = [
     "one-love-polo",
-    "kenyan-leopard",
     "theluji-oversized-shirt",
+    "theluji-shorts-set",
   ];
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Fetch products by slugs
         const query = `*[_type == "product" && slug.current in $slugs] {
           _id,
           name,
@@ -226,7 +283,6 @@ const SdgCommitment = () => {
           slugs: productSlugs,
         });
 
-        // Sort products to match the original order of slugs
         const sortedProducts = productSlugs
           .map((slug) =>
             fetchedProducts.find((p: Product) => p.slug.current === slug),
@@ -263,7 +319,6 @@ const SdgCommitment = () => {
             key={idx}
             className="group relative aspect-4/5 sm:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center overflow-hidden"
           >
-            {/* Background Image with Next Image */}
             <div className="absolute inset-0 z-0 overflow-hidden">
               <Image
                 src={
@@ -279,15 +334,11 @@ const SdgCommitment = () => {
                 unoptimized
               />
             </div>
-
-            {/* Text Content */}
             <div className="relative z-10 text-center px-4">
               <h3 className="text-xl md:text-3xl font-serif tracking-[0.2em] text-white uppercase wrap-break-words">
                 {item.title}
               </h3>
             </div>
-
-            {/* Animated color bar at the bottom */}
             <div
               className="absolute bottom-0 left-0 w-full h-1.5 transition-transform duration-700 scale-x-0 group-hover:scale-x-100 origin-left z-20"
               style={{ backgroundColor: item.color }}
@@ -296,9 +347,9 @@ const SdgCommitment = () => {
         ))}
       </div>
 
-      {/* Heritage Gallery - Staggered Layout with Clickable Product Links */}
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mt-10 mb-16">
+      {/* Heritage Gallery - 3x1 Grid Styled Like Sustainable Elegance */}
+      <div className="w-full px-2 sm:px-4 mb-32 m-4 sm:m-0">
+        <div className="text-center mt-32 mb-32">
           <span className="text-[18px] tracking-[0.6em] text-neutral-800 uppercase">
             The Heritage Collection
           </span>
@@ -309,29 +360,38 @@ const SdgCommitment = () => {
             <div className="w-10 h-10 border-2 border-[#008000] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {products.map((product, i) => (
-              <Link
+          <div className="grid grid-cols-3 gap-2  ">
+            {products.map((product, idx) => (
+              <div
                 key={product._id}
-                href={`/products/${product.slug.current}`}
-                className={`group relative overflow-hidden transition-all duration-1000 block cursor-pointer ${
-                  i === 1 ? "md:translate-y-20" : ""
-                }`}
+                className="group relative aspect-4/5 sm:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center overflow-hidden border border-neutral-400"
               >
-                <div className="relative w-full h-[70vh] overflow-hidden ">
-                  {product.images?.hero?.asset?.url && (
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                  {product.images?.hero?.asset?.url ? (
                     <Image
                       src={urlFor(product.images.hero).url()}
                       alt={product.name}
                       fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-contain p-8 transition-transform duration-[2s] ease-out group-hover:scale-110"
-                      priority={i === 0}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      className="object-cover transition-all duration-1000 group-hover:scale-105 "
+                      priority={idx < 2}
                       unoptimized
                     />
+                  ) : (
+                    <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
+                      <span className="text-neutral-500 text-sm">No image</span>
+                    </div>
                   )}
                 </div>
-              </Link>
+
+                {product.slug && (
+                  <Link
+                    href={`/products/${product.slug.current}`}
+                    className="absolute inset-0 z-30"
+                    aria-label={`View ${product.name}`}
+                  />
+                )}
+              </div>
             ))}
           </div>
         )}
