@@ -10,8 +10,8 @@ interface ProductHeroProps {
 export default function ProductHero({
   preTitle = "COLLECTION 2026",
   title = ["THE SPIRIT", "OF KENYA"],
-  ctaText = "DISCOVER THE SELECTION",
-  ctaLink = "#",
+  ctaText = "DISCOVER  SELECTION",
+  ctaLink = "/products",
 }: ProductHeroProps) {
   const safeTitle = Array.isArray(title) ? title : [];
 
@@ -45,7 +45,7 @@ export default function ProductHero({
               </p>
             </div>
           )}
-          
+
           {/* Bold Luxury Title */}
           <h1 className="mb-10 text-6xl md:text-8xl lg:text-9xl font-black leading-[0.9] tracking-tighter uppercase">
             {safeTitle.length > 0 ? (
