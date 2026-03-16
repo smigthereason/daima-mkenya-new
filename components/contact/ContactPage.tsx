@@ -24,7 +24,7 @@ const ContactPage: React.FC = () => {
       {/* Two-column layout */}
       <section className="grid gap-10 lg:grid-cols-[1.6fr,1.1fr]">
         {/* Left: form */}
-        <div className="bg-white border border-neutral-200/70 rounded-lg p-6 md:p-8 shadow-sm">
+        <div className="bg-white border border-neutral-200/70  p-6 md:p-8 shadow-sm">
           <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-6">
             Send a message
           </p>
@@ -139,7 +139,7 @@ const ContactPage: React.FC = () => {
 
         {/* Right: contact details & registry context */}
         <aside className="space-y-8">
-          <div className="bg-white border border-neutral-200/70 rounded-lg p-6 md:p-7 shadow-sm">
+          <div className="bg-white border border-neutral-200/70  p-6 md:p-7 shadow-sm">
             <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-4">
               Direct contact
             </p>
@@ -174,7 +174,7 @@ const ContactPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-neutral-200/70 rounded-lg p-6 md:p-7 shadow-sm">
+          <div className="bg-white border border-neutral-200/70  p-6 md:p-7 shadow-sm">
             <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-4">
               Registry & Orders
             </p>
@@ -191,7 +191,7 @@ const ContactPage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-[#F5F5F5] border border-neutral-200/70 rounded-lg p-6 md:p-7">
+          <div className="bg-[#F5F5F5] border border-neutral-200/70  p-6 md:p-7">
             <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-3">
               Unity in every thread
             </p>
