@@ -198,7 +198,7 @@ export default function AfricaDottedMap() {
         </div>
 
         {/* Quote */}
-        <p className="text-[13px] leading-relaxed text-neutral-300 tracking-wide uppercase italic text-center px-2">
+        <p className="text-[13px] leading-relaxed text-neutral-300 tracking-wide uppercase text-center px-2">
           &quot;A stitch that binds a continent, a design that speaks to the
           world.&quot;
         </p>
@@ -319,7 +319,7 @@ export default function AfricaDottedMap() {
 
         {/* Bottom-Left Quote */}
         <div className="absolute bottom-24 left-10 md:left-24 z-10 max-w-lg hidden lg:block">
-          <p className="text-[20px] leading-relaxed text-neutral-300 tracking-wide uppercase italic">
+          <p className="text-[20px] leading-relaxed text-neutral-300 tracking-wide uppercase">
             &quot;A stitch that binds a continent, a design that speaks to the
             world.&quot;
           </p>
