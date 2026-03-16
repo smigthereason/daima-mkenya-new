@@ -545,6 +545,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@sanity/client";
 import { isValidSignature, SIGNATURE_HEADER_NAME } from "@sanity/webhook";
 import { Resend } from "resend";
+import { getActiveLogo, urlFor as getLogoUrl } from "@/lib/sanity/logo";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -556,224 +557,165 @@ const client = createClient({
   useCdn: false,
 });
 
-// Function to generate SDG Commitment-style email HTML with 2x1 grid
-function generateEmailHTML(batchName: string, products: any[]) {
-  // Function to render SDG-style product card
-  const renderProductCard = (product: any, idx: number) => {
-    const colors = [
-      "#000000", // ELEGANT - Black
-      "#BB0000", // INNOVATIVE - Red
-      "#008000", // DELUXE - Green
-      "#E8E8E8", // ACTIVE - Light gray
-    ];
+function generateEmailHTML(
+  batchName: string,
+  products: any[],
+  logoUrl: string,
+  logoAlt: string,
+) {
+  const baseUrl = (
+    process.env.NEXT_PUBLIC_BASE_URL || "https://daimamkenyaafrica.com"
+  ).replace(/\/$/, "");
+
+  const renderProductCard = (product: any) => {
+    const productUrl = `${baseUrl}/products/${product.slug}`;
 
     return `
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1F2937; width: 100%; table-layout: fixed; position: relative;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; table-layout: fixed;">
         <tr>
-          <td style="background-color: #1F2937; padding: 0;">
-            <!-- Full bleed background image -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: 1;">
-              ${
-                product.imageUrl
-                  ? `<img src="${product.imageUrl}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; transition: transform 1s; opacity: 0.6;" />`
-                  : '<div style="width: 100%; height: 100%; background: linear-gradient(135deg, #1F2937 0%, #374151 100%);"></div>'
-              }
-            </div>
+          <td style="padding-bottom: 40px;">
+            <a href="${productUrl}" style="text-decoration: none; display: block;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9F9F9; border: 1px solid #eeeeee;">
+                <tr>
+                  <td align="center" valign="middle" style="height: 320px; padding: 30px;">
+                    ${
+                      product.imageUrl
+                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="220" style="display: block; width: 220px; height: auto; max-height: 260px; object-fit: contain;" />`
+                        : `<div style="height: 260px; width: 100%; background-color: #F9F9F9;"></div>`
+                    }
+                  </td>
+                </tr>
+              </table>
+            </a>
 
-            <!-- Content overlay -->
-            <div style="position: relative; z-index: 10; height: 280px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px;">
-              <!-- Product Title -->
-              <h3 style="font-size: 24px; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #FFFFFF; margin: 0 0 8px 0; line-height: 1.1; font-family: serif;">
-                ${product.name ? product.name.substring(0, 25) : "Product Name"}
-              </h3>
-
-              <!-- Category Tag -->
-              <span style="font-size: 10px; letter-spacing: 0.4em; text-transform: uppercase; color: #D1D5DB; font-weight: 700; margin-bottom: 12px; display: block; line-height: 1;">
-                ${product.category ? product.category.substring(0, 20) : "NEW ARRIVAL"}
-              </span>
-
-              <!-- Price -->
-              <p style="font-size: 16px; font-weight: 600; letter-spacing: 0.1em; color: #FFFFFF; margin: 8px 0 16px 0; opacity: 0.9;">
-                ${product.price || "Price"}
-              </p>
-            </div>
-
-            <!-- Animated accent bar at bottom -->
-            <div style="position: absolute; bottom: 0; left: 0; width: 0%; height: 4px; background-color: ${colors[idx % colors.length]}; transition: width 0.7s ease-out; z-index: 20;"></div>
-
-            <!-- Clickable overlay link -->
-            <a href="https://daimamkenyaafrica.com/products/${product.slug}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 30; text-decoration: none; display: block;"></a>
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px;">
+              <tr>
+                <td align="center" style="padding: 0 10px;">
+                  <p style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.4em; color: #71717a;">
+                    ${product.category || "NEW ARRIVAL"}
+                  </p>
+                  <h3 style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #18181b; line-height: 1.4;">
+                    ${product.name}
+                  </h3>
+                  <p style="margin: 0 0 15px 0; font-family: Arial, sans-serif; font-size: 16px; font-weight: 500; letter-spacing: 0.1em; color: #18181b;">
+                    ${product.price}
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td align="center" style="padding-bottom: 20px;">
+                  ${
+                    product.colors && product.colors.length > 0
+                      ? product.colors
+                          .slice(0, 4)
+                          .map(
+                            (color: any) => `
+                        <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 4px; background-color: ${color.hex} !important; border: 1px solid #e4e4e7;"></span>
+                      `,
+                          )
+                          .join("")
+                      : `<span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #000000; border: 1px solid #e4e4e7;"></span>`
+                  }
+                </td>
+              </tr>
+              <tr>
+                <td align="center">
+                  <a href="${productUrl}" style="display: inline-block; background-color: #18181b; color: #ffffff; padding: 14px 28px; font-family: Arial, sans-serif; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; text-decoration: none;">
+                    VIEW PIECE
+                  </a>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
       </table>
     `;
   };
 
-  // Build 2x1 horizontal grid matching SDG Commitment style
-  let gridHTML = `
-    <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F3F4F6; border-top: 1px solid #E5E7EB; border-bottom: 1px solid #E5E7EB; margin: 32px 0;">
+  let gridHTML = "";
+  for (let i = 0; i < products.length; i += 2) {
+    gridHTML += `
       <tr>
-  `;
-
-  products.slice(0, 2).forEach((product: any, idx: number) => {
-    gridHTML += `
-        <td style="width: 50%; vertical-align: top; padding: 8px;" valign="top">
-          ${renderProductCard(product, idx)}
+        <td width="50%" valign="top" style="padding: 0 10px;">
+          ${renderProductCard(products[i])}
         </td>
-    `;
-  });
-
-  // Fill empty slots if less than 2 products
-  const emptyCount = 2 - products.slice(0, 2).length;
-  for (let i = 0; i < emptyCount; i++) {
-    gridHTML += `
-        <td style="width: 50%; vertical-align: top; padding: 8px;" valign="top">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #1F2937; height: 280px;"></table>
+        <td width="50%" valign="top" style="padding: 0 10px;">
+          ${products[i + 1] ? renderProductCard(products[i + 1]) : ""}
         </td>
+      </tr>
     `;
   }
 
-  gridHTML += `
-      </tr>
-    </table>
-  `;
-
   return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="color-scheme" content="light only">
-  <meta name="supported-color-schemes" content="light only">
-  <title>New Collection: ${batchName}</title>
-  <style>
-    /* Force consistent rendering */
-    body, table, td, div, p, h1, h2, h3, h4, h5, h6, span, a {
-      background-color: #F9FAFB !important;
-    }
-    body {
-      margin: 0 !important;
-      padding: 0 !important;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      -webkit-text-size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-    }
-    .email-container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #F9FAFB !important;
-    }
-    .section-title {
-      font-size: 11px;
-      letter-spacing: 0.5em;
-      text-transform: uppercase;
-      color: #9CA3AF !important;
-      font-weight: 700;
-      margin-bottom: 15px;
-      text-align: center;
-    }
-    .collection-title {
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: #111827 !important;
-      text-align: center;
-      margin: 15px 0 12px 0;
-      font-family: serif;
-    }
-    .shop-button {
-      display: inline-block;
-      background-color: #111111 !important;
-      color: #FFFFFF !important;
-      padding: 16px 36px;
-      font-size: 11px;
-      font-weight: 900;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border: 2px solid #111111;
-      margin: 20px 0;
-      transition: all 0.3s;
-    }
-    .divider {
-      height: 2px;
-      background-color: #D1D5DB !important;
-      width: 48px;
-      margin: 36px auto;
-    }
-    .footer-text {
-      font-size: 10px;
-      color: #9CA3AF !important;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      text-align: center;
-    }
-    @media screen and (max-width: 480px) {
-      .email-container { padding: 15px !important; }
-      .collection-title { font-size: 22px; letter-spacing: 0.1em; }
-    }
-  </style>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F9FAFB;">
-  <div class="email-wrapper" style="background-color: #F9FAFB; width: 100%;">
-    <div class="email-container" style="max-width: 600px; margin: 0 auto; background-color: #F9FAFB; padding: 24px;">
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Collection: ${batchName}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #e8e8e8; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #e8e8e8;">
+        <tr>
+          <td align="center" style="padding: 40px 10px;">
+            <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #e8e8e8; width: 600px; margin: 0 auto;">
 
-      <!-- Header -->
-      <div style="text-align: center; padding: 36px 0 24px 0; border-bottom: 2px solid #E5E7EB;">
-        <span class="section-title" style="font-size: 11px; letter-spacing: 0.5em; color: #9CA3AF; font-weight: 700; display: block; margin-bottom: 16px;">
-          THE SELECTION
-        </span>
-        <h1 class="collection-title" style="font-size: 28px; font-weight: 900; letter-spacing: 0.15em; color: #111827; text-transform: uppercase; margin: 0 0 12px 0; font-family: serif;">
-          ${batchName}
-        </h1>
-        <p style="font-size: 12px; color: #6B7280; letter-spacing: 0.05em; margin: 0;">
-          A first look at our newest additions
-        </p>
-      </div>
+              <tr>
+                <td align="center" style="padding-bottom: 60px;">
+                  <img src="${logoUrl}" alt="${logoAlt}" width="180" style="display: block; width: 180px; height: auto;" />
+                </td>
+              </tr>
 
-      <!-- SDG Commitment Style 2x1 Product Grid -->
-      ${gridHTML}
+              <tr>
+                <td style="padding: 0 20px 40px 20px; border-bottom: 2px solid #d4d4d8;">
+                  <span style="display: block; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5em; color: #a1a1aa; margin-bottom: 12px;">
+                    THE SELECTION
+                  </span>
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #18181b;">
+                    ${batchName} <span style="color: #a1a1aa; font-weight: 300; margin-left: 8px;">(${products.length})</span>
+                  </h1>
+                </td>
+              </tr>
 
-      <!-- CTA & Footer -->
-      <div class="divider" style="height: 2px; background-color: #D1D5DB; width: 48px; margin: 48px auto;"></div>
+              <tr>
+                <td style="padding: 60px 10px 20px 10px;">
+                  <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                    ${gridHTML}
+                  </table>
+                </td>
+              </tr>
 
-      <div style="text-align: center; margin: 36px 0;">
-        <a href="https://daimamkenyaafrica.com/products" class="shop-button" style="display: inline-block; background-color: #111111; color: #FFFFFF; padding: 16px 36px; font-size: 11px; font-weight: 900; letter-spacing: 0.3em; text-transform: uppercase; text-decoration: none; border: 2px solid #111111;">
-          SHOP THE COLLECTION
-        </a>
-      </div>
+              <tr>
+                <td align="center" style="padding: 40px 20px 80px 20px;">
+                  <div style="width: 2px; height: 60px; background-color: #18181b; margin-bottom: 40px;"></div>
+                  <a href="${baseUrl}/products" style="display: inline-block; background-color: #18181b; color: #ffffff; padding: 22px 50px; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em; text-decoration: none;">
+                    SHOP FULL COLLECTION
+                  </a>
+                </td>
+              </tr>
 
-      <div style="text-align: center; padding: 24px 0; border-top: 1px solid #E5E7EB;">
-        <p class="footer-text" style="font-size: 10px; color: #9CA3AF; letter-spacing: 0.2em; text-transform: uppercase; margin: 0 0 8px 0;">
-          Daima Mkenya · Nairobi, Kenya
-        </p>
-        <p style="font-size: 9px; color: #D1D5DB; margin: 0;">
-          © ${new Date().getFullYear()} Daima Mkenya. All rights reserved.
-        </p>
-      </div>
-    </div>
-  </div>
-</body>
-</html>
+              <tr>
+                <td align="center" style="padding-bottom: 40px; border-top: 1px solid #d4d4d8; padding-top: 40px;">
+                  <p style="margin: 0; font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.2em; font-weight: bold;">
+                    Daima Mkenya &middot; Nairobi, Kenya
+                  </p>
+                  <p style="margin: 10px 0 0 0; font-size: 9px; color: #a1a1aa;">
+                    &copy; ${new Date().getFullYear()} Daima Mkenya. All rights reserved.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
   `;
 }
 
-// Rest of the webhook logic remains exactly the same...
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log("=".repeat(50));
-    console.log("🔔 WEBHOOK RECEIVED");
-    console.log("=".repeat(50));
-    console.log("Batch ID:", body._id);
-    console.log("Batch Name:", body.batchName);
-    console.log("Trigger Email:", body.triggerEmail);
-    console.log("Email Already Sent:", body.emailSent);
-    console.log("Scheduled For:", body.scheduledFor || "Immediate");
-    console.log("Timestamp:", new Date().toISOString());
-
     const signature = req.headers.get(SIGNATURE_HEADER_NAME);
     const secret = process.env.SANITY_WEBHOOK_SECRET!;
 
@@ -781,142 +723,72 @@ export async function POST(req: Request) {
       !signature ||
       !isValidSignature(JSON.stringify(body), signature, secret)
     ) {
-      console.log("❌ Invalid signature - Unauthorized");
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    console.log("✅ Signature verified successfully");
 
-    if (!body.triggerEmail) {
-      console.log("⏭️ Skipping - triggerEmail is false, no action needed");
+    if (!body.triggerEmail || body.emailSent) {
       await client.patch(body._id).set({ triggerEmail: false }).commit();
-      return NextResponse.json({
-        message: "Not triggered - triggerEmail is false",
-      });
+      return NextResponse.json({ message: "Skipping email trigger" });
     }
 
-    if (body.emailSent) {
-      console.log("⏭️ Skipping - email already sent for this batch");
-      await client.patch(body._id).set({ triggerEmail: false }).commit();
-      return NextResponse.json({
-        message: "Not triggered - email already sent",
-      });
-    }
-
-    if (body.scheduledFor && new Date(body.scheduledFor) > new Date()) {
-      console.log("⏰ Scheduled for future:", body.scheduledFor);
-      await client.patch(body._id).set({ triggerEmail: false }).commit();
-      return NextResponse.json({
-        message: "Scheduled for future date",
-        scheduledFor: body.scheduledFor,
-      });
-    }
-
-    console.log("📊 Fetching paid customers from orders...");
-    const paidOrders = await client.fetch(`
-      *[_type == "order" && paymentStatus == "paid" && defined(customer.email)] {
-        "email": customer.email
-      }
-    `);
-
-    console.log(`📧 Found ${paidOrders.length} paid order records`);
+    const paidOrders = await client.fetch(
+      `*[_type == "order" && paymentStatus == "paid" && defined(customer.email)] { "email": customer.email }`,
+    );
     const emails = [...new Set(paidOrders.map((order: any) => order.email))];
-    console.log(`👥 Unique customer emails: ${emails.length}`);
 
     if (emails.length === 0) {
-      console.log("⚠️ No customers with paid orders found");
       await client
         .patch(body._id)
         .set({
           emailSent: false,
-          sentAt: new Date().toISOString(),
           triggerEmail: false,
-          recipientCount: 0,
-          emailError: "No paid customers found",
+          emailError: "No paid customers",
         })
         .commit();
-
       return NextResponse.json({
         success: false,
-        message: "No customers with paid orders found.",
+        message: "No customers found",
       });
     }
 
-    console.log("📦 Fetching batch details for ID:", body._id);
     const batchData = await client.fetch(
       `*[_id == $id][0] {
         batchName,
         products[]->{
-          name,
-          price,
-          category,
+          name, price, category,
           "slug": slug.current,
           "imageUrl": images.hero.asset->url,
-          colors[] {
-            hex,
-            name
-          }
+          colors[] { hex, name }
         }
       }`,
       { id: body._id },
     );
 
-    if (!batchData) {
-      console.log("❌ Batch data not found");
-      await client
-        .patch(body._id)
-        .set({
-          emailError: "Batch data not found",
-          triggerEmail: false,
-        })
-        .commit();
+    // Fetch Logo for Email
+    const activeLogo = await getActiveLogo();
+    const baseUrl = (
+      process.env.NEXT_PUBLIC_BASE_URL || "https://daimamkenyaafrica.com"
+    ).replace(/\/$/, "");
+    const logoUrl = activeLogo?.imageUrl
+      ? getLogoUrl(activeLogo.imageUrl).width(200).url()
+      : `${baseUrl}/assets/Logo_no-bg.png`;
+    const logoAlt = activeLogo?.alt || "Daima Mkenya Africa";
 
-      return NextResponse.json(
-        { error: "Batch data not found" },
-        { status: 404 },
-      );
-    }
-
-    console.log("✅ Batch data retrieved:", batchData.batchName);
-    console.log(`📦 Products in batch: ${batchData.products?.length || 0}`);
-
-    console.log(`🚀 Sending email blast to ${emails.length} customers...`);
     const emailHTML = generateEmailHTML(
       batchData.batchName,
       batchData.products || [],
+      logoUrl,
+      logoAlt,
     );
 
-    const { data, error } = await resend.emails.send({
+    const { error } = await resend.emails.send({
       from: "Daima Mkenya <info@daimamkenyaafrica.com>",
       to: emails as string[],
       subject: `New Collection: ${batchData.batchName}`,
       html: emailHTML,
     });
 
-    if (error) {
-      console.error("❌ Resend API error:", error);
-      await client
-        .patch(body._id)
-        .set({
-          emailSent: false,
-          sentAt: new Date().toISOString(),
-          triggerEmail: false,
-          recipientCount: emails.length,
-          emailError: error.message,
-        })
-        .commit();
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: error.message,
-          recipientCount: emails.length,
-        },
-        { status: 500 },
-      );
-    }
-
-    console.log("✅ Email blast sent successfully!");
-    console.log("Resend response:", data);
+    if (error) throw error;
 
     await client
       .patch(body._id)
@@ -928,60 +800,15 @@ export async function POST(req: Request) {
       })
       .commit();
 
-    console.log("✅ Sanity document updated with emailSent: true");
-    console.log("=".repeat(50));
-    console.log("🎉 BATCH COMPLETE");
-    console.log("=".repeat(50));
-
-    return NextResponse.json({
-      success: true,
-      count: emails.length,
-      message: `Email blast sent to ${emails.length} customers`,
-      batchId: body._id,
-      batchName: batchData.batchName,
-      sentAt: new Date().toISOString(),
-    });
+    return NextResponse.json({ success: true, count: emails.length });
   } catch (err: any) {
-    console.error("💥 CRITICAL ERROR IN WEBHOOK:");
-    console.error("Error message:", err.message);
-    console.error("Error stack:", err.stack);
-
-    try {
-      const body = await req.json().catch(() => ({}));
-      if (body._id) {
-        await client
-          .patch(body._id)
-          .set({
-            emailSent: false,
-            sentAt: new Date().toISOString(),
-            triggerEmail: false,
-            emailError: err.message.substring(0, 200),
-          })
-          .commit();
-        console.log("✅ Batch updated with critical error");
-      }
-    } catch (patchErr) {
-      console.error("Failed to update batch with error:", patchErr);
-    }
-
-    return NextResponse.json(
-      {
-        error: err.message,
-        stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
-      },
-      { status: 500 },
-    );
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
 
 export async function GET() {
   return NextResponse.json({
-    message: "Notify customers endpoint is running",
     status: "active",
-    webhook_url: "https://daimamkenyaafrica.com/api/notify-customers",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV,
-    hasResendKey: !!process.env.RESEND_API_KEY,
-    hasSanityToken: !!process.env.SANITY_WRITE_TOKEN,
   });
 }
