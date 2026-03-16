@@ -571,57 +571,53 @@ function generateEmailHTML(
     const productUrl = `${baseUrl}/products/${product.slug}`;
 
     return `
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; table-layout: fixed;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="table-layout: fixed;">
         <tr>
-          <td style="padding-bottom: 40px;">
+          <td style="padding-bottom: 50px;">
             <a href="${productUrl}" style="text-decoration: none; display: block;">
-              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #F9F9F9; border: 1px solid #eeeeee;">
+              <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #FBFBFB;">
                 <tr>
-                  <td align="center" valign="middle" style="height: 320px; padding: 30px;">
+                  <td align="center" valign="middle" style="height: 350px;">
                     ${
                       product.imageUrl
-                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="220" style="display: block; width: 220px; height: auto; max-height: 260px; object-fit: contain;" />`
-                        : `<div style="height: 260px; width: 100%; background-color: #F9F9F9;"></div>`
+                        ? `<img src="${product.imageUrl}" alt="${product.name}" width="100%" style="display: block; width: 100%; height: 350px; object-fit: cover;" />`
+                        : `<div style="height: 350px; width: 100%; background-color: #F2F2/F2;"></div>`
                     }
                   </td>
                 </tr>
               </table>
             </a>
 
-            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 24px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-top: 20px;">
               <tr>
-                <td align="center" style="padding: 0 10px;">
-                  <p style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 10px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.4em; color: #71717a;">
+                <td align="left">
+                  <p style="margin: 0 0 8px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 9px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.3em; color: #888888;">
                     ${product.category || "NEW ARRIVAL"}
                   </p>
-                  <h3 style="margin: 0 0 10px 0; font-family: Arial, sans-serif; font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.15em; color: #18181b; line-height: 1.4;">
+                  <h3 style="margin: 0 0 6px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.1em; color: #000000; line-height: 1.2;">
                     ${product.name}
                   </h3>
-                  <p style="margin: 0 0 15px 0; font-family: Arial, sans-serif; font-size: 16px; font-weight: 500; letter-spacing: 0.1em; color: #18181b;">
+                  <p style="margin: 0 0 15px 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 300; color: #000000;">
                     ${product.price}
                   </p>
-                </td>
-              </tr>
-              <tr>
-                <td align="center" style="padding-bottom: 20px;">
-                  ${
-                    product.colors && product.colors.length > 0
-                      ? product.colors
-                          .slice(0, 4)
-                          .map(
-                            (color: any) => `
-                        <span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin: 0 4px; background-color: ${color.hex} !important; border: 1px solid #e4e4e7;"></span>
-                      `,
-                          )
-                          .join("")
-                      : `<span style="display: inline-block; width: 12px; height: 12px; border-radius: 50%; background-color: #000000; border: 1px solid #e4e4e7;"></span>`
-                  }
-                </td>
-              </tr>
-              <tr>
-                <td align="center">
-                  <a href="${productUrl}" style="display: inline-block; background-color: #18181b; color: #ffffff; padding: 14px 28px; font-family: Arial, sans-serif; font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.3em; text-decoration: none;">
-                    VIEW PIECE
+
+                  <div style="margin-bottom: 20px;">
+                    ${
+                      product.colors && product.colors.length > 0
+                        ? product.colors
+                            .slice(0, 4)
+                            .map(
+                              (color: any) => `
+                          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background-color: ${color.hex} !important; border: 1px solid #e0e0e0;"></span>
+                        `,
+                            )
+                            .join("")
+                        : ""
+                    }
+                  </div>
+
+                  <a href="${productUrl}" style="display: inline-block; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.2em; color: #000000; text-decoration: underline;">
+                    Discover Piece
                   </a>
                 </td>
               </tr>
@@ -636,10 +632,10 @@ function generateEmailHTML(
   for (let i = 0; i < products.length; i += 2) {
     gridHTML += `
       <tr>
-        <td width="50%" valign="top" style="padding: 0 10px;">
+        <td width="50%" valign="top" style="padding: 0 15px;">
           ${renderProductCard(products[i])}
         </td>
-        <td width="50%" valign="top" style="padding: 0 10px;">
+        <td width="50%" valign="top" style="padding: 0 15px;">
           ${products[i + 1] ? renderProductCard(products[i + 1]) : ""}
         </td>
       </tr>
@@ -652,33 +648,33 @@ function generateEmailHTML(
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>New Collection: ${batchName}</title>
+      <title>${batchName}</title>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #e8e8e8; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing: antialiased;">
-      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #e8e8e8;">
+    <body style="margin: 0; padding: 0; background-color: #ffffff; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+      <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff;">
         <tr>
-          <td align="center" style="padding: 40px 10px;">
-            <table width="600" cellpadding="0" cellspacing="0" border="0" style="background-color: #e8e8e8; width: 600px; margin: 0 auto;">
+          <td align="center" style="padding: 60px 0;">
+            <table width="640" cellpadding="0" cellspacing="0" border="0" style="background-color: #ffffff; width: 640px; margin: 0 auto;">
 
               <tr>
-                <td align="center" style="padding-bottom: 60px;">
-                  <img src="${logoUrl}" alt="${logoAlt}" width="180" style="display: block; width: 180px; height: auto;" />
+                <td align="center" style="padding-bottom: 80px;">
+                  <img src="${logoUrl}" alt="${logoAlt}" width="160" style="display: block; width: 160px; height: auto;" />
                 </td>
               </tr>
 
               <tr>
-                <td style="padding: 0 20px 40px 20px; border-bottom: 2px solid #d4d4d8;">
-                  <span style="display: block; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5em; color: #a1a1aa; margin-bottom: 12px;">
-                    THE SELECTION
-                  </span>
-                  <h1 style="margin: 0; font-size: 24px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.2em; color: #18181b;">
-                    ${batchName} <span style="color: #a1a1aa; font-weight: 300; margin-left: 8px;">(${products.length})</span>
+                <td align="center" style="padding: 0 30px 60px 30px;">
+                  <p style="margin: 0 0 15px 0; font-size: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6em; color: #999999;">
+                    The Selection
+                  </p>
+                  <h1 style="margin: 0; font-size: 28px; font-weight: 300; text-transform: uppercase; letter-spacing: 0.3em; color: #000000;">
+                    ${batchName}
                   </h1>
                 </td>
               </tr>
 
               <tr>
-                <td style="padding: 60px 10px 20px 10px;">
+                <td style="padding: 0 15px;">
                   <table width="100%" cellpadding="0" cellspacing="0" border="0">
                     ${gridHTML}
                   </table>
@@ -686,21 +682,20 @@ function generateEmailHTML(
               </tr>
 
               <tr>
-                <td align="center" style="padding: 40px 20px 80px 20px;">
-                  <div style="width: 2px; height: 60px; background-color: #18181b; margin-bottom: 40px;"></div>
-                  <a href="${baseUrl}/products" style="display: inline-block; background-color: #18181b; color: #ffffff; padding: 22px 50px; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5em; text-decoration: none;">
-                    SHOP FULL COLLECTION
+                <td align="center" style="padding: 40px 0 100px 0;">
+                  <a href="${baseUrl}/products" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 20px 60px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4em; text-decoration: none;">
+                    Explore All Pieces
                   </a>
                 </td>
               </tr>
 
               <tr>
-                <td align="center" style="padding-bottom: 40px; border-top: 1px solid #d4d4d8; padding-top: 40px;">
-                  <p style="margin: 0; font-size: 10px; color: #71717a; text-transform: uppercase; letter-spacing: 0.2em; font-weight: bold;">
+                <td align="center" style="padding: 40px 20px; border-top: 1px solid #f0f0f0;">
+                  <p style="margin: 0; font-size: 9px; color: #999999; text-transform: uppercase; letter-spacing: 0.3em; font-weight: 400;">
                     Daima Mkenya &middot; Nairobi, Kenya
                   </p>
-                  <p style="margin: 10px 0 0 0; font-size: 9px; color: #a1a1aa;">
-                    &copy; ${new Date().getFullYear()} Daima Mkenya. All rights reserved.
+                  <p style="margin: 15px 0 0 0; font-size: 8px; color: #bbbbbb; text-transform: uppercase; letter-spacing: 0.1em;">
+                    &copy; ${new Date().getFullYear()} All rights reserved.
                   </p>
                 </td>
               </tr>
@@ -764,7 +759,6 @@ export async function POST(req: Request) {
       { id: body._id },
     );
 
-    // Fetch Logo for Email
     const activeLogo = await getActiveLogo();
     const baseUrl = (
       process.env.NEXT_PUBLIC_BASE_URL || "https://daimamkenyaafrica.com"
