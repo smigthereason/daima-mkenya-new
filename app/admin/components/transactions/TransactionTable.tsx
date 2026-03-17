@@ -2,7 +2,15 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Download, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Search,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  FileText,
+} from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 export default function TransactionTable({ orders }: { orders: any[] }) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -58,6 +66,137 @@ export default function TransactionTable({ orders }: { orders: any[] }) {
     a.click();
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF({
+      orientation: "landscape",
+      unit: "mm",
+      format: "a4",
+    });
+
+    // Add header with logo and title
+    doc.setFillColor(190, 30, 45); // #be1e2d
+    doc.rect(0, 0, 297, 10, "F");
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.setTextColor(0, 0, 0);
+    doc.text("Transaction Report", 14, 22);
+
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(
+      `Generated: ${new Date().toLocaleString("en-KE", {
+        timeZone: "Africa/Nairobi",
+        hour12: true,
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+      })} (EAT)`,
+      14,
+      30,
+    );
+
+    // Table headers
+    const tableHeaders = [
+      [
+        "Order #",
+        "Customer",
+        "Amount (KES)",
+        "Status",
+        "Method",
+        "Date",
+        "Transaction ID",
+      ],
+    ];
+
+    // Table data
+    const tableData = orders.map((o) => [
+      o.orderNumber || "N/A",
+      o.customer?.name || "N/A",
+      (o.amount || 0).toLocaleString(),
+      (o.paymentStatus || "pending").toUpperCase(),
+      (o.paymentMethod || "N/A").toUpperCase(),
+      new Date(o._createdAt).toLocaleDateString(),
+      (o.transactionId || o.pesapalOrderTrackingId || "N/A").slice(0, 12),
+    ]);
+
+    // Add table using autoTable
+    autoTable(doc, {
+      head: tableHeaders,
+      body: tableData,
+      startY: 35,
+      theme: "plain",
+      styles: {
+        fontSize: 8,
+        cellPadding: 4,
+        font: "helvetica",
+        lineColor: [220, 220, 220],
+        lineWidth: 0.1,
+      },
+      headStyles: {
+        fillColor: [245, 245, 245],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+        fontSize: 8,
+        halign: "left",
+        cellPadding: 6,
+      },
+      columnStyles: {
+        0: { fontStyle: "bold", cellWidth: 30 },
+        1: { cellWidth: 40 },
+        2: { halign: "right", fontStyle: "bold", cellWidth: 25 },
+        3: { cellWidth: 20 },
+        4: { cellWidth: 20 },
+        5: { cellWidth: 25 },
+        6: { fontStyle: "italic", cellWidth: 35 },
+      },
+      alternateRowStyles: {
+        fillColor: [250, 250, 250],
+      },
+      margin: { left: 14, right: 14 },
+    });
+
+    // Add footer with summary
+    const totalAmount = orders
+      .filter((o) => o.paymentStatus === "paid")
+      .reduce((sum, o) => sum + (o.amount || 0), 0);
+
+    const paidCount = orders.filter((o) => o.paymentStatus === "paid").length;
+    const pendingCount = orders.filter(
+      (o) => o.paymentStatus === "pending",
+    ).length;
+
+    // Get the last Y position after the table
+    const finalY = (doc as any).lastAutoTable.finalY + 10;
+
+    doc.setFillColor(245, 245, 245);
+    doc.rect(14, finalY, 269, 20, "F");
+
+    doc.setFontSize(8);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Total Transactions: ${orders.length}`, 18, finalY + 6);
+    doc.text(`Paid: ${paidCount}`, 18, finalY + 12);
+    doc.text(`Pending: ${pendingCount}`, 18, finalY + 18);
+
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text(
+      `Total Revenue: KES ${totalAmount.toLocaleString()}`,
+      180,
+      finalY + 12,
+    );
+
+    // Add footer with red line
+    doc.setFillColor(190, 30, 45);
+    doc.rect(0, doc.internal.pageSize.height - 5, 297, 5, "F");
+
+    // Save the PDF
+    doc.save(`transactions-${new Date().toISOString().split("T")[0]}.pdf`);
+  };
+
   return (
     <div className="bg-white rounded-none border border-neutral-100 shadow-sm overflow-hidden">
       {/* Table Header with Filters - Mobile stacked, Desktop inline */}
@@ -84,17 +223,25 @@ export default function TransactionTable({ orders }: { orders: any[] }) {
             >
               <option value="all">All Status</option>
               <option value="paid">Paid</option>
-              <option value="unpaid">Unpaid</option>
+              <option value="pending">Pending</option>
               <option value="failed">Failed</option>
               <option value="refunded">Refunded</option>
             </select>
           </div>
-          <button
-            onClick={exportToCSV}
-            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-none text-[10px] font-black hover:bg-neutral-800 transition-colors uppercase tracking-[0.2em]"
-          >
-            <Download size={14} /> Export CSV
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={exportToPDF}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-white border border-black text-black rounded-none text-[10px] font-black hover:bg-neutral-50 transition-colors uppercase tracking-[0.2em]"
+            >
+              <FileText size={14} /> PDF
+            </button>
+            <button
+              onClick={exportToCSV}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-black text-white rounded-none text-[10px] font-black hover:bg-neutral-800 transition-colors uppercase tracking-[0.2em]"
+            >
+              <Download size={14} /> CSV
+            </button>
+          </div>
         </div>
       </div>
 
@@ -157,7 +304,9 @@ export default function TransactionTable({ orders }: { orders: any[] }) {
                           ? "bg-red-50 text-red-700"
                           : order.paymentStatus === "refunded"
                             ? "bg-purple-50 text-purple-700"
-                            : "bg-orange-50 text-orange-700"
+                            : order.paymentStatus === "pending"
+                              ? "bg-orange-50 text-orange-700"
+                              : "bg-gray-50 text-gray-700"
                     }`}
                   >
                     {order.paymentStatus || "pending"}
