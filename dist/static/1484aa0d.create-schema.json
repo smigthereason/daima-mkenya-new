@@ -1457,5 +1457,157 @@
     "name": "logo",
     "type": "document",
     "title": "Logo & Branding"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "name",
+        "type": "string",
+        "title": "Full Name"
+      },
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "email",
+        "type": "string"
+      },
+      {
+        "name": "phone",
+        "type": "string",
+        "title": "Phone Number"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "General Enquiry",
+              "value": "general"
+            },
+            {
+              "title": "Order / Shipment",
+              "value": "order"
+            },
+            {
+              "title": "Wholesale / Bulk",
+              "value": "wholesale"
+            },
+            {
+              "title": "Partnership / Media",
+              "value": "partnership"
+            },
+            {
+              "title": "Account / Support",
+              "value": "support"
+            }
+          ]
+        },
+        "name": "subject",
+        "type": "string",
+        "title": "Subject Type"
+      },
+      {
+        "name": "subjectLabel",
+        "type": "string"
+      },
+      {
+        "rows": 5,
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "message",
+        "type": "text"
+      },
+      {
+        "options": {
+          "list": [
+            {
+              "title": "New",
+              "value": "new"
+            },
+            {
+              "title": "In Progress",
+              "value": "in_progress"
+            },
+            {
+              "title": "Replied",
+              "value": "replied"
+            },
+            {
+              "title": "Closed",
+              "value": "closed"
+            }
+          ]
+        },
+        "initialValue": "new",
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "readOnly": true,
+        "name": "submittedAt",
+        "type": "datetime"
+      },
+      {
+        "readOnly": true,
+        "name": "repliedAt",
+        "type": "datetime"
+      },
+      {
+        "of": [
+          {
+            "fields": [
+              {
+                "name": "note",
+                "type": "text"
+              },
+              {
+                "name": "addedBy",
+                "type": "string"
+              },
+              {
+                "name": "addedAt",
+                "type": "datetime"
+              }
+            ],
+            "type": "object",
+            "name": "note"
+          }
+        ],
+        "name": "notes",
+        "type": "array",
+        "title": "Internal Notes"
+      }
+    ],
+    "name": "contactSubmission",
+    "type": "document",
+    "title": "Contact Form Submissions"
   }
 ]

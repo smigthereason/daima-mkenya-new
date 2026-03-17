@@ -1,9 +1,88 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 
 const ContactPage: React.FC = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "general",
+    phone: "",
+    message: "",
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<{
+    type: "success" | "error" | null;
+    message: string;
+  }>({ type: null, message: "" });
+
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitStatus({ type: null, message: "" });
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send message");
+      }
+
+      // Success
+      setSubmitStatus({
+        type: "success",
+        message:
+          "Thank you for your message. We'll respond within 1-2 business days.",
+      });
+
+      // Clear form
+      setFormData({
+        name: "",
+        email: "",
+        subject: "general",
+        phone: "",
+        message: "",
+      });
+    } catch (error) {
+      setSubmitStatus({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const subjectLabels = {
+    general: "General enquiry",
+    order: "Order / shipment",
+    wholesale: "Wholesale / bulk",
+    partnership: "Partnership / media",
+    support: "Account / support",
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       {/* Header */}
@@ -24,27 +103,37 @@ const ContactPage: React.FC = () => {
       {/* Two-column layout */}
       <section className="grid gap-10 lg:grid-cols-[1.6fr,1.1fr]">
         {/* Left: form */}
-        <div className="bg-white border border-neutral-200/70  p-6 md:p-8 shadow-sm">
+        <div className="bg-white border border-neutral-200/70 p-6 md:p-8 shadow-sm">
           <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-6">
             Send a message
           </p>
 
-          <form
-            className="space-y-5"
-            action="https://formspree.io/f/your-id" // or your own API route
-            method="POST"
-          >
+          {submitStatus.type && (
+            <div
+              className={`mb-6 p-4 text-sm ${
+                submitStatus.type === "success"
+                  ? "bg-green-50 text-green-800 border border-green-200"
+                  : "bg-red-50 text-red-800 border border-red-200"
+              }`}
+            >
+              {submitStatus.message}
+            </div>
+          )}
+
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid gap-5 md:grid-cols-2">
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor="name"
                   className="text-[11px] tracking-[0.25em] uppercase text-neutral-500"
                 >
-                  Full Name
+                  Full Name *
                 </label>
                 <input
                   id="name"
                   name="name"
+                  value={formData.name}
+                  onChange={handleChange}
                   required
                   className="h-11 px-3 border border-neutral-200 bg-[#FDFDFD] text-sm text-neutral-900 outline-none focus:border-neutral-900 transition-colors"
                 />
@@ -55,12 +144,14 @@ const ContactPage: React.FC = () => {
                   htmlFor="email"
                   className="text-[11px] tracking-[0.25em] uppercase text-neutral-500"
                 >
-                  Email
+                  Email *
                 </label>
                 <input
                   id="email"
                   name="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                   className="h-11 px-3 border border-neutral-200 bg-[#FDFDFD] text-sm text-neutral-900 outline-none focus:border-neutral-900 transition-colors"
                 />
@@ -73,19 +164,21 @@ const ContactPage: React.FC = () => {
                   htmlFor="subject"
                   className="text-[11px] tracking-[0.25em] uppercase text-neutral-500"
                 >
-                  Subject
+                  Subject *
                 </label>
                 <select
                   id="subject"
                   name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   className="h-11 px-3 border border-neutral-200 bg-[#FDFDFD] text-[13px] text-neutral-800 outline-none focus:border-neutral-900 transition-colors"
-                  defaultValue="general"
+                  required
                 >
                   <option value="general">General enquiry</option>
                   <option value="order">Order / shipment</option>
-                  {/*<option value="wholesale">Wholesale / bulk</option>*/}
-                  {/*<option value="partnership">Partnership / media</option>*/}
-                  {/*<option value="support">Account / support</option>*/}
+                  <option value="wholesale">Wholesale / bulk</option>
+                  <option value="partnership">Partnership / media</option>
+                  <option value="support">Account / support</option>
                 </select>
               </div>
 
@@ -99,6 +192,8 @@ const ContactPage: React.FC = () => {
                 <input
                   id="phone"
                   name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
                   className="h-11 px-3 border border-neutral-200 bg-[#FDFDFD] text-sm text-neutral-900 outline-none focus:border-neutral-900 transition-colors"
                 />
               </div>
@@ -109,11 +204,13 @@ const ContactPage: React.FC = () => {
                 htmlFor="message"
                 className="text-[11px] tracking-[0.25em] uppercase text-neutral-500"
               >
-                Message
+                Message *
               </label>
               <textarea
                 id="message"
                 name="message"
+                value={formData.message}
+                onChange={handleChange}
                 required
                 rows={5}
                 className="w-full px-3 py-2.5 border border-neutral-200 bg-[#FDFDFD] text-sm text-neutral-900 outline-none focus:border-neutral-900 resize-none transition-colors"
@@ -128,9 +225,12 @@ const ContactPage: React.FC = () => {
 
               <button
                 type="submit"
-                className="group relative inline-flex items-center gap-4 py-3 px-10 border border-neutral-900 bg-neutral-900 text-white text-[10px] md:text-[11px] font-bold uppercase tracking-[0.35em] overflow-hidden"
+                disabled={isSubmitting}
+                className="group relative inline-flex items-center gap-4 py-3 px-10 border border-neutral-900 bg-neutral-900 text-white text-[10px] md:text-[11px] font-bold uppercase tracking-[0.35em] overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="relative z-10">Send Message</span>
+                <span className="relative z-10">
+                  {isSubmitting ? "Sending..." : "Send Message"}
+                </span>
                 <div className="absolute inset-0 bg-black translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]" />
               </button>
             </div>
@@ -139,7 +239,7 @@ const ContactPage: React.FC = () => {
 
         {/* Right: contact details & registry context */}
         <aside className="space-y-8">
-          <div className="bg-white border border-neutral-200/70  p-6 md:p-7 shadow-sm">
+          <div className="bg-white border border-neutral-200/70 p-6 md:p-7 shadow-sm">
             <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-4">
               Direct contact
             </p>
@@ -174,7 +274,7 @@ const ContactPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white border border-neutral-200/70  p-6 md:p-7 shadow-sm">
+          <div className="bg-white border border-neutral-200/70 p-6 md:p-7 shadow-sm">
             <p className="text-[10px] tracking-[0.4em] text-neutral-400 uppercase mb-4">
               Registry & Orders
             </p>
@@ -191,7 +291,7 @@ const ContactPage: React.FC = () => {
             </Link>
           </div>
 
-          <div className="bg-[#F5F5F5] border border-neutral-200/70  p-6 md:p-7">
+          <div className="bg-[#F5F5F5] border border-neutral-200/70 p-6 md:p-7">
             <p className="text-[10px] tracking-[0.4em] text-neutral-500 uppercase mb-3">
               Unity in every thread
             </p>

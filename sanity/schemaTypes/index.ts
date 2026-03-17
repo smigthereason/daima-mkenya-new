@@ -7,7 +7,8 @@ import oneOff from "./oneOff";
 import priceInquiry from "./priceInquiry";
 import productBatch from "./productBatch";
 import newsletter from "./newsletter";
-import logo from "./logo"; // Add this import
+import logo from "./logo";
+import contactSubmission from "./contactSubmission";
 
 const product: SchemaTypeDefinition = {
   name: "product",
@@ -172,6 +173,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     priceInquiry,
     productBatch,
     newsletter,
-    logo, // Add this line
+    logo,
+    contactSubmission,
   ],
 };
