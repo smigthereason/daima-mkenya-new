@@ -1,23 +1,27 @@
-// import { createClient } from 'next-sanity'
-// import { apiVersion, dataset, projectId } from '../env'
+// // sanity/lib/client.ts
+// import { createClient } from "next-sanity";
+// import { apiVersion, dataset, projectId } from "../env";
 
 // export const client = createClient({
 //   projectId,
 //   dataset,
 //   apiVersion,
-//   // NextAuth needs to write to Sanity, so we use a token and disable CDN for those requests
-//   token: process.env.SANITY_API_TOKEN, 
-//   useCdn: false, 
-// })
-
+//   token: process.env.SANITY_API_TOKEN,
+//   useCdn: false,
+// });
 // sanity/lib/client.ts
-import { createClient } from 'next-sanity'
-import { apiVersion, dataset, projectId } from '../env'
+import { createClient } from "next-sanity";
+import { apiVersion, dataset, projectId } from "../env";
 
 export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  token: process.env.SANITY_API_TOKEN, 
-  useCdn: false, 
-})
+  // We keep the token for admin write-access
+  token: process.env.SANITY_API_TOKEN,
+
+  // OPTIMIZATION: Set to true.
+  // This uses Sanity's Edge Cache (API CDN) which is faster for public users.
+  // The client will still automatically bypass the CDN for mutations (writes).
+  useCdn: true,
+});
