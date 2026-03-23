@@ -14,22 +14,28 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@mapbox/node-pre-gyp": "^2.0.3",
     "@sanity/image-url": "^1.2.0",
     "@sanity/vision": "^4.22.0",
     "@sanity/webhook": "^4.0.4",
     "@types/bcryptjs": "^2.4.6",
     "@vercel/analytics": "^1.6.1",
+    "ajv": "^8.18.0",
+    "argon2": "^0.44.0",
     "bcryptjs": "^3.0.3",
     "d3-geo": "^3.1.1",
     "date-fns": "^4.1.0",
+    "dompurify": "^3.3.3",
     "dotted-map": "^2.2.3",
+    "flatted": "^3.4.2",
     "framer-motion": "^12.34.3",
     "gsap": "^3.14.2",
     "intasend-node": "^1.1.2",
-    "jspdf": "^4.2.0",
+    "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.563.0",
-    "next": "16.1.6",
+    "minimatch": "^10.2.4",
+    "next": "^16.2.1",
     "next-auth": "^4.24.13",
     "next-auth-sanity": "^1.5.3",
     "next-sanity": "^11.6.12",
@@ -39,11 +45,14 @@
     "react-icons": "^5.5.0",
     "recharts": "^3.7.0",
     "resend": "^6.9.3",
+    "rollup": "^4.60.0",
     "sanity": "^4.22.0",
     "styled-components": "^6.3.9",
-    "swiper": "^12.1.0",
+    "swiper": "^12.1.2",
     "tailwind-scrollbar-hide": "^4.0.0",
+    "tar": "^7.5.12",
     "topojson-client": "^3.1.0",
+    "undici": "^7.24.5",
     "uuid": "^13.0.0"
   },
   "devDependencies": {
@@ -61,5 +70,11 @@
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "minimatch": "^10.2.4",
+    "tar": "^7.5.12",
+    "@mapbox/node-pre-gyp": "^2.0.3",
+    "argon2": "^0.44.0"
   }
 }
