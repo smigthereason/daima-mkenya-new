@@ -118,7 +118,7 @@ export default function AfricaDottedMap() {
         <div className="text-center z-10 w-full">
           <h2 className="text-4xl font-serif tracking-tighter text-neutral-500 uppercase leading-[0.85] mb-4">
             Unity in Every <br />
-            <span className=""Thread</span>
+            <span className="">Thread</span>
           </h2>
           <div className="h-10 w-px bg-neutral-900 mx-auto" />
         </div>
