@@ -33,7 +33,7 @@ const BrandMission = ({
               className={`${serifDisplay} text-5xl md:text-6xl lg:text-7xl xl:text-8xl reveal leading-[1.1]`}
             >
               Crafting <br />
-              <span className="italic">Identity</span> <br />
+              <span className="">Identity</span> <br />
               and Pride.
             </h3>
           </div>
