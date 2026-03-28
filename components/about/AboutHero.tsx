@@ -17,12 +17,16 @@ const AboutHero = ({ serifDisplay, serifBody }: AboutHeroProps) => {
     >
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 lg:gap-10 xl:gap-12 items-center">
         <div className="lg:col-span-7 space-y-4 md:space-y-6 lg:space-y-8 xl:space-y-10">
-          <h1 className={`${serifDisplay} text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[10vw] reveal`}>
+          <h1
+            className={`${serifDisplay} text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[10vw] reveal`}
+          >
             Daima <br /> Mkenya <br /> Africa
           </h1>
-          <p className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal `}>
-            Daima Mkenya Africa is a celebration of identity, crafted with
-            intention.
+          <p
+            className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl max-w-xl reveal `}
+          >
+            Daima Mkenya Africa is a celebration of identity and pride crafted
+            with intention.
             <br />
             Our approach is deliberate:
           </p>
@@ -32,9 +36,15 @@ const AboutHero = ({ serifDisplay, serifBody }: AboutHeroProps) => {
               "Uncompromising quality",
               "Considered design",
             ].map((item, idx) => (
-              <div key={idx} className="flex items-start gap-2 mt-2 reveal" role="listitem">
+              <div
+                key={idx}
+                className="flex items-start gap-2 mt-2 reveal"
+                role="listitem"
+              >
                 <span className="font-semibold leading-none mt-1.5">•</span>
-                <span className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl`}>
+                <span
+                  className={`${serifBody} text-base md:text-lg lg:text-xl xl:text-2xl`}
+                >
                   {item}
                 </span>
               </div>

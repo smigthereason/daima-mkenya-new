@@ -33,8 +33,8 @@ const BrandMission = ({
               className={`${serifDisplay} text-5xl md:text-6xl lg:text-7xl xl:text-8xl reveal leading-[1.1]`}
             >
               Crafting <br />
-              <span className="">Identity</span> <br />
-              and Pride.
+              <span className="">with</span> <br />
+              Intention.
             </h3>
           </div>
 
@@ -45,8 +45,9 @@ const BrandMission = ({
                 className={`${serifBody} text-2xl md:text-3xl lg:text-4xl xl:text-4xl text-neutral-900 leading-tight reveal`}
               >
                 Daima Mkenya Africa is a Kenyan-owned apparel and fabric brand
-                dedicated to celebrating identity and cultural heritage through
-                design.
+                dedicated to celebrating identity and pride through design.
+                Kenya&apos;s beauty is in its people. The deeper you cherish who
+                you are, the more open you are to the beauty of others.
               </p>
 
               {/* Grid for Inspiration/Impact: Stays 2 columns on iPad Pro but 1 column on smaller tablets */}
@@ -61,8 +62,8 @@ const BrandMission = ({
                     className={`${serifBody} text-lg md:text-xl leading-relaxed`}
                   >
                     The brand is inspired by the colors of Kenya&apos;s flag,
-                    and the beauty of our land. Crafted from Kenyan cotton and
-                    produced by skilled local artisans.
+                    and the beauty of our land. Crafted primarily from Kenyan
+                    cotton and produced by skilled local artisans.
                   </p>
                 </div>
 
