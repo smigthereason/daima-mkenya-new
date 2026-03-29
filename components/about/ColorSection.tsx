@@ -33,7 +33,7 @@ const ColorSection = ({ serifSubheader, serifBody }: ColorSectionProps) => {
             <span className="text-[#be1e2d] font-black">red</span> symbolizes
             the struggle for freedom,
             <span className="text-[#006241] font-black"> green</span> celebrates
-            our land and natural wealth, and{" "}
+            the beauty of our land and natural wealth, and{" "}
             <span className="italic font-bold">white</span> stands for peace and
             unity. Together, they reflect the spirit and pride of Kenya.
           </p>
