@@ -178,101 +178,104 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="absolute top-0 w-full z-50 bg-transparent px-6 lg:px-12 py-8">
-      <div className="grid grid-cols-3 items-center w-full max-w-[1800px] mx-auto">
-        {/* LEFT: TOGGLE */}
-        <div className="flex justify-start">
-          <button
-            onClick={() => setIsOpen(true)}
-            className="flex items-center gap-3 group focus:outline-none cursor-pointer"
-          >
-            <div className="relative w-6 h-5 flex flex-col justify-between">
-              <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-1/2"></span>
-              <span className="w-full h-[1.5px] bg-black"></span>
-              <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-3/4"></span>
-            </div>
-            <span className="hidden md:block text-[11px] text-black uppercase tracking-[0.2em] font-medium pt-0.5">
-              Menu
-            </span>
-          </button>
-        </div>
-
-        {/* CENTER: LOGO - Fixed width/height with auto to maintain aspect ratio */}
-        <div className="flex justify-center">
-          <Link href="/" className="relative block">
-            <div className="block md:hidden">
-              <Image
-                src={SideStripe}
-                alt="DMA"
-                width={60}
-                height={60}
-                priority
-                style={{ width: "auto", height: "auto" }}
-              />
-            </div>
-            <div className="hidden md:block">
-              <Image
-                src={Logo}
-                alt="DMA"
-                width={120}
-                height={120}
-                priority
-                style={{ width: "auto", height: "auto" }}
-              />
-            </div>
-          </Link>
-        </div>
-
-        {/* RIGHT: ICONS */}
-        <div className="flex justify-end items-center gap-4 md:gap-6">
-          <Suspense fallback={<div className="w-6 h-6" />}>
-            <SearchLogic
-              isSearchOpen={isSearchOpen}
-              setIsSearchOpen={setIsSearchOpen}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              handleSearchSubmit={handleSearchSubmit}
-            />
-          </Suspense>
-
-          <Link
-            href="/cart"
-            className="relative cursor-pointer hover:scale-110 transition-transform"
-          >
-            <ShoppingBag
-              size={24}
-              className="stroke-[1.5px] text-neutral-700"
-            />
-            {itemCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-[#be1e2d] text-white text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
-                {itemCount}
+    <>
+      {/* STICKY NAVBAR - Solid background, no transparency */}
+      <nav className="sticky top-0 w-full z-50 bg-white shadow-sm px-6 lg:px-12 py-8">
+        <div className="grid grid-cols-3 items-center w-full max-w-[1800px] mx-auto">
+          {/* LEFT: TOGGLE */}
+          <div className="flex justify-start">
+            <button
+              onClick={() => setIsOpen(true)}
+              className="flex items-center gap-3 group focus:outline-none cursor-pointer"
+            >
+              <div className="relative w-6 h-5 flex flex-col justify-between">
+                <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-1/2"></span>
+                <span className="w-full h-[1.5px] bg-black"></span>
+                <span className="w-full h-[1.5px] bg-black transition-all group-hover:w-3/4"></span>
+              </div>
+              <span className="hidden md:block text-[11px] text-black uppercase tracking-[0.2em] font-medium pt-0.5">
+                Menu
               </span>
-            )}
-          </Link>
+            </button>
+          </div>
 
-          <Link href={session ? "/profile" : "/login"}>
-            {session?.user?.image ? (
-              <div className="w-7 h-7 relative rounded-full overflow-hidden border border-black/10">
+          {/* CENTER: LOGO - Fixed width/height with auto to maintain aspect ratio */}
+          <div className="flex justify-center">
+            <Link href="/" className="relative block">
+              <div className="block md:hidden">
                 <Image
-                  src={session.user.image}
-                  alt="User"
-                  fill
-                  className="object-cover"
-                  sizes="28px"
-                  unoptimized={session.user.image.includes("ui-avatars.com")}
+                  src={SideStripe}
+                  alt="DMA"
+                  width={60}
+                  height={60}
+                  priority
+                  style={{ width: "auto", height: "auto" }}
                 />
               </div>
-            ) : (
-              <User
-                size={32}
-                className="cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700"
-              />
-            )}
-          </Link>
-        </div>
-      </div>
+              <div className="hidden md:block">
+                <Image
+                  src={Logo}
+                  alt="DMA"
+                  width={120}
+                  height={120}
+                  priority
+                  style={{ width: "auto", height: "auto" }}
+                />
+              </div>
+            </Link>
+          </div>
 
-      {/* FULL SCREEN MENU OVERLAY */}
+          {/* RIGHT: ICONS */}
+          <div className="flex justify-end items-center gap-4 md:gap-6">
+            <Suspense fallback={<div className="w-6 h-6" />}>
+              <SearchLogic
+                isSearchOpen={isSearchOpen}
+                setIsSearchOpen={setIsSearchOpen}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
+                handleSearchSubmit={handleSearchSubmit}
+              />
+            </Suspense>
+
+            <Link
+              href="/cart"
+              className="relative cursor-pointer hover:scale-110 transition-transform"
+            >
+              <ShoppingBag
+                size={24}
+                className="stroke-[1.5px] text-neutral-700"
+              />
+              {itemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#be1e2d] text-white text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-bold">
+                  {itemCount}
+                </span>
+              )}
+            </Link>
+
+            <Link href={session ? "/profile" : "/login"}>
+              {session?.user?.image ? (
+                <div className="w-7 h-7 relative rounded-full overflow-hidden border border-black/10">
+                  <Image
+                    src={session.user.image}
+                    alt="User"
+                    fill
+                    className="object-cover"
+                    sizes="28px"
+                    unoptimized={session.user.image.includes("ui-avatars.com")}
+                  />
+                </div>
+              ) : (
+                <User
+                  size={32}
+                  className="cursor-pointer hover:scale-110 transition-transform stroke-[1.5px] text-neutral-700"
+                />
+              )}
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* FULL SCREEN MENU OVERLAY - Separate from navbar, fixed positioning */}
       <div
         ref={menuRef}
         className="fixed inset-0 bg-[#f8f8f8] z-[9999] overflow-hidden shadow-2xl"
@@ -352,7 +355,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 };
 
