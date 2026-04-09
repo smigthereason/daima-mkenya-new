@@ -197,20 +197,28 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* CENTER: LOGO */}
+        {/* CENTER: LOGO - Fixed width/height with auto to maintain aspect ratio */}
         <div className="flex justify-center">
           <Link href="/" className="relative block">
             <div className="block md:hidden">
               <Image
                 src={SideStripe}
                 alt="DMA"
-                height={60}
                 width={60}
+                height={60}
                 priority
+                style={{ width: "auto", height: "auto" }}
               />
             </div>
             <div className="hidden md:block">
-              <Image src={Logo} alt="DMA" height={120} width={120} priority />
+              <Image
+                src={Logo}
+                alt="DMA"
+                width={120}
+                height={120}
+                priority
+                style={{ width: "auto", height: "auto" }}
+              />
             </div>
           </Link>
         </div>
@@ -250,6 +258,7 @@ const Navbar = () => {
                   alt="User"
                   fill
                   className="object-cover"
+                  sizes="28px"
                   unoptimized={session.user.image.includes("ui-avatars.com")}
                 />
               </div>
@@ -321,6 +330,7 @@ const Navbar = () => {
                     alt="Featured"
                     fill
                     className="object-cover"
+                    sizes="288px"
                   />
                 )}
               </div>

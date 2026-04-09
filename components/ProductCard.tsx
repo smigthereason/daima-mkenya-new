@@ -10,7 +10,6 @@ import {
   CreditCard,
   MinusCircle,
   AlertTriangle,
-  ZoomIn,
   Loader2,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
@@ -427,11 +426,6 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
               priority
             />
           )}
-
-          {/* Zoom icon hint */}
-          <div className="absolute bottom-6 right-6 bg-white/50 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <ZoomIn size={20} className="text-black" />
-          </div>
         </div>
 
         {/* Out of Stock Overlay */}
@@ -448,10 +442,6 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
 
       {/* Right Panel: Details & Actions */}
       <div className="order-3 flex flex-col w-full xl:w-[28%] p-8 md:p-12 xl:p-16 bg-white justify-center border-l border-gray-50">
-        <span className="text-[12px] tracking-[0.6em] text-gray-900 uppercase block mb-8 font-light">
-          Ref. {activeProduct._id.substring(0, 8)}
-        </span>
-
         <h1 className="text-3xl md:text-5xl font-light tracking-tighter leading-[1.1] mb-6 uppercase">
           {titleLine1} <br />
           <span className="font-black">{titleLine2}</span>

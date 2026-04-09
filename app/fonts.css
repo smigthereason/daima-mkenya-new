@@ -1,0 +1,54 @@
+/* app/fonts.css */
+/* Self-hosted Playfair Display - eliminates Google Fonts dependency */
+
+/* Playfair Display - Regular 400 */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Playfair Display Regular"),
+    local("PlayfairDisplay-Regular"),
+    url("https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtY.woff2")
+      format("woff2");
+}
+
+/* Playfair Display - Regular 400 Italic */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src:
+    local("Playfair Display Italic"),
+    local("PlayfairDisplay-Italic"),
+    url("https://fonts.gstatic.com/s/playfairdisplay/v30/nuFkD-vYSZviVYUb_rj3ij__anPXDTnohkk72xU.woff2")
+      format("woff2");
+}
+
+/* Playfair Display - Bold 700 */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local("Playfair Display Bold"),
+    local("PlayfairDisplay-Bold"),
+    url("https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiunDXbtY.woff2")
+      format("woff2");
+}
+
+/* Playfair Display - Bold 700 Italic */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src:
+    local("Playfair Display Bold Italic"),
+    local("PlayfairDisplay-BoldItalic"),
+    url("https://fonts.gstatic.com/s/playfairdisplay/v30/nuFkD-vYSZviVYUb_rj3ij__anPXDTnohkk72xU.woff2")
+      format("woff2");
+}

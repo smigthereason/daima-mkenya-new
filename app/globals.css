@@ -1,6 +1,65 @@
 /* globals.css */
 @import "tailwindcss";
 
+/* ============================================
+   SELF-HOSTED GOOGLE FONTS (Playfair Display)
+   Eliminates hydration mismatch from font loading
+   ============================================ */
+
+/* Playfair Display - Regular 400 */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Playfair Display Regular'), local('PlayfairDisplay-Regular'),
+       url('https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtY.woff2') format('woff2');
+}
+
+/* Playfair Display - Regular 400 Italic */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: local('Playfair Display Italic'), local('PlayfairDisplay-Italic'),
+       url('https://fonts.gstatic.com/s/playfairdisplay/v30/nuFkD-vYSZviVYUb_rj3ij__anPXDTnohkk72xU.woff2') format('woff2');
+}
+
+/* Playfair Display - Bold 700 */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Playfair Display Bold'), local('PlayfairDisplay-Bold'),
+       url('https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKeiunDXbtY.woff2') format('woff2');
+}
+
+/* Playfair Display - Bold 700 Italic */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: local('Playfair Display Bold Italic'), local('PlayfairDisplay-BoldItalic'),
+       url('https://fonts.gstatic.com/s/playfairdisplay/v30/nuFkD-vYSZviVYUb_rj3ij__anPXDTnohkk72xU.woff2') format('woff2');
+}
+
+/* Playfair Display - Extra Bold 900 */
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: local('Playfair Display Black'), local('PlayfairDisplay-Black'),
+       url('https://fonts.gstatic.com/s/playfairdisplay/v30/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKfsunDXbtY.woff2') format('woff2');
+}
+
+/* ============================================
+   CSS VARIABLES & THEME
+   ============================================ */
+
 :root {
   --background: #fff;
   --foreground: #1d1d1d;
@@ -21,18 +80,34 @@
   --breakpoint-2xl: 1536px;
 }
 
-/* Base styles */
+/* ============================================
+   BASE STYLES
+   ============================================ */
+
+/* Base styles with font fallbacks */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Signika Negative", sans-serif, Arial;
+  font-family: 'Playfair Display', 'Signika Negative', Georgia, 'Times New Roman', serif, Arial;
   overscroll-behavior: none;
   margin: 0;
   padding: 0;
   overflow-x: hidden;
 }
 
-/* GSAP Smooth Scrolling Support */
+/* Font utility classes for consistent naming across server/client */
+.font-playfair {
+  font-family: 'Playfair Display', 'Signika Negative', Georgia, 'Times New Roman', serif;
+}
+
+.font-signika {
+  font-family: 'Signika Negative', 'Playfair Display', Arial, sans-serif;
+}
+
+/* ============================================
+   GSAP SMOOTH SCROLLING SUPPORT
+   ============================================ */
+
 #smooth-wrapper {
   position: fixed;
   top: 0;
@@ -50,12 +125,18 @@ body {
   will-change: transform;
 }
 
-/* Typography Utilities */
+/* ============================================
+   TYPOGRAPHY UTILITIES
+   ============================================ */
+
 .font-georgia {
-  font-family: Georgia, serif;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
-/* Hero Section Base */
+/* ============================================
+   HERO SECTION
+   ============================================ */
+
 .hero-section {
   z-index: 30;
   position: relative;
@@ -78,7 +159,11 @@ body {
   }
 }
 
-/* Utility for Line Clamping (Used in Product Cards) */
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Line Clamping (Used in Product Cards) */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -86,7 +171,10 @@ body {
   overflow: hidden;
 }
 
-/* Custom Scrollbar for Luxury Aesthetics */
+/* ============================================
+   CUSTOM SCROLLBAR (Luxury Aesthetics)
+   ============================================ */
+
 ::-webkit-scrollbar {
   width: 6px;
 }
@@ -104,19 +192,26 @@ body {
   background: var(--foreground);
 }
 
-/* Add to your globals.css */
+/* ============================================
+   TRANSACTION TABLE STYLES
+   ============================================ */
 
-/* Transaction table styles */
 .transaction-row:hover {
   background-color: rgba(0, 98, 65, 0.02);
 }
 
-/* Chart tooltip customization */
+/* ============================================
+   CHART TOOLTIP CUSTOMIZATION
+   ============================================ */
+
 .recharts-tooltip-wrapper {
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
 }
 
-/* Status badges */
+/* ============================================
+   STATUS BADGES
+   ============================================ */
+
 .status-badge {
   @apply text-[10px] px-2 py-1 rounded-full font-bold uppercase;
 }
@@ -133,12 +228,18 @@ body {
   @apply bg-red-100 text-[#be1e2d];
 }
 
-/* Card hover effects */
+/* ============================================
+   CARD HOVER EFFECTS
+   ============================================ */
+
 .stat-card {
   @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
 }
 
-/* Add to your globals.css */
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
 @keyframes bounce-slow {
   0%,
   100% {
@@ -151,4 +252,28 @@ body {
 
 .animate-bounce-slow {
   animation: bounce-slow 2s ease-in-out infinite;
+}
+
+/* ============================================
+   FONT FALLBACK FOR OFFLINE/CORPORATE ENVIRONMENTS
+   ============================================ */
+
+/* If Google Fonts CDN is blocked, fall back to local/system fonts gracefully */
+@supports not (font-family: 'Playfair Display') {
+  body {
+    font-family: 'Signika Negative', Georgia, 'Times New Roman', serif;
+  }
+  
+  .font-playfair {
+    font-family: 'Signika Negative', Georgia, 'Times New Roman', serif;
+  }
+}
+
+/* Optional: Print styles for better readability */
+@media print {
+  body {
+    font-family: Georgia, 'Times New Roman', serif;
+    color: black;
+    background: white;
+  }
 }

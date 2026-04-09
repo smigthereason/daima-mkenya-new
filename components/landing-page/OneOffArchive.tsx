@@ -13,10 +13,18 @@ interface OneOffArchiveProps {
   subtitle?: string;
 }
 
+interface SanityImageAsset {
+  _type: "image";
+  asset: {
+    _ref: string;
+    _type: "reference";
+  };
+}
+
 interface OneOffPiece {
   _id: string;
   name: string;
-  image: any;
+  image: SanityImageAsset;
   editionInfo?: string;
   description: string[];
   status?: string;
@@ -42,14 +50,16 @@ export default function OneOffArchive({
           ? `*[_type == "oneOff"] | order(_createdAt desc) [0...${limit}]`
           : `*[_type == "oneOff"] | order(_createdAt desc)`;
 
-        const data = await client.withConfig({ useCdn: false }).fetch(
-          query,
-          {},
-          {
-            cache: "no-store",
-            next: { revalidate: 0 },
-          },
-        );
+        const data = await client
+          .withConfig({ useCdn: false })
+          .fetch<OneOffPiece[]>(
+            query,
+            {},
+            {
+              cache: "no-store",
+              next: { revalidate: 0 },
+            },
+          );
 
         setPieces(data);
       } catch (error) {
@@ -94,7 +104,7 @@ export default function OneOffArchive({
   return (
     <>
       <section className="bg-[#F9F9F8] py-24 md:py-40 px-6 md:px-12 overflow-hidden">
-        <div className="max-w-[1600px] mx-auto">
+        <div className="max-w-400 mx-auto">
           <header className="mb-24 md:mb-32 flex flex-col md:flex-row md:items-end justify-between gap-8 border-b border-black/10 pb-12">
             <div className="max-w-2xl">
               <p className="text-[11px] uppercase tracking-[0.4em] text-[#868682] mb-6 font-medium">
@@ -122,7 +132,7 @@ export default function OneOffArchive({
                 } items-center gap-12 md:gap-24`}
               >
                 <div className="w-full md:w-3/5 relative group cursor-pointer overflow-hidden bg-white p-4 md:p-12 shadow-sm">
-                  <div className="relative aspect-[4/5] overflow-hidden">
+                  <div className="relative aspect-4/5 overflow-hidden">
                     {piece.image && (
                       <Image
                         src={urlFor(piece.image).url()}
@@ -142,13 +152,10 @@ export default function OneOffArchive({
 
                 <div className="w-full md:w-2/5 flex flex-col items-start space-y-8">
                   <div className="space-y-4">
-                    <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-[#868682]">
-                      {piece.editionInfo || "Edition 1/1"}
-                    </span>
                     <h3 className="text-4xl md:text-5xl font-light text-[#1A1A1A] tracking-tight">
                       {piece.name}
                     </h3>
-                    <div className="w-12 h-[1px] bg-[#1A1A1A]" />
+                    <div className="w-12 h-px bg-[#1A1A1A]" />
                   </div>
 
                   <div className="space-y-2">
