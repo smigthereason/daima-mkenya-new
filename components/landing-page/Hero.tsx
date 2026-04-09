@@ -108,7 +108,7 @@ export default function Hero() {
 
   return (
     <section
-      className="relative min-h-screen w-full mt-20 md:mt-32 overflow-hidden bg-white flex flex-col items-center justify-center"
+      className="relative min-h-screen w-full mt-0 md:mt-0 overflow-hidden bg-white flex flex-col items-center justify-center"
       id="hero-section"
     >
       <div className="absolute inset-0 flex w-full h-full z-0">

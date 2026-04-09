@@ -341,7 +341,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
   return (
     <div
       ref={cardRef}
-      className="flex flex-col xl:flex-row w-full bg-white relative min-h-screen text-black antialiased overflow-x-hidden mt-20 md:mt-32 border-t border-neutral-400"
+      className="flex flex-col xl:flex-row w-full bg-white relative min-h-screen text-black antialiased overflow-x-hidden mt-0 border-t border-neutral-400"
     >
       {/* Left Panel: All Product Images Gallery */}
       <div className="order-2 xl:order-1 flex flex-col w-full xl:w-[32%] p-8 md:p-12 xl:p-16 border-r border-gray-50 bg-white">

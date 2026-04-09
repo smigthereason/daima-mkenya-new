@@ -59,7 +59,7 @@ export default function ProductGrid({
   };
 
   return (
-    <div className="w-full bg-[#e8e8e8] py-10 md:py-20 px-4 sm:px-8 lg:px-16 text-black antialiased mt-32">
+    <div className="w-full bg-[#e8e8e8] py-10 md:py-20 px-4 sm:px-8 lg:px-16 text-black antialiased ">
       {/* ── GRID HEADER ── */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-16 border-b-2 border-neutral-300 pb-8 gap-6">
         <div>

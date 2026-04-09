@@ -169,7 +169,7 @@ const Login = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] flex items-start md:items-center justify-center p-0 md:p-8 font-sans relative">
+    <div className="min-h-screen bg-[#f8f8f8] flex items-start md:items-center justify-center mt-0 p-0  font-sans relative">
       <div
         ref={containerRef}
         className="relative w-full max-w-5xl mt-0 md:mt-0 min-h-screen md:min-h-0 md:h-[650px] bg-white shadow-2xl overflow-hidden flex flex-col md:flex-row border border-zinc-100"

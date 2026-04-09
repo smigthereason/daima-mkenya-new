@@ -289,7 +289,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
   // 8. JSX Return
   return (
-    <div className="min-h-screen bg-white text-black antialiased mt-20 md:mt-32 border-t border-neutral-200">
+    <div className="min-h-screen bg-white text-black antialiased border-t border-neutral-200">
       <Script
         src="https://cybqa.pesapal.com/v3/js/pesapal.js"
         strategy="afterInteractive"

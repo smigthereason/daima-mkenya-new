@@ -516,7 +516,7 @@ const GalleryPage = () => {
   return (
     <main
       ref={containerRef}
-      className="min-h-screen bg-[#F8F8F8] pt-32 pb-20 px-4 md:px-12 mt-2"
+      className="min-h-screen bg-[#F8F8F8] pt-16 md:pt-32 pb-20 px-4 md:px-12 "
     >
       {galleryJsonLd && (
         <script

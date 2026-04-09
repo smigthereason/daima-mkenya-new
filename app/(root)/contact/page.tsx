@@ -77,7 +77,7 @@ export default function Page() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F8F8F8] pt-32 pb-16 px-4 md:px-10 lg:px-24">
+    <main className="min-h-screen bg-[#F8F8F8] pt-10 pb-16 px-4 md:px-10 lg:px-24">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

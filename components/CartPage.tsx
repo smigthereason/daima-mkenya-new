@@ -216,7 +216,7 @@ export default function CartPage() {
   if (status === "unauthenticated") return null;
 
   return (
-    <div className="min-h-screen bg-white text-black mt-24 md:mt-32 px-4 sm:px-8 lg:px-16 pb-20 border-t border-neutral-200">
+    <div className="min-h-screen bg-white text-black mt-0 px-4 sm:px-8 lg:px-16 pb-20 border-t border-neutral-200">
       <div className="max-w-[1800px] mx-auto">
         <div className="flex justify-between items-center py-10 md:py-16">
           <Link

@@ -295,7 +295,7 @@ const ProfilePage = () => {
     "text-[11px] font-black text-neutral-900 uppercase tracking-[0.3em] flex items-center gap-2";
 
   return (
-    <div className="min-h-screen bg-white pt-24 md:pt-32 pb-20 mt-4 md:mt-8">
+    <div className="min-h-screen bg-white pt-10 md:pt-16 pb-20 mt-0">
       <div className="max-w-[1400px] mx-auto px-4 md:px-12">
         {/* Profile Header */}
         <div className="flex flex-col items-center mb-10 md:mb-16">

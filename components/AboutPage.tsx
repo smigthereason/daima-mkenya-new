@@ -86,7 +86,7 @@ export default function AboutPage() {
   return (
     <div
       ref={containerRef}
-      className="bg-white text-[#1d1d1d] selection:bg-[#be1e2d] selection:text-white mt-16 md:mt-20 lg:mt-24 xl:mt-32"
+      className="bg-white text-[#1d1d1d] selection:bg-[#be1e2d] selection:text-white "
     >
       <script
         type="application/ld+json"

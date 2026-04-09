@@ -46,7 +46,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-black antialiased mt-24 md:mt-32 border-t border-neutral-200 font-serif">
+    <div className="min-h-screen bg-white text-black antialiased mt-0 border-t border-neutral-200 font-serif">
       <nav className="sticky top-0 z-10 bg-white/80 backdrop-blur-md flex justify-between items-center px-4 md:px-16 py-6 border-b border-gray-100">
         <button onClick={() => router.back()} className="flex items-center gap-3 group">
           <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-1" />
