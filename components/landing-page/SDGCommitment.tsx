@@ -61,7 +61,7 @@ const SdgCommitment = () => {
       subtitle: "SDG 13",
       color: "#E8E8E8",
       bgImage: Hero55,
-      slug: "one-love-polo",
+      slug: "one-love-vest",
       routeToProducts: false,
     },
   ];
