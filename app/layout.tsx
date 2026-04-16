@@ -2,8 +2,7 @@
 
 import type { Metadata } from "next";
 import "./globals.css";
-import Navbar from "@/components/landing-page/Navbar";
-import Footer from "@/components/landing-page/Footer";
+
 import { CartProvider } from "@/context/CartContext";
 import { NextAuthProvider } from "./(root)/providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -35,9 +34,7 @@ export default function RootLayout({
           <ErrorBoundary>
             <NextAuthProvider>
               <CartProvider>
-                <Navbar />
                 <main>{children}</main>
-                <Footer />
                 <FloatingWhatsApp />
               </CartProvider>
             </NextAuthProvider>

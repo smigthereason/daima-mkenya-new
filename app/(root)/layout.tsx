@@ -6,6 +6,8 @@ import "../globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { NextAuthProvider } from "./providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import Navbar from "@/components/landing-page/Navbar";
+import Footer from "@/components/landing-page/Footer";
 import { Analytics } from "@vercel/analytics/next";
 
 const playfair = Playfair_Display({
@@ -74,7 +76,9 @@ export default function RootLayout({
     <div className={playfair.className}>
       <ErrorBoundary>
         <NextAuthProvider>
+          <Navbar />
           <CartProvider>{children}</CartProvider>
+          <Footer />
         </NextAuthProvider>
       </ErrorBoundary>
       <Analytics />
