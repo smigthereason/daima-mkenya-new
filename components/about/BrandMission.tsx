@@ -46,8 +46,6 @@ const BrandMission = ({
               >
                 Daima Mkenya Africa is a Kenyan-owned apparel and fabric brand
                 dedicated to celebrating identity and pride through design.
-                Kenya&apos;s beauty is in its people. The deeper you cherish who
-                you are, the more open you are to the beauty of others.
               </p>
 
               {/* Grid for Inspiration/Impact: Stays 2 columns on iPad Pro but 1 column on smaller tablets */}
