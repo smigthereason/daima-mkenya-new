@@ -116,7 +116,7 @@ export default function AfricaDottedMap() {
 
         {/* Title */}
         <div className="text-center z-10 w-full">
-          <h2 className="text-4xl font-serif tracking-tighter text-neutral-500 uppercase leading-[0.85] mb-4">
+          <h2 className="text-4xl font-serif tracking-tighter text-black/80 uppercase leading-[0.85] mb-4">
             Unity in Every <br />
             <span className="">Thread</span>
           </h2>
@@ -198,7 +198,7 @@ export default function AfricaDottedMap() {
         </div>
 
         {/* Quote */}
-        <p className="text-[13px] leading-relaxed text-neutral-300 tracking-wide uppercase text-center px-2">
+        <p className="text-[13px] leading-relaxed text-neutral-900 tracking-wide uppercase text-center px-2">
           &quot;A stitch that binds a continent, a design that speaks to the
           world.&quot;
         </p>
@@ -240,7 +240,7 @@ export default function AfricaDottedMap() {
 
         {/* Center Branding */}
         <div className="text-center mb-16 z-10 px-6 relative">
-          <h2 className="text-5xl md:text-8xl font-serif tracking-tighter text-neutral-500 uppercase leading-[0.85] mb-6">
+          <h2 className="text-5xl md:text-8xl font-serif tracking-tighter text-black/80 uppercase leading-[0.85] mb-6">
             Unity in Every <br />
             <span className="">Thread</span>
           </h2>
@@ -319,7 +319,7 @@ export default function AfricaDottedMap() {
 
         {/* Bottom-Left Quote */}
         <div className="absolute bottom-24 left-10 md:left-24 z-10 max-w-lg hidden lg:block">
-          <p className="text-[20px] leading-relaxed text-neutral-300 tracking-wide uppercase">
+          <p className="text-[20px] leading-relaxed text-neutral-900 tracking-wide uppercase">
             &quot;A stitch that binds a continent, a design that speaks to the
             world.&quot;
           </p>
