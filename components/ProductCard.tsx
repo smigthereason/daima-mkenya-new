@@ -493,7 +493,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
           {activeProduct.colors && (
             <div>
               <p className="text-[14px] uppercase tracking-[0.4em] font-bold mb-6">
-                Palettes
+                Color
               </p>
               <div className="flex gap-6">
                 {activeProduct.colors.map((c, i) => (
