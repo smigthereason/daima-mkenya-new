@@ -118,7 +118,7 @@ const SdgCommitment = () => {
   };
 
   return (
-    <section className="bg-[#e8e8e8] py-24 overflow-hidden border-b border-neutral-300">
+    <section className="bg-[#F9F9F8] py-24 overflow-hidden border-b border-neutral-300">
       {/* Luxury Minimalist Header */}
       <div className="max-w-7xl mx-auto px-6 mb-24 text-center">
         <span className="text-[10px] tracking-[0.5em] text-neutral-400 uppercase block mb-4">

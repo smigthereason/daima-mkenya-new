@@ -11,6 +11,9 @@ import RevenueChart from "../admin/components/admin/RevenueChart";
 import CategoryPieChart from "../admin/components/admin/CategoryPieChart";
 import RecentTransactions from "../admin/components/admin/RecentTransactions";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function AdminOverview() {
   const orders = await client.fetch(
     `*[_type == "order"] | order(_createdAt desc) {

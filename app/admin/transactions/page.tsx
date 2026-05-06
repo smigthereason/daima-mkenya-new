@@ -3,6 +3,9 @@ import { client } from "@/sanity/lib/client";
 import { CreditCard, ArrowUpRight } from "lucide-react";
 import TransactionTable from "../components/transactions/TransactionTable";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TransactionsPage() {
   const orders = await client.fetch(
     `*[_type == "order"] | order(_createdAt desc) {

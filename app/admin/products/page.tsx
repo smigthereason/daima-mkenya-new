@@ -15,6 +15,9 @@ import {
   Package,
 } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function deleteProduct(formData: FormData) {
   "use server";
   const id = formData.get("id") as string;
