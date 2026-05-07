@@ -6,10 +6,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { client } from "@/sanity/lib/client";
 import { urlFor } from "@/sanity/lib/image";
-// Importing assets from the centralized index
 import { SDG1, Hero33, Hero77, Hero55 } from "@/public/assets";
 
-// Define Product type
 interface Product {
   _id: string;
   name: string;
@@ -118,26 +116,26 @@ const SdgCommitment = () => {
   };
 
   return (
-    <section className="bg-[#F9F9F8] py-24 overflow-hidden border-b border-neutral-300">
-      {/* Luxury Minimalist Header */}
-      <div className="max-w-7xl mx-auto px-6 mb-24 text-center">
+    <section className="bg-[#F9F9F8] py-16 md:py-24 overflow-hidden border-b border-neutral-300">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto px-6 mb-16 md:mb-24 text-center">
         <span className="text-[10px] tracking-[0.5em] text-neutral-400 uppercase block mb-4">
           The Commitment
         </span>
-        <h2 className="text-4xl md:text-7xl font-serif tracking-tighter text-neutral-900 uppercase">
+        <h2 className="text-3xl md:text-5xl lg:text-7xl font-serif tracking-tighter text-neutral-900 uppercase leading-tight">
           SUSTAINABLE <br /> ELEGANCE
         </h2>
       </div>
 
-      {/* Large Grid Cards with Background Images - Now Clickable */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-neutral-100 border-y border-neutral-200 mb-32 m-4 sm:m-0">
+      {/* Sustainable Goals Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-neutral-100 border-y border-neutral-200 mb-20 md:mb-32 px-4 sm:px-0">
         {essentials.map((item, idx) => (
           <div
             key={idx}
             onClick={() => handleEssentialClick(item)}
-            className="group relative aspect-4/5 sm:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center overflow-hidden cursor-pointer"
+            className="group relative aspect-[4/5] sm:aspect-square bg-neutral-900 flex flex-col justify-center items-center overflow-hidden cursor-pointer"
           >
-            <div className="absolute inset-0 z-0 overflow-hidden">
+            <div className="absolute inset-0 z-0">
               <Image
                 src={
                   typeof item.bgImage === "string"
@@ -146,14 +144,13 @@ const SdgCommitment = () => {
                 }
                 alt={item.title}
                 fill
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 100vw, 50vw"
                 className="object-cover transition-all duration-1000 group-hover:scale-105 opacity-60 group-hover:opacity-80"
                 priority={idx < 2}
-                unoptimized
               />
             </div>
             <div className="relative z-10 text-center px-4">
-              <h3 className="text-xl md:text-3xl font-serif tracking-[0.2em] text-white uppercase wrap-break-words">
+              <h3 className="text-xl md:text-3xl font-serif tracking-[0.2em] text-white uppercase">
                 {item.title}
               </h3>
             </div>
@@ -165,28 +162,28 @@ const SdgCommitment = () => {
         ))}
       </div>
 
-      {/* Heritage Gallery - 3x1 Grid Styled Like Sustainable Elegance */}
-      <div className="w-full px-2 sm:px-4 mb-32 m-4 sm:m-0">
-        <div className="text-center mt-32 mb-32">
-          <span className="text-[18px] tracking-[0.6em] text-neutral-800 uppercase">
+      {/* Heritage Collection Section */}
+      <div className="max-w-7xl mx-auto px-4 md:px-6 mb-24">
+        <div className="text-center mb-12 md:mb-20">
+          <span className="text-sm md:text-lg tracking-[0.4em] md:tracking-[0.6em] text-neutral-800 uppercase block">
             The Heritage Collection
           </span>
         </div>
 
         {loading ? (
-          <div className="flex justify-center items-center h-[70vh]">
-            <div className="w-10 h-10 border-2 border-[#008000] border-t-transparent rounded-full animate-spin" />
+          <div className="flex justify-center items-center py-20">
+            <div className="w-8 h-8 border-2 border-neutral-800 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-2">
             {products.map((product, idx) => (
               <div
                 key={product._id}
-                className="group relative aspect-4/5 sm:aspect-square lg:aspect-3/4 bg-neutral-900 flex flex-col justify-center items-center overflow-hidden border border-neutral-400"
+                className="group relative aspect-[4/5] sm:aspect-square lg:aspect-[3/4] bg-neutral-900 flex flex-col justify-center items-center overflow-hidden border border-neutral-200"
                 onMouseEnter={() => setHoveredProductId(product._id)}
                 onMouseLeave={() => setHoveredProductId(null)}
               >
-                <div className="absolute inset-0 z-0 overflow-hidden">
+                <div className="absolute inset-0 z-0">
                   {product.images?.hero?.asset?.url ? (
                     <Image
                       src={urlFor(product.images.hero).url()}
@@ -194,32 +191,35 @@ const SdgCommitment = () => {
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                       className="object-cover transition-all duration-1000 group-hover:scale-105"
-                      priority={idx < 2}
                       unoptimized
                     />
                   ) : (
                     <div className="w-full h-full bg-neutral-800 flex items-center justify-center">
-                      <span className="text-neutral-500 text-sm">No image</span>
+                      <span className="text-neutral-500 text-xs uppercase tracking-widest">
+                        No Image
+                      </span>
                     </div>
                   )}
                 </div>
 
-                {/* Rectangle Bookmark on Hover - Bottom Right */}
-                {hoveredProductId === product._id && (
-                  <div className="absolute bottom-0 right-0  z-20 border-l-0 px-6 py-3 transition-all duration-300">
-                    <span className="text-white text-[10px] md:text-xs lg:text-sm uppercase text-shadow-lg text-shadow-gray-700 tracking-[0.2em] font-serif whitespace-nowrap">
-                      {product.name}
-                    </span>
-                  </div>
-                )}
+                {/* Bookmark Overlay - Visible on Hover for Desktop, Always for Mobile */}
+                <div
+                  className={`absolute bottom-0 right-0 z-20 bg-black/40 backdrop-blur-sm px-4 py-2 transition-all duration-500 ${
+                    hoveredProductId === product._id
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-2 lg:group-hover:opacity-100 lg:group-hover:translate-y-0"
+                  } sm:opacity-100 sm:translate-y-0`}
+                >
+                  <span className="text-white text-[10px] md:text-xs uppercase tracking-[0.2em] font-serif">
+                    {product.name}
+                  </span>
+                </div>
 
-                {product.slug && (
-                  <Link
-                    href={`/products/${product.slug.current}`}
-                    className="absolute inset-0 z-30"
-                    aria-label={`View ${product.name}`}
-                  />
-                )}
+                <Link
+                  href={`/products/${product.slug.current}`}
+                  className="absolute inset-0 z-30"
+                  aria-label={`View ${product.name}`}
+                />
               </div>
             ))}
           </div>
@@ -227,14 +227,15 @@ const SdgCommitment = () => {
       </div>
 
       {/* Brand Statement */}
-      <div className="max-w-3xl mx-auto text-center px-6 mt-64 mb-20">
-        <p className="text-xl md:text-2xl text-neutral-800 font-light leading-relaxed italic font-serif">
-          Identity is a story best worn. <br /> Ours is written in the bold
-          colours of Kenya,
-          <br /> a powerful expression of who we are. <br /> Let it speak before
-          you do.
+      <div className="max-w-3xl mx-auto text-center px-6 mt-32 mb-10">
+        <p className="text-lg md:text-2xl text-neutral-800 font-light leading-relaxed italic font-serif">
+          Identity is a story best worn. <br className="hidden md:block" />
+          Ours is written in the bold colours of Kenya,{" "}
+          <br className="hidden md:block" />a powerful expression of who we are.{" "}
+          <br className="hidden md:block" />
+          Let it speak before you do.
         </p>
-        <div className="mt-16 h-24 w-px bg-neutral-500 mx-auto" />
+        <div className="mt-12 h-20 w-px bg-neutral-400 mx-auto" />
       </div>
     </section>
   );
