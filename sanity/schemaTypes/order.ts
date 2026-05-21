@@ -1,6 +1,4 @@
 // sanity/schemaTypes/order.ts
-import { PreviewValue } from "sanity";
-
 export default {
   name: "order",
   title: "Orders",
@@ -57,7 +55,7 @@ export default {
           { title: "Refunded", value: "refunded" },
         ],
       },
-      initialValue: "paid", // Changed from "pending" to "paid"
+      initialValue: "pending",
     },
     {
       name: "paymentMethod",
@@ -67,6 +65,7 @@ export default {
         list: [
           { title: "PesaPal", value: "pesapal" },
           { title: "M-Pesa", value: "mpesa" },
+          { title: "Card", value: "card" },
         ],
       },
     },
@@ -76,71 +75,33 @@ export default {
       type: "datetime",
     },
     {
+      name: "paymentConfirmedAt",
+      title: "Payment Confirmed At",
+      type: "datetime",
+    },
+    {
       name: "paymentDetails",
       title: "Payment Details",
-      type: "object",
-      fields: [
-        { name: "amount", title: "Amount", type: "number" },
-        {
-          name: "confirmation_code",
-          title: "Confirmation Code",
-          type: "string",
-        },
-        { name: "currency", title: "Currency", type: "string" },
-        { name: "payment_account", title: "Payment Account", type: "string" },
-        { name: "payment_method", title: "Payment Method", type: "string" },
-        {
-          name: "payment_status_description",
-          title: "Payment Status Description",
-          type: "string",
-        },
-        { name: "status", title: "Status", type: "string" },
-        { name: "status_code", title: "Status Code", type: "number" },
-      ],
+      type: "paymentDetails",
     },
     {
       name: "customer",
       title: "Customer Info",
-      type: "object",
-      fields: [
-        { name: "name", title: "Full Name", type: "string" },
-        { name: "phone", title: "Phone Number", type: "string" },
-        { name: "email", title: "Email", type: "string" },
-      ],
+      type: "customerInfo",
     },
     {
       name: "deliveryDetails",
       title: "Delivery Details",
-      type: "object",
-      fields: [
-        {
-          name: "method",
-          title: "Method",
-          type: "string",
-          options: {
-            list: [
-              { title: "Home Delivery", value: "shipping" },
-              { title: "Pickup Station", value: "pickup" },
-            ],
-          },
-        },
-        { name: "city", title: "City/County", type: "string" },
-        {
-          name: "pickupStationName",
-          title: "Pickup Station Name",
-          type: "string",
-        },
-        { name: "pickupStationId", title: "Pickup Station ID", type: "string" },
-        {
-          name: "shippingAddress",
-          title: "Address/Building/Floor",
-          type: "string",
-        },
-      ],
+      type: "deliveryDetails",
     },
     {
       name: "amount",
       title: "Total Amount",
+      type: "number",
+    },
+    {
+      name: "subtotal",
+      title: "Subtotal",
       type: "number",
     },
     {
@@ -152,64 +113,24 @@ export default {
       name: "items",
       title: "Order Items",
       type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            {
-              name: "product",
-              title: "Product",
-              type: "reference",
-              to: [{ type: "product" }],
-            },
-            { name: "productName", title: "Product Name", type: "string" },
-            { name: "quantity", title: "Quantity", type: "number" },
-            { name: "price", title: "Price", type: "number" },
-            { name: "size", title: "Size", type: "string" },
-            { name: "color", title: "Color", type: "string" },
-          ],
-          preview: {
-            select: {
-              title: "productName",
-              quantity: "quantity",
-              price: "price",
-              size: "size",
-              color: "color",
-            },
-            prepare(selection: any) {
-              const { title, quantity, price, size, color } = selection;
-              return {
-                title: title || "Unknown Product",
-                subtitle: `Qty: ${quantity} | ${price} | ${size} | ${color}`,
-              };
-            },
-          },
-        },
-      ],
+      of: [{ type: "orderItem" }],
     },
     {
       name: "stockUpdates",
       title: "Stock Update Log",
       type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            { name: "productId", type: "string" },
-            { name: "productName", type: "string" },
-            { name: "previousStock", type: "number" },
-            { name: "newStock", type: "number" },
-            { name: "success", type: "boolean" },
-            { name: "error", type: "string" },
-          ],
-        },
-      ],
+      of: [{ type: "stockUpdate" }],
     },
     {
       name: "createdAt",
       title: "Created At",
       type: "datetime",
       initialValue: () => new Date().toISOString(),
+    },
+    {
+      name: "updatedAt",
+      title: "Updated At",
+      type: "datetime",
     },
   ],
   preview: {

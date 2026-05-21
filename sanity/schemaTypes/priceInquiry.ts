@@ -11,7 +11,6 @@ const priceInquiry = {
       title: "Inquiry Number",
       type: "string",
       readOnly: true,
-      description: "Auto-generated unique inquiry identifier",
     },
     {
       name: "piece",
@@ -24,37 +23,11 @@ const priceInquiry = {
       name: "pieceName",
       title: "Piece Name",
       type: "string",
-      description: "Denormalized piece name for easy reference",
     },
     {
       name: "customer",
       title: "Customer Information",
-      type: "object",
-      fields: [
-        {
-          name: "name",
-          title: "Full Name",
-          type: "string",
-          validation: (Rule: any) => Rule.required(),
-        },
-        {
-          name: "email",
-          title: "Email Address",
-          type: "string",
-          validation: (Rule: any) => Rule.required().email(),
-        },
-        {
-          name: "phone",
-          title: "Phone Number",
-          type: "string",
-        },
-        {
-          name: "message",
-          title: "Additional Message",
-          type: "text",
-          rows: 3,
-        },
-      ],
+      type: "customerInfo",
     },
     {
       name: "status",
@@ -74,16 +47,14 @@ const priceInquiry = {
     },
     {
       name: "user",
-      title: "Registered User (if applicable)",
+      title: "Registered User",
       type: "reference",
       to: [{ type: "user" }],
-      description: "Link to registered user if they have an account",
     },
     {
       name: "userEmail",
       title: "User Email",
       type: "string",
-      description: "Email for quick lookup",
     },
     {
       name: "inquirySource",
@@ -104,77 +75,18 @@ const priceInquiry = {
       name: "quotedPrice",
       title: "Quoted Price",
       type: "string",
-      description: "Price quoted to customer (e.g., Ksh 450,000)",
     },
     {
       name: "internalNotes",
       title: "Internal Notes",
       type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            {
-              name: "note",
-              title: "Note",
-              type: "text",
-            },
-            {
-              name: "addedBy",
-              title: "Added By",
-              type: "string",
-            },
-            {
-              name: "addedAt",
-              title: "Added At",
-              type: "datetime",
-              initialValue: () => new Date().toISOString(),
-            },
-          ],
-        },
-      ],
-      description: "Private notes for staff",
+      of: [{ type: "internalNote" }],
     },
     {
       name: "communicationLog",
       title: "Communication Log",
       type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            {
-              name: "type",
-              title: "Type",
-              type: "string",
-              options: {
-                list: [
-                  { title: "Email Sent", value: "email_sent" },
-                  { title: "Email Received", value: "email_received" },
-                  { title: "Phone Call", value: "phone_call" },
-                  { title: "WhatsApp", value: "whatsapp" },
-                  { title: "Meeting", value: "meeting" },
-                ],
-              },
-            },
-            {
-              name: "date",
-              title: "Date",
-              type: "datetime",
-            },
-            {
-              name: "summary",
-              title: "Summary",
-              type: "text",
-            },
-            {
-              name: "followupDate",
-              title: "Follow-up Date",
-              type: "datetime",
-            },
-          ],
-        },
-      ],
+      of: [{ type: "communicationLog" }],
     },
     {
       name: "createdAt",
@@ -221,11 +133,6 @@ const priceInquiry = {
       title: "Newest First",
       name: "createdAtDesc",
       by: [{ field: "createdAt", direction: "desc" }],
-    },
-    {
-      title: "Status",
-      name: "statusAsc",
-      by: [{ field: "status", direction: "asc" }],
     },
   ],
 };

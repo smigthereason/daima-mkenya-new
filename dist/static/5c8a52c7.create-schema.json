@@ -49,7 +49,6 @@
             "level": "error"
           }
         ],
-        "description": "e.g., Ksh 8,500",
         "name": "price",
         "type": "string"
       },
@@ -107,37 +106,13 @@
         "type": "array"
       },
       {
-        "fields": [
-          {
-            "name": "material",
-            "type": "string"
-          },
-          {
-            "name": "care",
-            "type": "string"
-          },
-          {
-            "name": "origin",
-            "type": "string"
-          }
-        ],
         "name": "details",
-        "type": "object"
+        "type": "productDetails"
       },
       {
         "of": [
           {
-            "fields": [
-              {
-                "name": "label",
-                "type": "string"
-              },
-              {
-                "name": "hex",
-                "type": "string"
-              }
-            ],
-            "type": "object"
+            "type": "productColor"
           }
         ],
         "name": "colors",
@@ -153,30 +128,8 @@
         "type": "array"
       },
       {
-        "fields": [
-          {
-            "options": {
-              "hotspot": true
-            },
-            "name": "hero",
-            "type": "image",
-            "title": "Hero Image"
-          },
-          {
-            "of": [
-              {
-                "options": {
-                  "hotspot": true
-                },
-                "type": "image"
-              }
-            ],
-            "name": "thumbnails",
-            "type": "array"
-          }
-        ],
         "name": "images",
-        "type": "object"
+        "type": "productImages"
       },
       {
         "initialValue": false,
@@ -197,14 +150,12 @@
             "level": "error"
           }
         ],
-        "description": "Current inventory count. Shows \"Low Stock\" when 5 or less, \"Out of Stock\" when 0.",
         "name": "stock",
         "type": "number",
         "title": "Stock Quantity"
       },
       {
         "initialValue": false,
-        "description": "When enabled, this product will not appear in the store (useful for editing or temporary removal)",
         "name": "disabled",
         "type": "boolean",
         "title": "Disable Product"
@@ -493,7 +444,7 @@
             }
           ]
         },
-        "initialValue": "paid",
+        "initialValue": "pending",
         "name": "paymentStatus",
         "type": "string"
       },
@@ -507,6 +458,10 @@
             {
               "title": "M-Pesa",
               "value": "mpesa"
+            },
+            {
+              "title": "Card",
+              "value": "card"
             }
           ]
         },
@@ -518,109 +473,30 @@
         "type": "datetime"
       },
       {
-        "fields": [
-          {
-            "name": "amount",
-            "type": "number"
-          },
-          {
-            "name": "confirmation_code",
-            "type": "string"
-          },
-          {
-            "name": "currency",
-            "type": "string"
-          },
-          {
-            "name": "payment_account",
-            "type": "string"
-          },
-          {
-            "name": "payment_method",
-            "type": "string"
-          },
-          {
-            "name": "payment_status_description",
-            "type": "string"
-          },
-          {
-            "name": "status",
-            "type": "string"
-          },
-          {
-            "name": "status_code",
-            "type": "number"
-          }
-        ],
-        "name": "paymentDetails",
-        "type": "object"
+        "name": "paymentConfirmedAt",
+        "type": "datetime"
       },
       {
-        "fields": [
-          {
-            "name": "name",
-            "type": "string",
-            "title": "Full Name"
-          },
-          {
-            "name": "phone",
-            "type": "string",
-            "title": "Phone Number"
-          },
-          {
-            "name": "email",
-            "type": "string"
-          }
-        ],
+        "name": "paymentDetails",
+        "type": "paymentDetails"
+      },
+      {
         "name": "customer",
-        "type": "object",
+        "type": "customerInfo",
         "title": "Customer Info"
       },
       {
-        "fields": [
-          {
-            "options": {
-              "list": [
-                {
-                  "title": "Home Delivery",
-                  "value": "shipping"
-                },
-                {
-                  "title": "Pickup Station",
-                  "value": "pickup"
-                }
-              ]
-            },
-            "name": "method",
-            "type": "string"
-          },
-          {
-            "name": "city",
-            "type": "string",
-            "title": "City/County"
-          },
-          {
-            "name": "pickupStationName",
-            "type": "string"
-          },
-          {
-            "name": "pickupStationId",
-            "type": "string",
-            "title": "Pickup Station ID"
-          },
-          {
-            "name": "shippingAddress",
-            "type": "string",
-            "title": "Address/Building/Floor"
-          }
-        ],
         "name": "deliveryDetails",
-        "type": "object"
+        "type": "deliveryDetails"
       },
       {
         "name": "amount",
         "type": "number",
         "title": "Total Amount"
+      },
+      {
+        "name": "subtotal",
+        "type": "number"
       },
       {
         "name": "shippingFee",
@@ -629,38 +505,7 @@
       {
         "of": [
           {
-            "fields": [
-              {
-                "to": [
-                  {
-                    "type": "product"
-                  }
-                ],
-                "name": "product",
-                "type": "reference"
-              },
-              {
-                "name": "productName",
-                "type": "string"
-              },
-              {
-                "name": "quantity",
-                "type": "number"
-              },
-              {
-                "name": "price",
-                "type": "number"
-              },
-              {
-                "name": "size",
-                "type": "string"
-              },
-              {
-                "name": "color",
-                "type": "string"
-              }
-            ],
-            "type": "object"
+            "type": "orderItem"
           }
         ],
         "name": "items",
@@ -670,33 +515,7 @@
       {
         "of": [
           {
-            "fields": [
-              {
-                "name": "productId",
-                "type": "string"
-              },
-              {
-                "name": "productName",
-                "type": "string"
-              },
-              {
-                "name": "previousStock",
-                "type": "number"
-              },
-              {
-                "name": "newStock",
-                "type": "number"
-              },
-              {
-                "name": "success",
-                "type": "boolean"
-              },
-              {
-                "name": "error",
-                "type": "string"
-              }
-            ],
-            "type": "object"
+            "type": "stockUpdate"
           }
         ],
         "name": "stockUpdates",
@@ -705,6 +524,10 @@
       },
       {
         "name": "createdAt",
+        "type": "datetime"
+      },
+      {
+        "name": "updatedAt",
         "type": "datetime"
       }
     ],
@@ -726,7 +549,6 @@
             "level": "error"
           }
         ],
-        "description": "The user who owns this cart",
         "to": [
           {
             "type": "user"
@@ -747,116 +569,13 @@
             "level": "error"
           }
         ],
-        "description": "Email of the user who owns this cart",
         "name": "userEmail",
         "type": "string"
       },
       {
         "of": [
           {
-            "fields": [
-              {
-                "validation": [
-                  {
-                    "rules": [
-                      {
-                        "flag": "presence",
-                        "constraint": "required"
-                      }
-                    ],
-                    "level": "error"
-                  }
-                ],
-                "description": "Unique identifier for this cart item",
-                "name": "cartId",
-                "type": "string",
-                "title": "Cart Item ID"
-              },
-              {
-                "validation": [
-                  {
-                    "rules": [
-                      {
-                        "flag": "presence",
-                        "constraint": "required"
-                      }
-                    ],
-                    "level": "error"
-                  }
-                ],
-                "to": [
-                  {
-                    "type": "product"
-                  }
-                ],
-                "name": "product",
-                "type": "reference"
-              },
-              {
-                "description": "Denormalized product name",
-                "name": "productName",
-                "type": "string"
-              },
-              {
-                "description": "Denormalized product price",
-                "name": "productPrice",
-                "type": "string"
-              },
-              {
-                "initialValue": 1,
-                "validation": [
-                  {
-                    "rules": [
-                      {
-                        "flag": "min",
-                        "constraint": 1
-                      }
-                    ],
-                    "level": "error"
-                  }
-                ],
-                "name": "quantity",
-                "type": "number"
-              },
-              {
-                "name": "selectedSize",
-                "type": "string"
-              },
-              {
-                "fields": [
-                  {
-                    "name": "label",
-                    "type": "string"
-                  },
-                  {
-                    "name": "hex",
-                    "type": "string"
-                  }
-                ],
-                "name": "selectedColor",
-                "type": "object"
-              },
-              {
-                "fields": [
-                  {
-                    "options": {
-                      "hotspot": true
-                    },
-                    "name": "hero",
-                    "type": "image",
-                    "title": "Hero Image"
-                  }
-                ],
-                "name": "productImage",
-                "type": "object"
-              },
-              {
-                "name": "addedAt",
-                "type": "datetime"
-              }
-            ],
-            "type": "object",
-            "name": "cartItem"
+            "type": "cartItem"
           }
         ],
         "name": "items",
@@ -947,7 +666,6 @@
   {
     "fields": [
       {
-        "description": "Auto-generated unique inquiry identifier",
         "readOnly": true,
         "name": "inquiryNumber",
         "type": "string"
@@ -974,58 +692,12 @@
         "title": "One-Off Piece"
       },
       {
-        "description": "Denormalized piece name for easy reference",
         "name": "pieceName",
         "type": "string"
       },
       {
-        "fields": [
-          {
-            "validation": [
-              {
-                "rules": [
-                  {
-                    "flag": "presence",
-                    "constraint": "required"
-                  }
-                ],
-                "level": "error"
-              }
-            ],
-            "name": "name",
-            "type": "string",
-            "title": "Full Name"
-          },
-          {
-            "validation": [
-              {
-                "rules": [
-                  {
-                    "flag": "presence",
-                    "constraint": "required"
-                  }
-                ],
-                "level": "error"
-              }
-            ],
-            "name": "email",
-            "type": "string",
-            "title": "Email Address"
-          },
-          {
-            "name": "phone",
-            "type": "string",
-            "title": "Phone Number"
-          },
-          {
-            "rows": 3,
-            "name": "message",
-            "type": "text",
-            "title": "Additional Message"
-          }
-        ],
         "name": "customer",
-        "type": "object",
+        "type": "customerInfo",
         "title": "Customer Information"
       },
       {
@@ -1063,7 +735,6 @@
         "title": "Inquiry Status"
       },
       {
-        "description": "Link to registered user if they have an account",
         "to": [
           {
             "type": "user"
@@ -1071,10 +742,9 @@
         ],
         "name": "user",
         "type": "reference",
-        "title": "Registered User (if applicable)"
+        "title": "Registered User"
       },
       {
-        "description": "Email for quick lookup",
         "name": "userEmail",
         "type": "string"
       },
@@ -1108,29 +778,13 @@
         "type": "string"
       },
       {
-        "description": "Price quoted to customer (e.g., Ksh 450,000)",
         "name": "quotedPrice",
         "type": "string"
       },
       {
-        "description": "Private notes for staff",
         "of": [
           {
-            "fields": [
-              {
-                "name": "note",
-                "type": "text"
-              },
-              {
-                "name": "addedBy",
-                "type": "string"
-              },
-              {
-                "name": "addedAt",
-                "type": "datetime"
-              }
-            ],
-            "type": "object"
+            "type": "internalNote"
           }
         ],
         "name": "internalNotes",
@@ -1139,50 +793,7 @@
       {
         "of": [
           {
-            "fields": [
-              {
-                "options": {
-                  "list": [
-                    {
-                      "title": "Email Sent",
-                      "value": "email_sent"
-                    },
-                    {
-                      "title": "Email Received",
-                      "value": "email_received"
-                    },
-                    {
-                      "title": "Phone Call",
-                      "value": "phone_call"
-                    },
-                    {
-                      "title": "WhatsApp",
-                      "value": "whatsapp"
-                    },
-                    {
-                      "title": "Meeting",
-                      "value": "meeting"
-                    }
-                  ]
-                },
-                "name": "type",
-                "type": "string"
-              },
-              {
-                "name": "date",
-                "type": "datetime"
-              },
-              {
-                "name": "summary",
-                "type": "text"
-              },
-              {
-                "name": "followupDate",
-                "type": "datetime",
-                "title": "Follow-up Date"
-              }
-            ],
-            "type": "object"
+            "type": "communicationLog"
           }
         ],
         "name": "communicationLog",
@@ -1583,22 +1194,7 @@
       {
         "of": [
           {
-            "fields": [
-              {
-                "name": "note",
-                "type": "text"
-              },
-              {
-                "name": "addedBy",
-                "type": "string"
-              },
-              {
-                "name": "addedAt",
-                "type": "datetime"
-              }
-            ],
-            "type": "object",
-            "name": "note"
+            "type": "note"
           }
         ],
         "name": "notes",
@@ -1609,5 +1205,382 @@
     "name": "contactSubmission",
     "type": "document",
     "title": "Contact Form Submissions"
+  },
+  {
+    "fields": [
+      {
+        "name": "material",
+        "type": "string"
+      },
+      {
+        "name": "care",
+        "type": "string",
+        "title": "Care Instructions"
+      },
+      {
+        "name": "origin",
+        "type": "string"
+      }
+    ],
+    "name": "productDetails",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "label",
+        "type": "string",
+        "title": "Color Label"
+      },
+      {
+        "name": "hex",
+        "type": "string",
+        "title": "Hex Code"
+      }
+    ],
+    "name": "productColor",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "hero",
+        "type": "image",
+        "title": "Hero Image"
+      },
+      {
+        "of": [
+          {
+            "options": {
+              "hotspot": true
+            },
+            "type": "image"
+          }
+        ],
+        "name": "thumbnails",
+        "type": "array"
+      }
+    ],
+    "name": "productImages",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "name",
+        "type": "string",
+        "title": "Full Name"
+      },
+      {
+        "name": "phone",
+        "type": "string",
+        "title": "Phone Number"
+      },
+      {
+        "name": "email",
+        "type": "string"
+      }
+    ],
+    "name": "customerInfo",
+    "type": "object",
+    "title": "Customer Information"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Home Delivery",
+              "value": "shipping"
+            },
+            {
+              "title": "Pickup Station",
+              "value": "pickup"
+            }
+          ]
+        },
+        "name": "method",
+        "type": "string",
+        "title": "Delivery Method"
+      },
+      {
+        "name": "city",
+        "type": "string",
+        "title": "City/County"
+      },
+      {
+        "name": "pickupStationName",
+        "type": "string"
+      },
+      {
+        "name": "pickupStationId",
+        "type": "string",
+        "title": "Pickup Station ID"
+      },
+      {
+        "name": "shippingAddress",
+        "type": "string",
+        "title": "Street Address/Building/Floor"
+      },
+      {
+        "name": "additionalInfo",
+        "type": "text"
+      }
+    ],
+    "name": "deliveryDetails",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "amount",
+        "type": "number"
+      },
+      {
+        "name": "confirmation_code",
+        "type": "string"
+      },
+      {
+        "name": "currency",
+        "type": "string"
+      },
+      {
+        "name": "payment_account",
+        "type": "string"
+      },
+      {
+        "name": "payment_method",
+        "type": "string"
+      },
+      {
+        "name": "payment_status_description",
+        "type": "string"
+      },
+      {
+        "name": "status",
+        "type": "string"
+      },
+      {
+        "name": "status_code",
+        "type": "number"
+      }
+    ],
+    "name": "paymentDetails",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "weak": true,
+        "to": [
+          {
+            "type": "product"
+          }
+        ],
+        "name": "product",
+        "type": "reference"
+      },
+      {
+        "name": "productId",
+        "type": "string",
+        "title": "Product ID"
+      },
+      {
+        "name": "productName",
+        "type": "string"
+      },
+      {
+        "name": "quantity",
+        "type": "number"
+      },
+      {
+        "name": "price",
+        "type": "number"
+      },
+      {
+        "name": "size",
+        "type": "string"
+      },
+      {
+        "name": "color",
+        "type": "string"
+      },
+      {
+        "name": "colorHex",
+        "type": "string"
+      },
+      {
+        "name": "imageUrl",
+        "type": "string",
+        "title": "Product Image"
+      }
+    ],
+    "name": "orderItem",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "productId",
+        "type": "string"
+      },
+      {
+        "name": "productName",
+        "type": "string"
+      },
+      {
+        "name": "previousStock",
+        "type": "number"
+      },
+      {
+        "name": "newStock",
+        "type": "number"
+      },
+      {
+        "name": "success",
+        "type": "boolean"
+      },
+      {
+        "name": "error",
+        "type": "string"
+      },
+      {
+        "name": "timestamp",
+        "type": "datetime"
+      }
+    ],
+    "name": "stockUpdate",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "cartId",
+        "type": "string",
+        "title": "Cart Item ID"
+      },
+      {
+        "to": [
+          {
+            "type": "product"
+          }
+        ],
+        "name": "product",
+        "type": "reference"
+      },
+      {
+        "name": "productName",
+        "type": "string"
+      },
+      {
+        "name": "productPrice",
+        "type": "string"
+      },
+      {
+        "name": "quantity",
+        "type": "number"
+      },
+      {
+        "name": "selectedSize",
+        "type": "string"
+      },
+      {
+        "name": "selectedColor",
+        "type": "productColor"
+      },
+      {
+        "name": "addedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "cartItem",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "note",
+        "type": "text"
+      },
+      {
+        "name": "addedBy",
+        "type": "string"
+      },
+      {
+        "name": "addedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "note",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "name": "note",
+        "type": "text"
+      },
+      {
+        "name": "addedBy",
+        "type": "string"
+      },
+      {
+        "name": "addedAt",
+        "type": "datetime"
+      }
+    ],
+    "name": "internalNote",
+    "type": "object"
+  },
+  {
+    "fields": [
+      {
+        "options": {
+          "list": [
+            {
+              "title": "Email Sent",
+              "value": "email_sent"
+            },
+            {
+              "title": "Email Received",
+              "value": "email_received"
+            },
+            {
+              "title": "Phone Call",
+              "value": "phone_call"
+            },
+            {
+              "title": "WhatsApp",
+              "value": "whatsapp"
+            },
+            {
+              "title": "Meeting",
+              "value": "meeting"
+            }
+          ]
+        },
+        "name": "type",
+        "type": "string"
+      },
+      {
+        "name": "date",
+        "type": "datetime"
+      },
+      {
+        "name": "summary",
+        "type": "text"
+      },
+      {
+        "name": "followupDate",
+        "type": "datetime",
+        "title": "Follow-up Date"
+      }
+    ],
+    "name": "communicationLog",
+    "type": "object"
   }
 ]

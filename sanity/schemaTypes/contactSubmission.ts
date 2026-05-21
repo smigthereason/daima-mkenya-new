@@ -79,43 +79,7 @@ const contactSubmission: SchemaTypeDefinition = {
       name: "notes",
       title: "Internal Notes",
       type: "array",
-      of: [
-        {
-          type: "object",
-          name: "note",
-          fields: [
-            {
-              name: "note",
-              title: "Note",
-              type: "text",
-            },
-            {
-              name: "addedBy",
-              title: "Added By",
-              type: "string",
-            },
-            {
-              name: "addedAt",
-              title: "Added At",
-              type: "datetime",
-              initialValue: () => new Date().toISOString(),
-            },
-          ],
-          preview: {
-            select: {
-              title: "note",
-              subtitle: "addedBy",
-              date: "addedAt",
-            },
-            prepare({ title, subtitle, date }) {
-              return {
-                title: title || "No content",
-                subtitle: `${subtitle || "Unknown"} • ${date ? new Date(date).toLocaleDateString() : ""}`,
-              };
-            },
-          },
-        },
-      ],
+      of: [{ type: "note" }], // Fixed: using named type
     },
   ],
   preview: {
@@ -126,7 +90,7 @@ const contactSubmission: SchemaTypeDefinition = {
       status: "status",
       date: "submittedAt",
     },
-    prepare({ title, subtitle, subject, status, date }) {
+    prepare({ title, subtitle, subject, status, date }: any) {
       const statusIcons = {
         new: "🆕",
         in_progress: "⏳",

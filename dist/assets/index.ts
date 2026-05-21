@@ -21,6 +21,9 @@ export { default as Hero66 } from "./leopard-shield-print-vest.webp";
 export { default as Hero77 } from "./leopard-shield-print-vest-women.webp";
 export { default as Hero88 } from "./unity-ribbed-tank-top-men.webp";
 export { default as SDG1 } from "./shield-stripe-maxi-skirt.webp";
+export { default as Polo } from "./Daima Mkenya-7 (3).jpg";
+export { default as Dress } from "./IMG-20260225-WA0055.jpg";
+export { default as Sets } from "./IMG-20260225-WA0061.jpg";
 
 // Collection Model Images
 export { default as Model1 } from "./kenyan-striped-poncho-2.webp";

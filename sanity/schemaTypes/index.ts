@@ -9,6 +9,18 @@ import productBatch from "./productBatch";
 import newsletter from "./newsletter";
 import logo from "./logo";
 import contactSubmission from "./contactSubmission";
+import productDetails from "./productDetails";
+import productColor from "./productColor";
+import productImages from "./productImages";
+import customerInfo from "./customerInfo";
+import deliveryDetails from "./deliveryDetails";
+import paymentDetails from "./paymentDetails";
+import orderItem from "./orderItem";
+import stockUpdate from "./stockUpdate";
+import cartItem from "./cartItem";
+import note from "./note";
+import internalNote from "./internalNote";
+import communicationLog from "./communicationLog";
 
 const product: SchemaTypeDefinition = {
   name: "product",
@@ -32,7 +44,6 @@ const product: SchemaTypeDefinition = {
       name: "price",
       title: "Price",
       type: "string",
-      description: "e.g., Ksh 8,500",
       validation: (Rule) => Rule.required(),
     },
     {
@@ -64,26 +75,13 @@ const product: SchemaTypeDefinition = {
     {
       name: "details",
       title: "Details",
-      type: "object",
-      fields: [
-        { name: "material", type: "string" },
-        { name: "care", type: "string" },
-        { name: "origin", type: "string" },
-      ],
+      type: "productDetails",
     },
     {
       name: "colors",
       title: "Colors",
       type: "array",
-      of: [
-        {
-          type: "object",
-          fields: [
-            { name: "label", type: "string" },
-            { name: "hex", type: "string" },
-          ],
-        },
-      ],
+      of: [{ type: "productColor" }],
     },
     {
       name: "sizes",
@@ -94,21 +92,7 @@ const product: SchemaTypeDefinition = {
     {
       name: "images",
       title: "Images",
-      type: "object",
-      fields: [
-        {
-          name: "hero",
-          title: "Hero Image",
-          type: "image",
-          options: { hotspot: true },
-        },
-        {
-          name: "thumbnails",
-          title: "Thumbnails",
-          type: "array",
-          of: [{ type: "image", options: { hotspot: true } }],
-        },
-      ],
+      type: "productImages",
     },
     {
       name: "isNew",
@@ -120,8 +104,6 @@ const product: SchemaTypeDefinition = {
       name: "stock",
       title: "Stock Quantity",
       type: "number",
-      description:
-        'Current inventory count. Shows "Low Stock" when 5 or less, "Out of Stock" when 0.',
       validation: (Rule) => Rule.min(0).integer(),
       initialValue: 0,
     },
@@ -129,8 +111,6 @@ const product: SchemaTypeDefinition = {
       name: "disabled",
       title: "Disable Product",
       type: "boolean",
-      description:
-        "When enabled, this product will not appear in the store (useful for editing or temporary removal)",
       initialValue: false,
     },
   ],
@@ -175,5 +155,17 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     newsletter,
     logo,
     contactSubmission,
+    productDetails,
+    productColor,
+    productImages,
+    customerInfo,
+    deliveryDetails,
+    paymentDetails,
+    orderItem,
+    stockUpdate,
+    cartItem,
+    note,
+    internalNote,
+    communicationLog,
   ],
 };
