@@ -4,6 +4,14 @@ import { client } from "@/sanity/lib/client";
 export interface ProductColor {
   label: string;
   hex: string;
+  image?: {
+    _type: "image";
+    asset: {
+      _ref: string;
+      _type: "reference";
+      url?: string;
+    };
+  };
 }
 
 export interface Product {
@@ -41,7 +49,16 @@ export const getAllProducts = async (): Promise<Product[]> => {
     category,
     slug,
     details,
-    colors,
+    colors[] {
+      label,
+      hex,
+      image {
+        asset-> {
+          _id,
+          url
+        }
+      }
+    },
     sizes,
     images,
     stock,
@@ -61,7 +78,16 @@ export const getNewArrivals = async (): Promise<Product[]> => {
     category,
     slug,
     details,
-    colors,
+    colors[] {
+      label,
+      hex,
+      image {
+        asset-> {
+          _id,
+          url
+        }
+      }
+    },
     sizes,
     images,
     stock,
@@ -81,7 +107,16 @@ export const getProductById = async (id: string): Promise<Product> => {
     category,
     slug,
     details,
-    colors,
+    colors[] {
+      label,
+      hex,
+      image {
+        asset-> {
+          _id,
+          url
+        }
+      }
+    },
     sizes,
     images,
     stock,
@@ -101,7 +136,16 @@ export const getProductBySlug = async (slug: string): Promise<Product> => {
     category,
     slug,
     details,
-    colors,
+    colors[] {
+      label,
+      hex,
+      image {
+        asset-> {
+          _id,
+          url
+        }
+      }
+    },
     sizes,
     images,
     stock,
@@ -121,7 +165,16 @@ export const getAllProductsAdmin = async (): Promise<Product[]> => {
     category,
     slug,
     details,
-    colors,
+    colors[] {
+      label,
+      hex,
+      image {
+        asset-> {
+          _id,
+          url
+        }
+      }
+    },
     sizes,
     images,
     stock,

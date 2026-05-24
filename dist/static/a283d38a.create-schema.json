@@ -1228,14 +1228,44 @@
   {
     "fields": [
       {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
         "name": "label",
         "type": "string",
         "title": "Color Label"
       },
       {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
         "name": "hex",
         "type": "string",
         "title": "Hex Code"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "image",
+        "type": "image",
+        "title": "Variant Showcase Image"
       }
     ],
     "name": "productColor",
