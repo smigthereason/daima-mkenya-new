@@ -989,10 +989,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
   return (
     <div className="min-h-screen bg-white text-black antialiased border-t border-neutral-200">
-      <Script
-        src="https://cybqa.pesapal.com/v3/js/pesapal.js"
-        strategy="afterInteractive"
-      />
+      <Script src="https://pay.pesapal.com/v3" strategy="afterInteractive" />
 
       <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-6 md:px-12 lg:px-16 py-5 border-b border-gray-100">
         <button
