@@ -216,17 +216,42 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
     setIsProcessing(true);
 
-    const formattedItems = displayItems.map((item) => ({
-      product: { _type: "reference", _ref: item.product._id },
-      productName: item.product.name,
-      quantity: localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1,
-      price: parseFloat(item.product.price.replace(/[^0-9.]/g, "")),
-      size: item.selectedSize,
-      color: item.selectedColor?.label || item.selectedColor,
-      image: item.product.images?.hero
-        ? urlFor(item.product.images.hero).url()
-        : "",
-    }));
+    const formattedItems = displayItems.map((item) => {
+      const productId =
+        item.product._id || item.product.id || item.productId || item._id;
+
+      const priceRaw = item.product.price;
+      const price =
+        typeof priceRaw === "number"
+          ? priceRaw
+          : parseFloat(String(priceRaw ?? "0").replace(/[^0-9.]/g, ""));
+
+      if (!productId) {
+        console.error("Missing product ID for item:", item);
+      }
+
+      return {
+        product: { _type: "reference", _ref: productId },
+        productName: item.product.name,
+        quantity:
+          localQuantities[item.cartId || "direct"] ?? item.quantity ?? 1,
+        price,
+        size: item.selectedSize,
+        color: item.selectedColor?.label || item.selectedColor,
+        image: item.product.images?.hero
+          ? urlFor(item.product.images.hero).url()
+          : "",
+      };
+    });
+
+    // Abort early if any item is missing a product ID
+    if (formattedItems.some((i) => !i.product._ref)) {
+      alert(
+        "One or more items is missing product data. Please return to the product page and try again.",
+      );
+      setIsProcessing(false);
+      return;
+    }
 
     try {
       const response = await fetch("/api/pesapal/register-order", {
