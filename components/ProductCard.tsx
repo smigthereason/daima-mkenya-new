@@ -1274,7 +1274,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
     }
   };
 
-  // ==================== PURCHASE NOW (DIRECT CHECKOUT) - FIXED ====================
+  // ==================== PURCHASE NOW (DIRECT CHECKOUT) ====================
   const handlePurchaseNow = async () => {
     if (stockStatus.disabled) return;
 
@@ -1358,6 +1358,9 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
   const titleLine1 = activeProduct.name;
   const titleLine2 = activeProduct.colors?.[selectedColor]?.label || "";
 
+  // Use the first category from the categories array (or fallback)
+  const productCategory = activeProduct.categories?.[0] || "COLLECTION";
+
   return (
     <div
       ref={cardRef}
@@ -1373,7 +1376,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
               The Collection
             </span>
             <span className="text-[11px] xl:text-[12px] uppercase tracking-[0.3em] font-bold border-b-2 border-black pb-2">
-              {activeProduct.category}
+              {productCategory}
             </span>
           </div>
 
@@ -1671,7 +1674,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
               The Collection
             </span>
             <span className="text-[11px] uppercase tracking-[0.3em] font-bold border-b-2 border-black pb-2">
-              {activeProduct.category}
+              {productCategory}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-light tracking-tighter leading-[1.1] mb-2 uppercase">

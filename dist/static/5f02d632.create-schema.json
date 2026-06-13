@@ -88,13 +88,32 @@
               {
                 "flag": "presence",
                 "constraint": "required"
+              },
+              {
+                "flag": "min",
+                "constraint": 1
               }
             ],
             "level": "error"
           }
         ],
-        "name": "category",
-        "type": "string"
+        "of": [
+          {
+            "type": "string"
+          }
+        ],
+        "name": "categories",
+        "type": "array"
+      },
+      {
+        "description": "Group products that share the same design/print (e.g. Jasiri)",
+        "to": [
+          {
+            "type": "collection"
+          }
+        ],
+        "name": "collection",
+        "type": "reference"
       },
       {
         "of": [
@@ -162,6 +181,70 @@
       }
     ],
     "name": "product",
+    "type": "document"
+  },
+  {
+    "fields": [
+      {
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "description": "e.g. Jasiri, Heritage Edit, Bold Prints",
+        "name": "name",
+        "type": "string",
+        "title": "Collection Name"
+      },
+      {
+        "options": {
+          "source": "name"
+        },
+        "validation": [
+          {
+            "rules": [
+              {
+                "flag": "custom"
+              },
+              {
+                "flag": "presence",
+                "constraint": "required"
+              }
+            ],
+            "level": "error"
+          }
+        ],
+        "name": "slug",
+        "type": "slug"
+      },
+      {
+        "rows": 3,
+        "name": "description",
+        "type": "text"
+      },
+      {
+        "options": {
+          "hotspot": true
+        },
+        "name": "heroImage",
+        "type": "image"
+      },
+      {
+        "name": "material",
+        "type": "string"
+      },
+      {
+        "name": "printDesign",
+        "type": "string"
+      }
+    ],
+    "name": "collection",
     "type": "document"
   },
   {

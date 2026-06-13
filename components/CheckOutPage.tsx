@@ -994,7 +994,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
         strategy="afterInteractive"
       />
 
-      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-6 md:px-12 lg:px-16 py-5 border-b border-gray-100">
+      <nav className="top-0 z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-6 md:px-12 lg:px-16 py-5 border-b border-gray-100">
         <button
           onClick={onBack}
           className="flex items-center gap-3 group cursor-pointer"
