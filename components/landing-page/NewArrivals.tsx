@@ -3,7 +3,7 @@
 // import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 // import Image from "next/image";
 // import Link from "next/link";
-// import { getNewArrivals, Product } from "@/types/Product"; // CHANGED: import getNewArrivals
+// import { getNewArrivals, Product } from "@/types/Product";
 // import { urlFor } from "@/sanity/lib/image";
 
 // const ProductCard = ({
@@ -15,10 +15,8 @@
 // }) => {
 //   const [isHovered, setIsHovered] = useState(false);
 
-//   // Use slug for the product link, fallback to ID
 //   const productSlug = product.slug?.current || product._id;
 
-//   // Logic fix: Swapped to ensure Hero is main and Thumbnail is the small popup
 //   const heroImageUrl = product.images?.hero
 //     ? urlFor(product.images.hero).url()
 //     : "";
@@ -75,7 +73,8 @@
 //         >
 //           <div className="flex flex-col gap-1 md:gap-2">
 //             <span className="text-white/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
-//               {product.category?.toUpperCase() || "NEW ARRIVAL"}
+//               {/* FIXED: use categories array instead of category string */}
+//               {product.categories?.[0]?.toUpperCase() || "NEW ARRIVAL"}
 //             </span>
 //             <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight uppercase">
 //               {product.name}
@@ -108,7 +107,7 @@
 
 //   useEffect(() => {
 //     const fetchProducts = async () => {
-//       const data = await getNewArrivals(); // CHANGED: Now only returns products with isNew == true
+//       const data = await getNewArrivals();
 //       setProducts(data);
 //       setOrder(Array.from({ length: data.length }, (_, i) => i));
 //     };
@@ -235,7 +234,7 @@
 //   );
 // }
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -255,9 +254,6 @@ const ProductCard = ({
 
   const heroImageUrl = product.images?.hero
     ? urlFor(product.images.hero).url()
-    : "";
-  const thumbnailImageUrl = product.images?.thumbnails?.[0]
-    ? urlFor(product.images.thumbnails[0]).url()
     : "";
 
   return (
@@ -287,29 +283,12 @@ const ProductCard = ({
         </div>
         <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-black/80 opacity-90" />
 
-        {/* Thumbnail Popup */}
-        <div
-          className={`absolute top-4 right-4 md:top-6 md:right-6 z-20 w-20 md:w-32 aspect-3/4 bg-white p-1 shadow-xl transition-all duration-500 delay-100
-                        ${isHovered ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"}`}
-        >
-          {thumbnailImageUrl && (
-            <Image
-              src={thumbnailImageUrl}
-              alt="product thumbnail"
-              fill
-              unoptimized
-              className="object-cover"
-            />
-          )}
-        </div>
-
         <div
           className={`absolute bottom-0 left-0 right-0 p-6 md:p-10 transition-all duration-500
                         ${isActive ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}
         >
           <div className="flex flex-col gap-1 md:gap-2">
             <span className="text-white/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
-              {/* FIXED: use categories array instead of category string */}
               {product.categories?.[0]?.toUpperCase() || "NEW ARRIVAL"}
             </span>
             <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight uppercase">
