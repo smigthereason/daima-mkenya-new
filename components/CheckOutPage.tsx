@@ -1050,7 +1050,7 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
                     <div className="flex-1 flex flex-col">
                       <div className="flex justify-between items-start">
-                        <h2 className="text-[13px] font-black uppercase tracking-tighter leading-tight max-w-[180px]">
+                        <h2 className="text-[13px] font-black tracking-tighter leading-tight max-w-[180px]">
                           {item.product.name}
                         </h2>
                         <button

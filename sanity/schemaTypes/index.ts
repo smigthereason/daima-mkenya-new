@@ -234,6 +234,7 @@ const product: SchemaTypeDefinition = {
           "Jackets",
           "Trousers",
           "Knitwear",
+          "Pants",
         ],
       },
       validation: (Rule) => Rule.required().min(1),

@@ -274,7 +274,7 @@ export default function CartPage() {
                     <div className="md:col-span-3 flex flex-col justify-between py-2">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-lg md:text-xl font-black uppercase tracking-widest mb-2">
+                          <h3 className="text-lg md:text-xl font-black  tracking-widest mb-2">
                             {item.product.name}
                           </h3>
                           <div className="flex flex-wrap gap-4 text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-gray-500 font-bold">

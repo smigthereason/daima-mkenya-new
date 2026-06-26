@@ -291,7 +291,7 @@ const ProductCard = ({
             <span className="text-white/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
               {product.categories?.[0]?.toUpperCase() || "NEW ARRIVAL"}
             </span>
-            <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight">
+            <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight ">
               {product.name}
             </h3>
             <div className="flex items-center gap-3 mt-2">

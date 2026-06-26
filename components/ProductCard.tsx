@@ -1336,7 +1336,7 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
       <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4">
         <div className="max-w-md text-center">
           <AlertTriangle size={48} className="mx-auto mb-6 text-gray-400" />
-          <h1 className="text-2xl md:text-3xl font-black uppercase tracking-wider mb-4">
+          <h1 className="text-2xl md:text-3xl font-black tracking-wider mb-4">
             {fetchError || "Product Not Available"}
           </h1>
           <p className="text-sm text-gray-500 mb-8">
@@ -1469,9 +1469,11 @@ export default function ProductCard({ productSlug }: ProductCardProps) {
 
       {/* 3. RIGHT PANEL - Details Panel */}
       <div className="hidden xl:block xl:w-[28%] p-6 sm:p-8 md:p-12 xl:p-16 bg-white flex flex-col justify-center">
-        <h1 className="text-2xl sm:text-3xl xl:text-4xl font-light tracking-tighter leading-[1.1] mb-4 xl:mb-6 uppercase">
+        <h1 className="text-2xl sm:text-3xl xl:text-4xl font-light tracking-tighter leading-[1.1] mb-4 xl:mb-6 ">
           {titleLine1} <br />
-          <span className="font-black text-neutral-900">{titleLine2}</span>
+          <span className="font-black text-neutral-900 uppercase ">
+            {titleLine2}
+          </span>
         </h1>
 
         <p className="text-[1.75rem] xl:text-[2rem] font-light tracking-[0.15em] mb-4 xl:mb-6">

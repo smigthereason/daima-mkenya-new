@@ -213,7 +213,7 @@ export default function ProductGrid({
                   <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] text-zinc-500 font-bold">
                     {product.categories?.[0] || "New Arrival"}
                   </span>
-                  <h3 className="text-[13px] md:text-[15px] font-black tracking-wider uppercase text-zinc-900 leading-tight min-h-[2.5rem] line-clamp-2">
+                  <h3 className="text-[13px] md:text-[15px] font-black tracking-wider  text-zinc-900 leading-tight min-h-[2.5rem] line-clamp-2">
                     {product.name}
                   </h3>
                   <p className="text-[14px] md:text-[16px] font-medium tracking-wide text-zinc-900">
