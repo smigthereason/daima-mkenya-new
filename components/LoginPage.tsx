@@ -6,7 +6,7 @@ import { FaFacebook, FaGoogle, FaApple } from "react-icons/fa6";
 import Image from "next/image";
 import Link from "next/link";
 import { Logo, HeroImage2 } from "@/public/assets";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, useSession, getSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 const Login = () => {
@@ -15,7 +15,7 @@ const Login = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
 
   // Form States
   const [email, setEmail] = useState("");
@@ -72,10 +72,29 @@ const Login = () => {
     setError(null);
 
     try {
+      // If the user is signing up, we must actually create the account
+      // first. Previously this step was skipped entirely, so signIn()
+      // was called against an account that never existed, which always
+      // failed with "Invalid credentials" for every new user.
+      if (isSignUp) {
+        const registerRes = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, password }),
+        });
+
+        const registerData = await registerRes.json();
+
+        if (!registerRes.ok) {
+          setError(registerData.error || "Failed to create account");
+          setLoading(false);
+          return;
+        }
+      }
+
       const result = await signIn("credentials", {
         email,
         password,
-        ...(isSignUp && { name }),
         redirect: false,
       });
 
@@ -90,10 +109,29 @@ const Login = () => {
       }
 
       if (result?.ok) {
-        // Trigger a session update. The useEffect above will handle the redirect
-        // once the session is updated with user data.
-        await update();
+        // Don't wait on useSession()/update() to reactively pick up the new
+        // session - in practice that update can lag or get missed entirely
+        // in this tab, which is exactly why a manual page refresh was
+        // previously required. Instead, fetch the fresh session directly
+        // (a one-off request, same thing a refresh would do) and redirect
+        // immediately once we have it.
+        const freshSession = await getSession();
+
+        const isAdmin =
+          freshSession?.user?.isAdmin ||
+          freshSession?.user?.role === "admin" ||
+          freshSession?.user?.email === "prodbysmig@gmail.com";
+
+        if (typeof window !== "undefined") {
+          sessionStorage.removeItem("redirectAfterLogin");
+          window.location.href = isAdmin ? "/admin" : redirectTo;
+        }
+        return;
       }
+
+      // If we got here, signIn() didn't return an error but also wasn't ok -
+      // reset loading instead of leaving the button stuck.
+      setLoading(false);
     } catch (error) {
       console.error("Authentication error:", error);
       setError("An unexpected error occurred");
