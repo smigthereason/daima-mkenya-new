@@ -10,7 +10,9 @@
     "migrate:users": "ts-node scripts/migrate-all-user-fields.ts",
     "migrate:reset-fields": "ts-node scripts/add-password-reset-fields.ts",
     "migrate:admin": "ts-node scripts/sync-admin-role.ts",
-    "migrate:verify": "ts-node scripts/verify-user-fields.ts"
+    "migrate:verify": "ts-node scripts/verify-user-fields.ts",
+    "add:admin-user": "tsx scripts/add-admin-user.ts",
+    "cleanup:pending-orders": "tsx scripts/delete-pending-orders.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

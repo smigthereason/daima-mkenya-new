@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { client } from "@/sanity/lib/client";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { normalizeEmail } from "@/lib/utils/normalizeEmail";
 
 export async function POST(request: Request) {
   try {
@@ -12,16 +13,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    console.log("🔍 Forgot password requested for:", email);
+    const normalizedEmail = normalizeEmail(email);
+
+    console.log("🔍 Forgot password requested for:", normalizedEmail);
 
     // Find user in Sanity
     const user = await client.fetch(
-      `*[_type == "user" && email == $email][0] {
+      `*[_type == "user" && lower(email) == $email][0] {
         _id,
         name,
         email
       }`,
-      { email },
+      { email: normalizedEmail },
     );
 
     if (!user) {

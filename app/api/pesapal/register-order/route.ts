@@ -37,6 +37,25 @@ export async function POST(req: Request) {
       );
     }
 
+    // Delivery method is either a pickup station or a drop-off/home
+    // delivery address - default to pickup for any unrecognized value.
+    const deliveryMethod: "pickup" | "shipping" =
+      deliveryDetails?.method === "shipping" ? "shipping" : "pickup";
+
+    if (deliveryMethod === "pickup" && !deliveryDetails?.pickupStationName) {
+      return NextResponse.json(
+        { error: "Pickup station is required" },
+        { status: 400 },
+      );
+    }
+
+    if (deliveryMethod === "shipping" && !deliveryDetails?.shippingAddress) {
+      return NextResponse.json(
+        { error: "Drop-off address is required for home delivery" },
+        { status: 400 },
+      );
+    }
+
     // Find or create user
     let user = await client.fetch(
       `*[_type == "user" && email == $email][0]{ _id }`,
@@ -105,11 +124,18 @@ export async function POST(req: Request) {
       paymentDate: new Date().toISOString(),
       customer: { name, email: customerEmail, phone: phoneNumber },
       deliveryDetails: {
-        method: "pickup",
+        method: deliveryMethod,
         city: deliveryDetails?.city || "Nairobi",
-        pickupStationName: deliveryDetails?.pickupStationName || "",
-        pickupStationId: deliveryDetails?.pickupStationId || "",
+        pickupStationName:
+          deliveryMethod === "pickup"
+            ? deliveryDetails?.pickupStationName || ""
+            : "",
+        pickupStationId:
+          deliveryMethod === "pickup"
+            ? deliveryDetails?.pickupStationId || ""
+            : "",
         shippingAddress: deliveryDetails?.shippingAddress || "",
+        additionalInfo: deliveryDetails?.additionalInfo || "",
       },
       amount,
       shippingFee: shippingFee || 0,

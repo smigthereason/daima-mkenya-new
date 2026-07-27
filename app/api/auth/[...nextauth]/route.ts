@@ -7,10 +7,11 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { SanityAdapter } from "next-auth-sanity";
 import { client } from "@/sanity/lib/client";
 import bcrypt from "bcryptjs";
+import { normalizeEmail } from "@/lib/utils/normalizeEmail";
 
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || "prodbysmig@gmail.com")
   .split(",")
-  .map((email) => email.trim());
+  .map((email) => normalizeEmail(email));
 
 export const authOptions: NextAuthOptions = {
   adapter: SanityAdapter(client as any),
@@ -39,11 +40,13 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Missing email or password");
         }
 
+        const normalizedEmail = normalizeEmail(credentials.email);
+
         const user = await client.fetch(
-          `*[_type == "user" && email == $email][0]{
+          `*[_type == "user" && lower(email) == $email][0]{
             _id, name, email, password, role, isAdmin, image
           }`,
-          { email: credentials.email },
+          { email: normalizedEmail },
         );
 
         if (!user || !user.password) {
@@ -73,7 +76,8 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.role = user.role;
         // Check database flag OR environment variable list
-        token.isAdmin = user.isAdmin || ADMIN_EMAILS.includes(user.email || "");
+        token.isAdmin =
+          user.isAdmin || ADMIN_EMAILS.includes(normalizeEmail(user.email || ""));
       }
       return token;
     },

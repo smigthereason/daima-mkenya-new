@@ -643,6 +643,8 @@ import {
   Phone,
   MapPin,
   ChevronDown,
+  Truck,
+  Package,
 } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useSession } from "next-auth/react";
@@ -693,6 +695,13 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
   const [selectedPickupPoint, setSelectedPickupPoint] = useState(
     PICKUP_LOCATIONS.Nairobi[0],
   );
+  // Delivery method toggle: pick up from a station, or have it dropped off
+  // at the customer's own address.
+  const [deliveryMethod, setDeliveryMethod] = useState<"pickup" | "shipping">(
+    "pickup",
+  );
+  const [dropoffAddress, setDropoffAddress] = useState("");
+  const [deliveryNotes, setDeliveryNotes] = useState("");
 
   // NEW: Support for direct checkout via sessionStorage (reliable) + legacy URL support
   const [directCheckoutItem, setDirectCheckoutItem] = useState<any>(null);
@@ -863,6 +872,11 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
       return;
     }
 
+    if (deliveryMethod === "shipping" && !dropoffAddress.trim()) {
+      alert("Please enter a drop-off address for delivery.");
+      return;
+    }
+
     setIsProcessing(true);
 
     const formattedItems = displayItems.map((item) => {
@@ -914,12 +928,18 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
           email: email.trim(),
           items: formattedItems,
           deliveryDetails: {
-            method: "pickup",
+            method: deliveryMethod,
             city: selectedCity,
-            pickupStationName: selectedPickupPoint.name,
-            pickupStationId: selectedPickupPoint.id,
+            pickupStationName:
+              deliveryMethod === "pickup" ? selectedPickupPoint.name : "",
+            pickupStationId:
+              deliveryMethod === "pickup" ? selectedPickupPoint.id : "",
             shippingAddress:
-              shippingAddress.trim() || "No specific building details",
+              deliveryMethod === "pickup"
+                ? shippingAddress.trim() || "No specific building details"
+                : dropoffAddress.trim(),
+            additionalInfo:
+              deliveryMethod === "shipping" ? deliveryNotes.trim() : "",
           },
           shippingFee,
         }),
@@ -1184,6 +1204,36 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
 
                   <div className="flex flex-col gap-3 md:col-span-2">
                     <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
+                      Delivery Method
+                    </label>
+                    <div className="flex bg-neutral-100 p-1 rounded-sm border border-neutral-200 w-fit">
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryMethod("pickup")}
+                        className={`flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                          deliveryMethod === "pickup"
+                            ? "bg-white shadow-sm text-black"
+                            : "text-neutral-400 hover:text-black"
+                        }`}
+                      >
+                        <Package size={14} /> Pickup Station
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryMethod("shipping")}
+                        className={`flex items-center gap-2 px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all ${
+                          deliveryMethod === "shipping"
+                            ? "bg-white shadow-sm text-black"
+                            : "text-neutral-400 hover:text-black"
+                        }`}
+                      >
+                        <Truck size={14} /> Drop-Off / Home Delivery
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 md:col-span-2">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
                       Select City
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -1208,46 +1258,79 @@ export default function CheckOutPage({ onBack }: CheckOutPageProps) {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 md:col-span-2 relative">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 flex items-center gap-2">
-                      <MapPin size={12} /> Specific Pickup Station
-                    </label>
-                    <div className="relative">
-                      <select
-                        className="appearance-none w-full border-b-2 border-gray-100 py-4 outline-none text-[13px] bg-transparent pr-10 focus:border-black transition-colors"
-                        value={selectedPickupPoint.id}
-                        onChange={(e) => {
-                          const point = PICKUP_LOCATIONS[selectedCity].find(
-                            (p) => p.id === e.target.value,
-                          );
-                          if (point) setSelectedPickupPoint(point);
-                        }}
-                      >
-                        {PICKUP_LOCATIONS[selectedCity].map((point) => (
-                          <option key={point.id} value={point.id}>
-                            {point.name} — {point.address}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={16}
-                        className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
-                      />
-                    </div>
-                  </div>
+                  {deliveryMethod === "pickup" ? (
+                    <>
+                      <div className="flex flex-col gap-3 md:col-span-2 relative">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 flex items-center gap-2">
+                          <MapPin size={12} /> Specific Pickup Station
+                        </label>
+                        <div className="relative">
+                          <select
+                            className="appearance-none w-full border-b-2 border-gray-100 py-4 outline-none text-[13px] bg-transparent pr-10 focus:border-black transition-colors"
+                            value={selectedPickupPoint.id}
+                            onChange={(e) => {
+                              const point = PICKUP_LOCATIONS[selectedCity].find(
+                                (p) => p.id === e.target.value,
+                              );
+                              if (point) setSelectedPickupPoint(point);
+                            }}
+                          >
+                            {PICKUP_LOCATIONS[selectedCity].map((point) => (
+                              <option key={point.id} value={point.id}>
+                                {point.name} — {point.address}
+                              </option>
+                            ))}
+                          </select>
+                          <ChevronDown
+                            size={16}
+                            className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400"
+                          />
+                        </div>
+                      </div>
 
-                  <div className="flex flex-col gap-3 md:col-span-2">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
-                      Building / Suite / Floor (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={shippingAddress}
-                      onChange={(e) => setShippingAddress(e.target.value)}
-                      className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] font-black uppercase transition-colors"
-                      placeholder="E.G. SUITE 302, 3RD FLOOR"
-                    />
-                  </div>
+                      <div className="flex flex-col gap-3 md:col-span-2">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
+                          Building / Suite / Floor (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={shippingAddress}
+                          onChange={(e) => setShippingAddress(e.target.value)}
+                          className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] font-black uppercase transition-colors"
+                          placeholder="E.G. SUITE 302, 3RD FLOOR"
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex flex-col gap-3 md:col-span-2">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400 flex items-center gap-2">
+                          <Truck size={12} /> Drop-Off Address
+                        </label>
+                        <textarea
+                          required
+                          value={dropoffAddress}
+                          onChange={(e) => setDropoffAddress(e.target.value)}
+                          rows={2}
+                          className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] transition-colors resize-none"
+                          placeholder="STREET, ESTATE, BUILDING, HOUSE/APARTMENT NO."
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-3 md:col-span-2">
+                        <label className="text-[9px] uppercase tracking-[0.2em] font-black text-gray-400">
+                          Landmark / Delivery Instructions (Optional)
+                        </label>
+                        <input
+                          type="text"
+                          value={deliveryNotes}
+                          onChange={(e) => setDeliveryNotes(e.target.value)}
+                          className="border-b-2 border-gray-100 py-3 focus:border-black outline-none text-[13px] transition-colors"
+                          placeholder="E.G. GATE COLOR, NEAREST LANDMARK"
+                        />
+                      </div>
+                    </>
+                  )}
                 </div>
               </section>
 

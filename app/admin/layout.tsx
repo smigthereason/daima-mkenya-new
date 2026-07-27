@@ -106,7 +106,7 @@ export default function AdminLayout({
             <AdminNavLink
               href="/admin/orders"
               icon={<Package size={16} />}
-              label="Shipments"
+              label="Orders"
               onClick={() => setSidebarOpen(false)}
             />
             <AdminNavLink

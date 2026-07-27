@@ -119,6 +119,7 @@
 import { NextResponse } from "next/server";
 import { getPesaPalAuthToken, getTransactionStatus } from "@/lib/pesapal";
 import { client } from "@/sanity/lib/client";
+import { sendOrderNotificationEmail } from "@/lib/email";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -157,8 +158,14 @@ export async function GET(req: Request) {
     const order = await client.fetch(
       `*[_type == "order" && orderNumber == $orderNumber][0] {
         _id,
+        orderNumber,
         status,
-        paymentStatus
+        paymentStatus,
+        amount,
+        shippingFee,
+        customer,
+        deliveryDetails,
+        items[] { productName, quantity, price, size, color }
       }`,
       { orderNumber: OrderMerchantReference },
     );
@@ -219,6 +226,29 @@ export async function GET(req: Request) {
         payment_method: statusData.payment_method,
         confirmation_code: confirmationCode || statusData.confirmation_code,
       });
+
+      // Notify the store inbox only once the payment has actually gone
+      // through - and only on the transition into "paid", so a repeat IPN
+      // ping for an order that was already confirmed doesn't send a
+      // duplicate email.
+      if (isSuccessful && order.paymentStatus !== "paid") {
+        try {
+          await sendOrderNotificationEmail({
+            orderNumber: order.orderNumber,
+            amount: order.amount,
+            shippingFee: order.shippingFee,
+            customer: order.customer,
+            deliveryDetails: order.deliveryDetails,
+            items: order.items || [],
+          });
+        } catch (emailError) {
+          console.error(
+            "❌ Failed to send order-paid notification email:",
+            emailError,
+          );
+          // Order status update still stands even if the email fails
+        }
+      }
     } else {
       console.log(
         `Order not found for merchant reference: ${OrderMerchantReference}`,

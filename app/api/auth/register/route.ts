@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { client } from "@/sanity/lib/client";
 import bcrypt from "bcryptjs";
+import { normalizeEmail } from "@/lib/utils/normalizeEmail";
 
 const ADMIN_EMAILS = ["prodbysmig@gmail.com"];
 
@@ -23,10 +24,13 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user already exists
+    const normalizedEmail = normalizeEmail(email);
+
+    // Check if user already exists (case-insensitive, so "Name@Gmail.com"
+    // can't be used to create a duplicate of "name@gmail.com")
     const existingUser = await client.fetch(
-      `*[_type == "user" && email == $email][0]`,
-      { email },
+      `*[_type == "user" && lower(email) == $email][0]`,
+      { email: normalizedEmail },
     );
 
     if (existingUser) {
@@ -39,13 +43,14 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const isAdmin = ADMIN_EMAILS.includes(email);
+    const isAdmin = ADMIN_EMAILS.includes(normalizedEmail);
 
-    // Create user in Sanity
+    // Create user in Sanity - email is always stored lowercase so future
+    // logins match regardless of how the person capitalizes it
     const user = await client.create({
       _type: "user",
       name,
-      email,
+      email: normalizedEmail,
       password: hashedPassword,
       role: isAdmin ? "admin" : "customer",
       emailVerified: new Date().toISOString(),

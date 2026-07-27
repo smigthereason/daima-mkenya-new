@@ -10,7 +10,7 @@ export default {
       type: "string",
       options: {
         list: [
-          { title: "Home Delivery", value: "shipping" },
+          { title: "Home Delivery / Drop-Off", value: "shipping" },
           { title: "Pickup Station", value: "pickup" },
         ],
       },

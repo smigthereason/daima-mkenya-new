@@ -40,6 +40,7 @@ interface Order {
     pickupStationName?: string;
     pickupStationId?: string;
     shippingAddress?: string;
+    additionalInfo?: string;
   };
   items?: OrderItem[];
   paymentMethod?: string;
@@ -196,6 +197,11 @@ export default function OrderList({
                           {order.deliveryDetails.shippingAddress && (
                             <p className="text-xs text-neutral-600 mt-1">
                               🏢 {order.deliveryDetails.shippingAddress}
+                            </p>
+                          )}
+                          {order.deliveryDetails.additionalInfo && (
+                            <p className="text-xs text-neutral-600 mt-1">
+                              📝 {order.deliveryDetails.additionalInfo}
                             </p>
                           )}
                         </div>

@@ -71,6 +71,11 @@ const Login = () => {
     setLoading(true);
     setError(null);
 
+    // Normalize on the client too - phone keyboards commonly auto-capitalize
+    // the first letter of a text field, which would otherwise silently turn
+    // a correct password + email into "Invalid credentials".
+    const normalizedEmail = email.trim().toLowerCase();
+
     try {
       // If the user is signing up, we must actually create the account
       // first. Previously this step was skipped entirely, so signIn()
@@ -80,7 +85,7 @@ const Login = () => {
         const registerRes = await fetch("/api/auth/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, password }),
+          body: JSON.stringify({ name, email: normalizedEmail, password }),
         });
 
         const registerData = await registerRes.json();
@@ -93,7 +98,7 @@ const Login = () => {
       }
 
       const result = await signIn("credentials", {
-        email,
+        email: normalizedEmail,
         password,
         redirect: false,
       });
@@ -257,6 +262,9 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     className="w-full bg-zinc-100 border-none py-4 pl-12 pr-4 outline-none text-black focus:ring-1 focus:ring-black/5"
                   />
                 </div>
@@ -353,6 +361,9 @@ const Login = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck={false}
                     className="w-full bg-zinc-100 border-none py-4 pl-12 pr-4 outline-none text-black"
                   />
                 </div>
