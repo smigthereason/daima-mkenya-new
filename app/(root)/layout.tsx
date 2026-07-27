@@ -3,8 +3,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display } from "next/font/google";
 import "../globals.css";
-import { CartProvider } from "@/context/CartContext";
-import { NextAuthProvider } from "./providers/NextAuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import Navbar from "@/components/landing-page/Navbar";
 import Footer from "@/components/landing-page/Footer";
@@ -75,11 +73,9 @@ export default function RootLayout({
   return (
     <div className={playfair.className}>
       <ErrorBoundary>
-        <NextAuthProvider>
-          <Navbar />
-          <CartProvider>{children}</CartProvider>
-          <Footer />
-        </NextAuthProvider>
+        <Navbar />
+        {children}
+        <Footer />
       </ErrorBoundary>
       <Analytics />
     </div>

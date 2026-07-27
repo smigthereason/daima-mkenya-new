@@ -12,7 +12,7 @@ export default function CheckoutRoute() {
 
   // Check for direct checkout item in sessionStorage
   useEffect(() => {
-    const directItem = sessionStorage.getItem("directCheckout");
+    const directItem = sessionStorage.getItem("directCheckoutItem");
     setHasDirectItem(!!directItem);
   }, []);
 

@@ -2,9 +2,14 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
-import { client } from "@/sanity/lib/client";
+// Use the no-cache client here (not the CDN-cached one) — this route reads
+// data back immediately after every write, and the CDN can lag behind
+// writes by up to ~60s, causing the cart to appear to "lose" items until
+// the cache catches up.
+import { serverClient as client } from "@/sanity/lib/server-client";
 
-// Cache for user IDs to reduce queries
+// Cache for user IDs to reduce queries — only needed on the very first
+// cart a user ever creates (see note below), but kept for that path.
 const userCache = new Map<string, { id: string; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
@@ -27,6 +32,26 @@ async function getUserId(email: string) {
   return user;
 }
 
+const CART_PROJECTION = `{
+  _id,
+  items[] {
+    cartId,
+    quantity,
+    selectedSize,
+    selectedColor,
+    addedAt,
+    product-> {
+      _id,
+      name,
+      price,
+      images,
+      colors,
+      sizes,
+      slug
+    }
+  }
+}`;
+
 // GET /api/cart - Fetch user's cart
 export async function GET() {
   try {
@@ -36,34 +61,13 @@ export async function GET() {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get user ID first
-    const userId = await getUserId(session.user.email);
-
-    if (!userId) {
-      return NextResponse.json({ items: [] });
-    }
-
-    // Single optimized query - get cart with products in one go
+    // Every cart document stores userEmail at creation time, so we can
+    // fetch it directly — no separate userId lookup needed. This is the
+    // single most-called endpoint in the cart flow, so cutting it from
+    // 2 round trips to 1 matters most here.
     const cart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] {
-        items[] {
-          cartId,
-          quantity,
-          selectedSize,
-          selectedColor,
-          addedAt,
-          product-> {
-            _id,
-            name,
-            price,
-            images,
-            colors,
-            sizes,
-            slug
-          }
-        }
-      }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] ${CART_PROJECTION}`,
+      { email: session.user.email },
     );
 
     return NextResponse.json({ items: cart?.items || [] });
@@ -85,6 +89,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const email = session.user.email;
+
     const {
       product,
       quantity = 1,
@@ -99,17 +105,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get user ID
-    const userId = await getUserId(session.user.email);
-
-    if (!userId) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Find existing cart
+    // Find existing cart directly by email — no userId round trip.
     let cart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] { _id, items }`,
+      { email },
     );
 
     const cartId = `cart-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -129,14 +128,22 @@ export async function POST(req: Request) {
     };
 
     if (!cart) {
-      // Create new cart with item
+      // First-ever cart for this user — this is the one path that still
+      // needs the user document's _id, since a brand-new cart requires a
+      // real `user` reference, not just the email string.
+      const userId = await getUserId(email);
+
+      if (!userId) {
+        return NextResponse.json({ error: "User not found" }, { status: 404 });
+      }
+
       await client.create({
         _type: "cart",
         user: {
           _type: "reference",
           _ref: userId,
         },
-        userEmail: session.user.email,
+        userEmail: email,
         items: [newItem],
         lastUpdated: new Date().toISOString(),
       });
@@ -178,25 +185,8 @@ export async function POST(req: Request) {
 
     // Fetch updated cart with product details
     const updatedCart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] {
-        items[] {
-          cartId,
-          quantity,
-          selectedSize,
-          selectedColor,
-          addedAt,
-          product-> {
-            _id,
-            name,
-            price,
-            images,
-            colors,
-            sizes,
-            slug
-          }
-        }
-      }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] ${CART_PROJECTION}`,
+      { email },
     );
 
     return NextResponse.json({
@@ -221,6 +211,7 @@ export async function PATCH(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const email = session.user.email;
     const { cartId, quantity } = await req.json();
 
     if (!cartId || quantity === undefined) {
@@ -230,16 +221,10 @@ export async function PATCH(req: Request) {
       );
     }
 
-    const userId = await getUserId(session.user.email);
-
-    if (!userId) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Find cart
+    // Find cart directly by email — no userId round trip
     const cart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] { _id, items }`,
+      { email },
     );
 
     if (!cart) {
@@ -264,25 +249,8 @@ export async function PATCH(req: Request) {
 
     // Fetch updated cart with product details
     const updatedCart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] {
-        items[] {
-          cartId,
-          quantity,
-          selectedSize,
-          selectedColor,
-          addedAt,
-          product-> {
-            _id,
-            name,
-            price,
-            images,
-            colors,
-            sizes,
-            slug
-          }
-        }
-      }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] ${CART_PROJECTION}`,
+      { email },
     );
 
     return NextResponse.json({
@@ -307,6 +275,7 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const email = session.user.email;
     const { searchParams } = new URL(req.url);
     const cartId = searchParams.get("cartId");
 
@@ -314,16 +283,10 @@ export async function DELETE(req: Request) {
       return NextResponse.json({ error: "Cart ID required" }, { status: 400 });
     }
 
-    const userId = await getUserId(session.user.email);
-
-    if (!userId) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    // Find cart
+    // Find cart directly by email — no userId round trip
     const cart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] { _id, items }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] { _id, items }`,
+      { email },
     );
 
     if (!cart) {
@@ -345,25 +308,8 @@ export async function DELETE(req: Request) {
 
     // Fetch updated cart with product details
     const updatedCart = await client.fetch(
-      `*[_type == "cart" && user._ref == $userId][0] {
-        items[] {
-          cartId,
-          quantity,
-          selectedSize,
-          selectedColor,
-          addedAt,
-          product-> {
-            _id,
-            name,
-            price,
-            images,
-            colors,
-            sizes,
-            slug
-          }
-        }
-      }`,
-      { userId },
+      `*[_type == "cart" && userEmail == $email][0] ${CART_PROJECTION}`,
+      { email },
     );
 
     return NextResponse.json({

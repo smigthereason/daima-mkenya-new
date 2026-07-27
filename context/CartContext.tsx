@@ -64,6 +64,11 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }, 100);
   }, []);
 
+  const cartItemsRef = useRef<CartItem[]>([]);
+  useEffect(() => {
+    cartItemsRef.current = cartItems;
+  }, [cartItems]);
+
   const fetchCart = useCallback(async () => {
     if (status !== "authenticated" || !session?.user?.email) {
       setCartItems([]);
@@ -72,7 +77,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
     // Don't show loading for initial fetch if we already have items
-    if (cartItems.length === 0) {
+    // (read from a ref, not state, so this never re-creates fetchCart)
+    if (cartItemsRef.current.length === 0) {
       setLoading(true);
     }
 
@@ -92,7 +98,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
       setLoading(false);
       setIsInitialized(true);
     }
-  }, [session, status, cartItems.length]);
+    // Only depends on stable primitives — NOT the whole `session` object.
+    // `session` gets a new object reference on every background revalidation
+    // (window focus, polling interval) even when nothing actually changed,
+    // which was silently re-triggering this fetch (and overwriting state)
+    // far more often than intended.
+  }, [session?.user?.email, status]);
 
   // Fetch cart on mount and when session changes
   useEffect(() => {
@@ -120,35 +131,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         item.selectedSize === size &&
         item.selectedColor.label === colorLabel,
     );
-  };
-
-  // Merge server items with current items to prevent race conditions
-  const mergeCartItems = (
-    serverItems: CartItem[],
-    currentItems: CartItem[],
-  ) => {
-    // Create a map of current items for quick lookup
-    const currentMap = new Map(currentItems.map((item) => [item.cartId, item]));
-
-    // Start with server items
-    const merged = [...serverItems];
-
-    // Add any items that exist in current but not in server (optimistic updates)
-    currentItems.forEach((currentItem) => {
-      const existsInServer = serverItems.some(
-        (serverItem) =>
-          serverItem.product._id === currentItem.product._id &&
-          serverItem.selectedSize === currentItem.selectedSize &&
-          serverItem.selectedColor.label === currentItem.selectedColor.label,
-      );
-
-      if (!existsInServer && currentItem.cartId.startsWith("temp-")) {
-        // This is a temporary item that hasn't been confirmed by server yet
-        merged.push(currentItem);
-      }
-    });
-
-    return merged;
   };
 
   const addToCart = async (
@@ -233,21 +215,13 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           }
           const data = await response.json();
 
-          // Merge server data with current state instead of replacing
-          setCartItems((currentItems) => {
-            // Remove temporary items that match the server items
-            const serverItemIds = new Set(
-              data.items.map((item: CartItem) => item.cartId),
-            );
-            const filteredCurrent = currentItems.filter(
-              (item) =>
-                !item.cartId.startsWith("temp-") ||
-                !serverItemIds.has(item.cartId),
-            );
-
-            // Combine server items with remaining current items
-            return [...filteredCurrent, ...data.items];
-          });
+          // The server's response is the full, authoritative cart (fresh,
+          // no-cache read as of the previous fix) — replace state with it
+          // directly instead of trying to merge by cartId. Merging by
+          // cartId never matched the temp-prefixed optimistic item against
+          // its real server-generated id, which is what caused duplicate
+          // rows for the same product.
+          setCartItems(data.items || []);
 
           return data;
         })
@@ -307,18 +281,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       const data = await response.json();
 
-      // Merge server data with current state
-      setCartItems((currentItems) => {
-        // Keep items that aren't in the server response (optimistic updates)
-        const serverItemIds = new Set(
-          data.items.map((item: CartItem) => item.cartId),
-        );
-        const optimisticItems = currentItems.filter(
-          (item) => !serverItemIds.has(item.cartId) && item.cartId !== cartId,
-        );
-
-        return [...optimisticItems, ...data.items];
-      });
+      // Trust the server's full, authoritative cart (fresh, no-cache read)
+      setCartItems(data.items || []);
     } catch (err) {
       // Revert optimistic update on error
       if (removedItem) {
@@ -373,18 +337,8 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
       const data = await response.json();
 
-      // Merge server data with current state
-      setCartItems((currentItems) => {
-        // Keep items that aren't in the server response (optimistic updates)
-        const serverItemIds = new Set(
-          data.items.map((item: CartItem) => item.cartId),
-        );
-        const optimisticItems = currentItems.filter(
-          (item) => !serverItemIds.has(item.cartId) && item.cartId !== cartId,
-        );
-
-        return [...optimisticItems, ...data.items];
-      });
+      // Trust the server's full, authoritative cart (fresh, no-cache read)
+      setCartItems(data.items || []);
     } catch (err) {
       // Revert optimistic update on error
       if (originalItem) {
