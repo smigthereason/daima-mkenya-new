@@ -16,7 +16,6 @@ import {
   AlertCircle,
   RefreshCw,
   Save,
-  MessageSquare,
   Calendar,
   Edit3,
   Check,
@@ -593,13 +592,7 @@ export default function ContactSubmissionDetailPage() {
           <div className="bg-white border border-neutral-200 p-8">
             <h2 className="text-lg font-light mb-6">Quick Actions</h2>
             <div className="space-y-2">
-              <a
-                href={`mailto:${submission.email}?subject=${encodeURIComponent(replyEmail.subject)}`}
-                className="flex items-center gap-2 w-full p-3 border border-neutral-200 text-sm hover:bg-neutral-50 transition-colors"
-              >
-                <Mail size={14} />
-                Open in Email Client
-              </a>
+
               {submission.phone && (
                 <a
                   href={`tel:${submission.phone}`}
