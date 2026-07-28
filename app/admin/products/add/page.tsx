@@ -1,9 +1,10 @@
 // app/admin/products/add/page.tsx
-import { client } from "@/sanity/lib/client";
+import { serverClient } from "@/sanity/lib/server-client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import ColorPickerField from "../components/ColorPickerField";
 
 async function addProductAction(formData: FormData) {
   "use server";
@@ -22,7 +23,7 @@ async function addProductAction(formData: FormData) {
   const heroImageFile = formData.get("heroImage") as File;
   let heroImageAsset;
   if (heroImageFile && heroImageFile.size > 0) {
-    heroImageAsset = await client.assets.upload("image", heroImageFile);
+    heroImageAsset = await serverClient.assets.upload("image", heroImageFile);
   }
 
   // Handle thumbnails
@@ -30,7 +31,7 @@ async function addProductAction(formData: FormData) {
   for (let i = 1; i <= 4; i++) {
     const thumbFile = formData.get(`thumb${i}`) as File;
     if (thumbFile && thumbFile.size > 0) {
-      const asset = await client.assets.upload("image", thumbFile);
+      const asset = await serverClient.assets.upload("image", thumbFile);
       thumbnails.push({
         _type: "image",
         asset: { _type: "reference", _ref: asset._id },
@@ -44,15 +45,15 @@ async function addProductAction(formData: FormData) {
     .split("\n")
     .filter((line) => line.trim() !== "");
 
-  // Process Colors (up to 4)
-  const colors = [];
-  for (let i = 1; i <= 4; i++) {
-    const label = formData.get(`color${i}Label`);
-    const hex = formData.get(`color${i}Hex`);
-    if (label && hex) {
-      colors.push({ label, hex });
-    }
-  }
+  // Process Colors (via ColorPickerField, repeated name attributes)
+  const colorLabels = formData.getAll("colorLabel") as string[];
+  const colorHexes = formData.getAll("colorHex") as string[];
+  const colors = colorLabels
+    .map((label, index) => ({
+      label,
+      hex: colorHexes[index] || "#000000",
+    }))
+    .filter((c) => c.label.trim() !== "");
 
   // Process Sizes
   const sizesRaw = formData.get("sizes") as string;
@@ -61,8 +62,12 @@ async function addProductAction(formData: FormData) {
     .map((s) => s.trim())
     .filter((s) => s !== "");
 
+  // Categories - the schema field is "categories" (array, min 1), not a
+  // single "category" string
+  const categories = formData.getAll("categories") as string[];
+
   // Create Document
-  await client.create({
+  await serverClient.create({
     _type: "product",
     name: name,
     slug: {
@@ -70,7 +75,7 @@ async function addProductAction(formData: FormData) {
       current: slug,
     },
     price: formData.get("price"),
-    category: formData.get("category"),
+    categories,
     description: descriptionArray,
     details: {
       material: formData.get("material") || "",
@@ -94,7 +99,7 @@ async function addProductAction(formData: FormData) {
   });
 
   revalidatePath("/admin/products");
-  redirect("/admin/products");
+  redirect("/admin/products?status=created");
 }
 
 export default function AddProductPage() {
@@ -156,27 +161,38 @@ export default function AddProductPage() {
           </div>
         </div>
 
-        {/* Category and Price */}
+        {/* Categories and Price */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-2">
-            <label className={labelClasses}>Category *</label>
-            <select
-              name="category"
-              required
-              className={`${inputClasses} appearance-none bg-white`}
-            >
-              <option value="">Select a category</option>
-              <option value="Accessories">Accessories</option>
-              <option value="Streetwear">Streetwear</option>
-              <option value="Sets">Sets</option>
-              <option value="Shirts">Shirts</option>
-              <option value="Tops">Tops</option>
-              <option value="Skirts">Skirts</option>
-              <option value="Dresses">Dresses</option>
-              <option value="Jackets">Jackets</option>
-              <option value="Trousers">Trousers</option>
-              <option value="Knitwear">Knitwear</option>
-            </select>
+            <label className={labelClasses}>Categories * (select one or more)</label>
+            <div className="grid grid-cols-2 gap-2 border border-neutral-200 p-4">
+              {[
+                "Accessories",
+                "Streetwear",
+                "Sets",
+                "Shirts",
+                "Tops",
+                "Skirts",
+                "Dresses",
+                "Jackets",
+                "Trousers",
+                "Knitwear",
+                "Pants",
+              ].map((cat) => (
+                <label
+                  key={cat}
+                  className="flex items-center gap-2 text-xs font-bold cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    name="categories"
+                    value={cat}
+                    className="w-4 h-4 accent-black"
+                  />
+                  {cat}
+                </label>
+              ))}
+            </div>
           </div>
           <div className="space-y-2">
             <label className={labelClasses}>Price *</label>
@@ -276,54 +292,10 @@ export default function AddProductPage() {
         <div className="space-y-4">
           <label className={labelClasses}>Colors (up to 4)</label>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="flex gap-2">
-              <input
-                name="color1Label"
-                className={`${inputClasses} flex-1`}
-                placeholder="Color name (e.g., Black)"
-              />
-              <input
-                name="color1Hex"
-                className={`${inputClasses} w-24`}
-                placeholder="#000000"
-              />
-            </div>
-            <div className="flex gap-2">
-              <input
-                name="color2Label"
-                className={`${inputClasses} flex-1`}
-                placeholder="Color name"
-              />
-              <input
-                name="color2Hex"
-                className={`${inputClasses} w-24`}
-                placeholder="#FFFFFF"
-              />
-            </div>
-            <div className="flex gap-2">
-              <input
-                name="color3Label"
-                className={`${inputClasses} flex-1`}
-                placeholder="Color name"
-              />
-              <input
-                name="color3Hex"
-                className={`${inputClasses} w-24`}
-                placeholder="#FF0000"
-              />
-            </div>
-            <div className="flex gap-2">
-              <input
-                name="color4Label"
-                className={`${inputClasses} flex-1`}
-                placeholder="Color name"
-              />
-              <input
-                name="color4Hex"
-                className={`${inputClasses} w-24`}
-                placeholder="#00FF00"
-              />
-            </div>
+            <ColorPickerField index={0} />
+            <ColorPickerField index={1} />
+            <ColorPickerField index={2} />
+            <ColorPickerField index={3} />
           </div>
         </div>
 

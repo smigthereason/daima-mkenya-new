@@ -1,11 +1,12 @@
 // app/admin/products/edit/[id]/page.tsx
-import { client } from "@/sanity/lib/client";
+import { serverClient } from "@/sanity/lib/server-client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
+import ColorPickerField from "../../components/ColorPickerField";
 
 async function updateProduct(formData: FormData) {
   "use server";
@@ -14,7 +15,7 @@ async function updateProduct(formData: FormData) {
   const name = formData.get("name") as string;
   const slug = formData.get("slug") as string;
   const price = formData.get("price") as string;
-  const category = formData.get("category") as string;
+  const categories = formData.getAll("categories") as string[];
   const material = formData.get("material") as string;
   const care = formData.get("care") as string;
   const origin = formData.get("origin") as string;
@@ -42,7 +43,7 @@ async function updateProduct(formData: FormData) {
     .filter((c) => c.label.trim() !== "");
 
   // Update product
-  await client
+  await serverClient
     .patch(id)
     .set({
       name,
@@ -57,7 +58,7 @@ async function updateProduct(formData: FormData) {
             .substring(0, 200),
       },
       price,
-      category,
+      categories,
       description: descriptionArray,
       details: {
         material: material || "",
@@ -73,7 +74,7 @@ async function updateProduct(formData: FormData) {
     .commit();
 
   revalidatePath("/admin/products");
-  redirect("/admin/products");
+  redirect("/admin/products?status=updated");
 }
 
 export default async function EditProductPage({
@@ -83,13 +84,13 @@ export default async function EditProductPage({
 }) {
   const { id } = await params;
 
-  const product = await client.fetch(
+  const product = await serverClient.fetch(
     `*[_type == "product" && _id == $id][0] {
       _id,
       name,
       "slug": slug.current,
       price,
-      category,
+      categories,
       description,
       details {
         material,
@@ -125,6 +126,7 @@ export default async function EditProductPage({
     "Jackets",
     "Trousers",
     "Knitwear",
+    "Pants",
   ];
 
   const descriptionText = product.description?.join("\n") || "";
@@ -208,24 +210,29 @@ export default async function EditProductPage({
           </div>
         </div>
 
-        {/* Category and Price */}
+        {/* Categories and Price */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-2">
             <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] block mb-2">
-              Category *
+              Categories * (select one or more)
             </label>
-            <select
-              name="category"
-              defaultValue={product.category}
-              required
-              className="w-full p-4 border border-neutral-200 focus:border-black outline-none transition-colors text-sm bg-white"
-            >
+            <div className="grid grid-cols-2 gap-2 border border-neutral-200 p-4">
               {categoryOptions.map((cat) => (
-                <option key={cat} value={cat}>
+                <label
+                  key={cat}
+                  className="flex items-center gap-2 text-xs font-bold cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    name="categories"
+                    value={cat}
+                    defaultChecked={product.categories?.includes(cat)}
+                    className="w-4 h-4 accent-black"
+                  />
                   {cat}
-                </option>
+                </label>
               ))}
-            </select>
+            </div>
           </div>
           <div className="space-y-2">
             <label className="text-[9px] font-black text-neutral-400 uppercase tracking-[0.2em] block mb-2">
@@ -342,21 +349,12 @@ export default async function EditProductPage({
             {[0, 1, 2, 3].map((index) => {
               const color = product.colors?.[index];
               return (
-                <div key={index} className="flex gap-2">
-                  <input
-                    type="text"
-                    name="colorLabel"
-                    defaultValue={color?.label || ""}
-                    placeholder={`Color ${index + 1} name`}
-                    className="flex-1 p-4 border border-neutral-200 focus:border-black outline-none text-sm"
-                  />
-                  <input
-                    type="color"
-                    name="colorHex"
-                    defaultValue={color?.hex || "#000000"}
-                    className="w-16 h-14 border border-neutral-200"
-                  />
-                </div>
+                <ColorPickerField
+                  key={index}
+                  index={index}
+                  defaultLabel={color?.label || ""}
+                  defaultHex={color?.hex || "#000000"}
+                />
               );
             })}
           </div>

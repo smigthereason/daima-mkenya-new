@@ -56,8 +56,8 @@ export default async function AdminProfilePage() {
           </p>
         </div>
 
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-50 rounded-none border border-neutral-100 text-[9px] font-black uppercase tracking-widest text-neutral-500">
-          <ShieldCheck size={12} className="text-[#be1e2d]" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-50 rounded-none border border-neutral-100 text-[9px] font-black uppercase tracking-widest text-neutral-500">
+          <ShieldCheck size={12} className="text-[#238737]" />
           Authenticated Admin
         </div>
       </div>

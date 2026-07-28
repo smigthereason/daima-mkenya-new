@@ -1,6 +1,6 @@
 "use server";
 
-import { client } from "@/sanity/lib/client";
+import { serverClient } from "@/sanity/lib/server-client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -10,13 +10,13 @@ export async function addOneOffAction(formData: FormData) {
   let imageAsset;
 
   if (imageFile && imageFile.size > 0) {
-    imageAsset = await client.assets.upload("image", imageFile);
+    imageAsset = await serverClient.assets.upload("image", imageFile);
   }
 
   const descRaw = formData.get("description") as string;
   const descriptionArray = descRaw.split("\n").filter((l) => l.trim() !== "");
 
-  await client.create({
+  await serverClient.create({
     _type: "oneOff",
     name,
     editionInfo: formData.get("editionInfo") || "Edition 1/1",
@@ -28,5 +28,5 @@ export async function addOneOffAction(formData: FormData) {
   });
 
   revalidatePath("/admin/products");
-  redirect("/admin/products?type=one-off");
+  redirect("/admin/products?type=one-off&status=created");
 }

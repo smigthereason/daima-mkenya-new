@@ -1,4 +1,4 @@
-import { client } from "@/sanity/lib/client";
+import { serverClient } from "@/sanity/lib/server-client";
 import { urlFor } from "@/sanity/lib/image";
 import { revalidatePath } from "next/cache";
 import { redirect, notFound } from "next/navigation";
@@ -18,7 +18,7 @@ async function updateOneOff(formData: FormData) {
   let newImageAsset;
 
   if (imageFile && imageFile.size > 0) {
-    newImageAsset = await client.assets.upload("image", imageFile);
+    newImageAsset = await serverClient.assets.upload("image", imageFile);
   }
 
   const patchData: any = {
@@ -35,9 +35,9 @@ async function updateOneOff(formData: FormData) {
     };
   }
 
-  await client.patch(id).set(patchData).commit();
+  await serverClient.patch(id).set(patchData).commit();
   revalidatePath("/admin/products");
-  redirect("/admin/products?type=one-off");
+  redirect("/admin/products?type=one-off&status=updated");
 }
 
 export default async function EditOneOffPage({
@@ -46,7 +46,7 @@ export default async function EditOneOffPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const piece = await client.fetch(`*[_type == "oneOff" && _id == $id][0]`, {
+  const piece = await serverClient.fetch(`*[_type == "oneOff" && _id == $id][0]`, {
     id,
   });
 

@@ -82,7 +82,7 @@ export default function ProfileMenu() {
                 {session?.user?.email}
               </p>
               {isAdmin && (
-                <span className="inline-flex items-center gap-1.5 mt-2 text-[8px] font-bold text-[#be1e2d] bg-red-50 px-2 py-0.5 rounded-full uppercase tracking-widest">
+                <span className="inline-flex items-center gap-1.5 mt-2 text-[8px] font-bold text-[#238737] bg-green-50 px-2 py-0.5 rounded-full uppercase tracking-widest">
                   <ShieldCheck size={10} /> Authenticated Admin
                 </span>
               )}
