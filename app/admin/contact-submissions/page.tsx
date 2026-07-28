@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Search,
   ChevronRight,
+  ChevronDown,
   Clock,
   CheckCircle,
   XCircle,
@@ -235,17 +236,23 @@ export default function ContactSubmissionsPage() {
               className="w-full pl-10 pr-4 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm"
             />
           </div>
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white min-w-[140px]"
-          >
-            <option value="all">All Status</option>
-            <option value="new">New</option>
-            <option value="in_progress">In Progress</option>
-            <option value="replied">Replied</option>
-            <option value="closed">Closed</option>
-          </select>
+          <div className="relative min-w-[160px]">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full appearance-none pl-4 pr-10 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white cursor-pointer"
+            >
+              <option value="all">All Status</option>
+              <option value="new">New</option>
+              <option value="in_progress">In Progress</option>
+              <option value="replied">Replied</option>
+              <option value="closed">Closed</option>
+            </select>
+            <ChevronDown
+              size={14}
+              className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-900"
+            />
+          </div>
         </div>
       </div>
 
