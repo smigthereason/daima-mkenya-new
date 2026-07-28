@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { client } from "@/sanity/lib/client";
 import {
   upsertBatch,
@@ -22,6 +22,8 @@ import {
   Package,
   RefreshCw,
   Calendar,
+  Search,
+  ChevronDown
 } from "lucide-react";
 
 interface Product {
@@ -50,6 +52,8 @@ export default function AnnouncementBatchesPage() {
   const [loading, setLoading] = useState(false);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   const [formData, setFormData] = useState({
     _id: "",
@@ -245,6 +249,28 @@ export default function AnnouncementBatchesPage() {
     });
   };
 
+  const getBatchStatus = (batch: Batch) => {
+    if (batch.emailSent) return "dispatched";
+    const isScheduled =
+      batch.scheduledFor && new Date(batch.scheduledFor) > new Date();
+    return isScheduled ? "scheduled" : "pending";
+  };
+
+  const filteredBatches = useMemo(() => {
+    let result = batches;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.trim().toLowerCase();
+      result = result.filter((b) => b.batchName?.toLowerCase().includes(q));
+    }
+
+    if (statusFilter !== "all") {
+      result = result.filter((b) => getBatchStatus(b) === statusFilter);
+    }
+
+    return result;
+  }, [batches, searchQuery, statusFilter]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn pt-10 pb-20 relative">
       {/* SUCCESS MESSAGE TOAST */}
@@ -287,9 +313,64 @@ export default function AnnouncementBatchesPage() {
         </div>
       </div>
 
+      {/* SEARCH + FILTER BAR */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search
+            size={14}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+          />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by campaign name..."
+            className="w-full pl-11 pr-4 py-3.5 border border-neutral-200 bg-white text-sm focus:border-black outline-none transition-colors"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
+
+        {/* CLEAN SELECT DROPDOWN */}
+        <div className="relative sm:w-52">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="w-full h-full pl-4 pr-10 py-3.5 border border-neutral-200 bg-white text-[11px] font-black uppercase tracking-widest outline-none focus:border-black appearance-none cursor-pointer"
+          >
+            <option value="all">All Statuses</option>
+            <option value="dispatched">Dispatched</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="pending">Pending</option>
+          </select>
+          <ChevronDown
+            size={14}
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-neutral-900 pointer-events-none"
+          />
+        </div>
+      </div>
+
+      <p className="text-[10px] text-neutral-400 uppercase tracking-widest font-bold">
+        Showing {filteredBatches.length} of {batches.length} batches
+      </p>
+
       {/* BATCH LIST */}
       <div className="grid grid-cols-1 gap-6">
-        {batches.map((batch) => {
+        {filteredBatches.length === 0 && (
+          <div className="text-center py-20 bg-neutral-50 border border-neutral-100">
+            <Megaphone className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
+            <p className="text-neutral-500 text-sm font-medium">
+              No batches match your search
+            </p>
+          </div>
+        )}
+        {filteredBatches.map((batch) => {
           const isScheduled =
             batch.scheduledFor && new Date(batch.scheduledFor) > new Date();
           const scheduledDate = batch.scheduledFor

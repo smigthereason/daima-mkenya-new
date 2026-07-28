@@ -8,6 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  ChevronDown,
 } from "lucide-react";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -206,7 +207,7 @@ export default function TransactionTable({ orders }: { orders: any[] }) {
             <div className="relative w-full sm:w-auto">
               <Search
                 size={16}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
               />
               <input
                 type="text"
@@ -216,17 +217,24 @@ export default function TransactionTable({ orders }: { orders: any[] }) {
                 className="w-full pl-9 pr-4 py-2 bg-neutral-50 rounded-none text-xs border border-neutral-100 focus:ring-1 focus:ring-black outline-none sm:w-64 uppercase tracking-widest font-bold text-neutral-900"
               />
             </div>
-            <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-              className="w-full sm:w-auto px-4 py-2 bg-neutral-50 rounded-none text-xs border border-neutral-100 focus:ring-1 focus:ring-black outline-none uppercase tracking-widest font-bold text-neutral-900"
-            >
-              <option value="all">All Status</option>
-              <option value="paid">Paid</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-              <option value="refunded">Refunded</option>
-            </select>
+            {/* FIXED DROPDOWN */}
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full sm:w-auto pl-4 pr-10 py-2 bg-neutral-50 rounded-none text-xs border border-neutral-100 focus:ring-1 focus:ring-black outline-none uppercase tracking-widest font-bold text-neutral-900 appearance-none cursor-pointer"
+              >
+                <option value="all">All Status</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="failed">Failed</option>
+                <option value="refunded">Refunded</option>
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-900 pointer-events-none"
+              />
+            </div>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
             <button

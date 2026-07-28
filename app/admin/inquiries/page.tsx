@@ -16,6 +16,7 @@ import {
   DollarSign,
   Users,
   Inbox,
+  ChevronDown,
 } from "lucide-react";
 import { client } from "@/sanity/lib/client";
 import { formatDistanceToNow } from "date-fns";
@@ -238,7 +239,7 @@ export default function InquiriesPage() {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
               size={18}
             />
             <input
@@ -249,30 +250,45 @@ export default function InquiriesPage() {
               className="w-full pl-10 pr-4 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm"
             />
           </div>
-          <div className="flex gap-2">
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white min-w-[140px]"
-            >
-              <option value="all">All Status</option>
-              <option value="new">New</option>
-              <option value="reviewing">Reviewing</option>
-              <option value="quoted">Quote Sent</option>
-              <option value="followup">Follow-up</option>
-              <option value="converted">Converted</option>
-              <option value="closed">Closed</option>
-            </select>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value)}
-              className="px-4 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white min-w-[140px]"
-            >
-              <option value="all">All Priority</option>
-              <option value="high">High</option>
-              <option value="medium">Medium</option>
-              <option value="low">Low</option>
-            </select>
+          <div className="flex flex-col sm:flex-row gap-2">
+            {/* Status Filter Dropdown */}
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                className="w-full sm:w-auto pl-4 pr-10 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white min-w-[140px] appearance-none cursor-pointer"
+              >
+                <option value="all">All Status</option>
+                <option value="new">New</option>
+                <option value="reviewing">Reviewing</option>
+                <option value="quoted">Quote Sent</option>
+                <option value="followup">Follow-up</option>
+                <option value="converted">Converted</option>
+                <option value="closed">Closed</option>
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-900 pointer-events-none"
+              />
+            </div>
+
+            {/* Priority Filter Dropdown */}
+            <div className="relative w-full sm:w-auto">
+              <select
+                value={priorityFilter}
+                onChange={(e) => setPriorityFilter(e.target.value)}
+                className="w-full sm:w-auto pl-4 pr-10 py-3 border border-neutral-200 focus:outline-none focus:border-black text-sm bg-white min-w-[140px] appearance-none cursor-pointer"
+              >
+                <option value="all">All Priority</option>
+                <option value="high">High</option>
+                <option value="medium">Medium</option>
+                <option value="low">Low</option>
+              </select>
+              <ChevronDown
+                size={14}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-900 pointer-events-none"
+              />
+            </div>
           </div>
         </div>
       </div>
