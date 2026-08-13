@@ -108,6 +108,33 @@
         "type": "array"
       },
       {
+        "options": {
+          "list": [
+            {
+              "title": "Men",
+              "value": "men"
+            },
+            {
+              "title": "Women",
+              "value": "women"
+            },
+            {
+              "title": "Unisex",
+              "value": "unisex"
+            },
+            {
+              "title": "Kids",
+              "value": "kids"
+            }
+          ],
+          "layout": "radio"
+        },
+        "description": "Select the audience this product belongs to.",
+        "name": "gender",
+        "type": "string",
+        "title": "Gender / Audience"
+      },
+      {
         "description": "Group products that share the same design/print (e.g. Jasiri)",
         "to": [
           {
@@ -1409,7 +1436,7 @@
         "options": {
           "list": [
             {
-              "title": "Home Delivery",
+              "title": "Home Delivery / Drop-Off",
               "value": "shipping"
             },
             {

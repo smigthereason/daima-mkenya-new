@@ -218,7 +218,7 @@ const product: SchemaTypeDefinition = {
       validation: (Rule) => Rule.required(),
     },
     {
-      name: "categories", // ← CHANGED from single "category"
+      name: "categories",
       title: "Categories",
       type: "array",
       of: [{ type: "string" }],
@@ -239,8 +239,26 @@ const product: SchemaTypeDefinition = {
       },
       validation: (Rule) => Rule.required().min(1),
     },
+
+    // NEW: Gender / Audience
     {
-      name: "collection", // ← NEW
+      name: "gender",
+      title: "Gender / Audience",
+      type: "string",
+      description: "Select the audience this product belongs to.",
+      options: {
+        list: [
+          { title: "Men", value: "men" },
+          { title: "Women", value: "women" },
+          { title: "Unisex", value: "unisex" },
+          { title: "Kids", value: "kids" },
+        ],
+        layout: "radio",
+      },
+    },
+
+    {
+      name: "collection",
       title: "Collection",
       type: "reference",
       to: [{ type: "collection" }],
@@ -295,6 +313,7 @@ const product: SchemaTypeDefinition = {
       initialValue: false,
     },
   ],
+
   preview: {
     select: {
       title: "name",
@@ -303,15 +322,19 @@ const product: SchemaTypeDefinition = {
       stock: "stock",
       disabled: "disabled",
     },
+
     prepare(selection: any) {
       const { title, subtitle, media, stock, disabled } = selection;
+
       const stockStatus =
         stock === 0
           ? "❌ Out of Stock"
           : stock <= 5
             ? "⚠️ Low Stock"
             : "✅ In Stock";
+
       const disabledStatus = disabled ? "🚫 Disabled" : "";
+
       return {
         title: title || "Untitled",
         subtitle: `${subtitle || "No price"} | ${stockStatus} ${disabledStatus}`,
