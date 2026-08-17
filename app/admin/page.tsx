@@ -17,8 +17,21 @@ export const revalidate = 0;
 export default async function AdminOverview() {
   const orders = await client.fetch(
     `*[_type == "order"] | order(_createdAt desc) {
-      _id, amount, status, paymentStatus, _createdAt,
-      items[] { productName, quantity, price, product-> { category } }
+      _id,
+      amount,
+      status,
+      paymentStatus,
+      _createdAt,
+      items[] {
+        productName,
+        quantity,
+        price,
+        product-> {
+          _id,
+          name,
+          categories
+        }
+      }
     }`,
   );
 
