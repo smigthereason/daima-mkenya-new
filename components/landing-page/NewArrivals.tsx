@@ -289,7 +289,7 @@ const ProductCard = ({
         >
           <div className="flex flex-col gap-1 md:gap-2">
             <span className="text-white/70 text-[10px] md:text-xs tracking-[0.3em] font-light">
-              {product.categories?.[0]?.toUpperCase() || "NEW ARRIVAL"}
+              {product.categories?.[0]?.toUpperCase() || "MADE TO ORDER"}
             </span>
             <h3 className="text-white text-xl md:text-3xl font-serif tracking-tight leading-tight ">
               {product.name}
@@ -374,20 +374,25 @@ export default function NewArrivals() {
     >
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full pointer-events-none select-none opacity-[0.03] z-0">
         <h1 className="text-[20vw] font-black tracking-tighter italic uppercase text-center leading-none">
-          Arrivals
+          Made
         </h1>
       </div>
 
       <header className="relative z-10 pt-12 px-6 md:px-12 flex justify-between items-end">
         <div className="flex flex-col">
           <span className="text-neutral-900 text-[10px] md:text-xs tracking-[0.5em] mb-2">
-            CURATED COLLECTION
+            BESPOKE PRODUCTION
           </span>
-          <h2 className="text-neutral-900 text-5xl md:text-7xl font-serif font-black tracking-tighter leading-none">
-            NEW
+          <h2 className="text-neutral-900 text-4xl sm:text-5xl md:text-7xl lg:text-[7.5rem]  font-serif font-black tracking-tighter leading-none">
+            MADE
             <br />
-            ARRIVALS
+            TO ORDER
           </h2>
+          <p className="mt-5 pb-4 max-w-xl text-sm md:text-base leading-relaxed text-neutral-600">
+            Made especially for you. Please allow 14 days for production—although
+            you may get lucky and find your preferred piece already in stock and
+            ready to go!
+          </p>
         </div>
         <div className="hidden md:block">
           <Link

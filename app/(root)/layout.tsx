@@ -74,6 +74,14 @@ export default function RootLayout({
     <div className={playfair.className}>
       <ErrorBoundary>
         <Navbar />
+        <div
+          role="note"
+          aria-label="Made to order production time"
+          className="bg-black px-4 py-2.5 text-center text-[10px] md:text-[11px] font-medium uppercase tracking-[0.16em] text-white"
+        >
+          <span className="font-black">Made to order.</span>{" "}
+          Please allow 7–14 days for production.
+        </div>
         {children}
         <Footer />
       </ErrorBoundary>

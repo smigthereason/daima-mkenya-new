@@ -14,6 +14,7 @@ export default async function OrderManagementPage() {
       status,
       paymentStatus,
       paymentMethod,
+      paymentConfirmedAt,
       amount,
       shippingFee,
       _createdAt,
@@ -41,7 +42,31 @@ export default async function OrderManagementPage() {
     }`,
   );
 
-  console.log("Fetched orders:", JSON.stringify(orders, null, 2)); // For debugging
+  const paymentPriority = (paymentStatus?: string) => {
+    if (paymentStatus === "paid") return 0;
+    if (paymentStatus === "pending") return 1;
+    return 2;
+  };
+
+  const sortedOrders = [...orders].sort((a, b) => {
+    const priorityDifference =
+      paymentPriority(a.paymentStatus) - paymentPriority(b.paymentStatus);
+
+    if (priorityDifference !== 0) return priorityDifference;
+
+    const aTimestamp = Date.parse(
+      a.paymentStatus === "paid" && a.paymentConfirmedAt
+        ? a.paymentConfirmedAt
+        : a._createdAt,
+    );
+    const bTimestamp = Date.parse(
+      b.paymentStatus === "paid" && b.paymentConfirmedAt
+        ? b.paymentConfirmedAt
+        : b._createdAt,
+    );
+
+    return bTimestamp - aTimestamp;
+  });
 
   return (
     <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 space-y-10 animate-fadeIn">
@@ -56,7 +81,7 @@ export default async function OrderManagementPage() {
         </div>
       </div>
 
-      {orders.length === 0 ? (
+      {sortedOrders.length === 0 ? (
         <div className="text-center py-20 bg-neutral-50 border border-neutral-100">
           <Package className="mx-auto h-12 w-12 text-neutral-400 mb-4" />
           <p className="text-neutral-500 text-sm font-medium">
@@ -64,7 +89,7 @@ export default async function OrderManagementPage() {
           </p>
         </div>
       ) : (
-        <OrderList initialOrders={orders} />
+        <OrderList initialOrders={sortedOrders} />
       )}
     </div>
   );

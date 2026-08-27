@@ -1,7 +1,7 @@
 // app/admin/layout.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -32,6 +32,63 @@ export default function AdminLayout({
 }) {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [newOrderCount, setNewOrderCount] = useState(0);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const syncOrderNotifications = async () => {
+      try {
+        const response = await fetch("/api/admin/orders/notifications", {
+          cache: "no-store",
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const orderNotifications = Array.isArray(data.orders) ? data.orders : [];
+        const latestNotificationAt = orderNotifications[0]?.notificationAt as
+          | string
+          | undefined;
+
+        if (!latestNotificationAt) {
+          if (!cancelled) setNewOrderCount(0);
+          return;
+        }
+
+        const storageKey = "daima-admin-last-seen-order-notification-at";
+
+        // Opening the Orders screen acknowledges all current order notifications.
+        if (pathname.startsWith("/admin/orders")) {
+          localStorage.setItem(storageKey, latestNotificationAt);
+          if (!cancelled) setNewOrderCount(0);
+          return;
+        }
+
+        const lastSeenAt = localStorage.getItem(storageKey);
+        const lastSeenTimestamp = lastSeenAt ? Date.parse(lastSeenAt) : 0;
+
+        const unseenOrderNotifications = orderNotifications.filter(
+          (order: { notificationAt?: string }) =>
+            order.notificationAt &&
+            Date.parse(order.notificationAt) > lastSeenTimestamp,
+        ).length;
+
+        if (!cancelled) setNewOrderCount(unseenOrderNotifications);
+      } catch (error) {
+        console.error("Failed to refresh order notifications:", error);
+      }
+    };
+
+    syncOrderNotifications();
+    const intervalId = window.setInterval(syncOrderNotifications, 30_000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(intervalId);
+    };
+  }, [pathname]);
 
   // Function to handle logout and redirect
   const handleExitStore = async () => {
@@ -107,6 +164,7 @@ export default function AdminLayout({
               href="/admin/orders"
               icon={<Package size={16} />}
               label="Orders"
+              badgeCount={newOrderCount}
               onClick={() => setSidebarOpen(false)}
             />
             <AdminNavLink
@@ -190,7 +248,7 @@ export default function AdminLayout({
   );
 }
 
-function AdminNavLink({ href, icon, label, onClick }: any) {
+function AdminNavLink({ href, icon, label, onClick, badgeCount = 0 }: any) {
   const pathname = usePathname();
   const isActive = pathname === href;
   return (
@@ -203,6 +261,14 @@ function AdminNavLink({ href, icon, label, onClick }: any) {
       <span className="z-10 text-[11px] font-black uppercase tracking-[0.2em]">
         {label}
       </span>
+      {badgeCount > 0 && (
+        <span
+          aria-label={`${badgeCount} new order ${badgeCount === 1 ? "notification" : "notifications"}`}
+          className="z-10 ml-auto min-w-6 h-6 px-1.5 rounded-full bg-[#be1e2d] text-white text-[9px] font-black flex items-center justify-center tabular-nums"
+        >
+          {badgeCount > 99 ? "99+" : badgeCount}
+        </span>
+      )}
       {isActive && (
         <motion.div
           layoutId="activeTab"
