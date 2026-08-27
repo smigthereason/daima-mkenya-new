@@ -129,13 +129,13 @@ export default function AdminLayout({
             >
               <X size={20} />
             </button>
-            <Link href="/admin" className="relative w-28 lg:w-32 h-14 lg:h-16">
+            <Link href="/admin" className="relative h-16 w-36 sm:h-20 sm:w-48 lg:h-24 lg:w-72">
               <Image
                 src="/assets/Logo_no-bg.png"
                 alt="Daima Mkenya"
                 fill
-                className="object-contain"
-                sizes="(max-width: 768px) 112px, 128px"
+                className="object-contain filter drop-shadow-sm"
+                sizes="(max-width: 1024px) 200px, 300px"
                 priority
               />
             </Link>
