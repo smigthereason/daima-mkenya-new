@@ -653,12 +653,12 @@ import { urlFor } from "@/sanity/lib/image";
 import { PICKUP_LOCATIONS } from "@/data/pickupPoints";
 
 const SHIPPING_RATES = {
-  Nairobi: 250,
-  Mombasa: 450,
-  Kisumu: 450,
-  Nakuru: 450,
-  Eldoret: 450,
-  Kiambu: 350,
+  Nairobi: 500,
+  Kiambu: 700,
+  Mombasa: 900,
+  Kisumu: 900,
+  Nakuru: 900,
+  Eldoret: 900,
 };
 
 interface CheckOutPageProps {
