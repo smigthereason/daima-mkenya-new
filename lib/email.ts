@@ -1,34 +1,157 @@
 // lib/email.ts
-import nodemailer from "nodemailer";
+import nodemailer, { type SendMailOptions } from "nodemailer";
 
-// Create transporter based on environment
-const createTransporter = () => {
-  // For development with Ethereal
-  if (process.env.NODE_ENV === "development") {
-    return nodemailer.createTransport({
-      host: process.env.EMAIL_SERVER_HOST || "smtp.ethereal.email",
-      port: Number(process.env.EMAIL_SERVER_PORT) || 587,
-      secure: false, // true for 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_SERVER_USER,
-        pass: process.env.EMAIL_SERVER_PASSWORD,
-      },
-    });
+const DEFAULT_SMTP_HOST = "mail.privateemail.com";
+const DEFAULT_SMTP_PORT = 465;
+const DEFAULT_FROM_EMAIL = "info@daimamkenyaafrica.com";
+const DEFAULT_FROM_NAME = "Daima Mkenya Africa";
+
+function getSmtpConfig() {
+  const host =
+    process.env.SMTP_HOST ||
+    process.env.EMAIL_SERVER_HOST ||
+    DEFAULT_SMTP_HOST;
+
+  const port = Number(
+    process.env.SMTP_PORT ||
+      process.env.EMAIL_SERVER_PORT ||
+      DEFAULT_SMTP_PORT,
+  );
+
+  const user =
+    process.env.SMTP_USER ||
+    process.env.EMAIL_SERVER_USER ||
+    DEFAULT_FROM_EMAIL;
+
+  const password =
+    process.env.SMTP_PASSWORD ||
+    process.env.EMAIL_SERVER_PASSWORD;
+
+  if (!password) {
+    throw new Error(
+      "SMTP password is not configured. Set SMTP_PASSWORD (recommended) or EMAIL_SERVER_PASSWORD.",
+    );
   }
 
-  // Production email configuration (for when you switch to SendGrid/Mailgun)
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
-    secure: true,
+  return {
+    host,
+    port,
+    user,
+    password,
+    secure: port === 465,
+  };
+}
+
+let transporter: ReturnType<typeof nodemailer.createTransport> | null = null;
+
+function getTransporter() {
+  if (transporter) return transporter;
+
+  const config = getSmtpConfig();
+
+  transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.secure,
     auth: {
-      user: process.env.EMAIL_SERVER_USER,
-      pass: process.env.EMAIL_SERVER_PASSWORD,
+      user: config.user,
+      pass: config.password,
     },
+    requireTLS: config.port === 587,
   });
+
+  return transporter;
+}
+
+export function getDefaultFromAddress() {
+  const config = getSmtpConfig();
+
+  return (
+    process.env.EMAIL_FROM ||
+    `${DEFAULT_FROM_NAME} <${config.user}>`
+  );
+}
+
+export async function verifyEmailTransport() {
+  return getTransporter().verify();
+}
+
+export async function sendEmail(
+  options: Omit<SendMailOptions, "from"> & { from?: SendMailOptions["from"] },
+) {
+  const info = await getTransporter().sendMail({
+    ...options,
+    from: options.from || getDefaultFromAddress(),
+  });
+
+  return info;
+}
+
+type BulkEmailOptions = {
+  recipients: string[];
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
 };
 
-const transporter = createTransporter();
+const NAMECHEAP_RECIPIENTS_PER_MESSAGE = 50;
+const NAMECHEAP_RECIPIENTS_PER_HOUR = 500;
+
+export async function sendBulkEmail({
+  recipients,
+  subject,
+  html,
+  text,
+  replyTo,
+}: BulkEmailOptions) {
+  const uniqueRecipients = [
+    ...new Set(
+      recipients
+        .map((email) => email.trim().toLowerCase())
+        .filter(Boolean),
+    ),
+  ];
+
+  if (uniqueRecipients.length === 0) {
+    return { sent: 0, messageIds: [] as string[] };
+  }
+
+  if (uniqueRecipients.length > NAMECHEAP_RECIPIENTS_PER_HOUR) {
+    throw new Error(
+      `Namecheap Private Email supports up to ${NAMECHEAP_RECIPIENTS_PER_HOUR} outgoing recipients per hour per mailbox. This batch has ${uniqueRecipients.length} recipients.`,
+    );
+  }
+
+  const config = getSmtpConfig();
+  const messageIds: string[] = [];
+
+  for (
+    let index = 0;
+    index < uniqueRecipients.length;
+    index += NAMECHEAP_RECIPIENTS_PER_MESSAGE
+  ) {
+    const batch = uniqueRecipients.slice(
+      index,
+      index + NAMECHEAP_RECIPIENTS_PER_MESSAGE,
+    );
+
+    const info = await sendEmail({
+      bcc: batch,
+      replyTo: replyTo || config.user,
+      subject,
+      html,
+      text,
+    });
+
+    if (info.messageId) messageIds.push(info.messageId);
+  }
+
+  return {
+    sent: uniqueRecipients.length,
+    messageIds,
+  };
+}
 
 // ── Order placed notification ──────────────────────────────────────────
 type OrderNotificationItem = {
@@ -82,7 +205,7 @@ export async function sendOrderNotificationEmail(order: OrderNotificationDetails
     : `Home Delivery / Drop-Off - ${order.deliveryDetails?.shippingAddress || "Not specified"} (${order.deliveryDetails?.city || "N/A"})`;
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"Daima Mkenya" <noreply@daimamkenya.com>',
+    from: getDefaultFromAddress(),
     to: notifyEmail,
     subject: `🛎️ New Order Placed - ${order.orderNumber}`,
     html: `
@@ -178,7 +301,7 @@ export async function sendOrderNotificationEmail(order: OrderNotificationDetails
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("✅ Order notification email sent to:", notifyEmail);
     return info;
   } catch (error) {
@@ -195,7 +318,7 @@ export async function sendPasswordResetEmail(
   const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/reset-password?token=${token}`;
 
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"Daima Mkenya" <noreply@daimamkenya.com>',
+    from: getDefaultFromAddress(),
     to: email,
     subject: "Reset Your Password - Daima Mkenya",
     html: `
@@ -352,20 +475,8 @@ export async function sendPasswordResetEmail(
   };
 
   try {
-    const info = await transporter.sendMail(mailOptions);
+    const info = await sendEmail(mailOptions);
     console.log("✅ Password reset email sent to:", email);
-
-    // For Ethereal, log the preview URL where you can see the email
-    if (process.env.NODE_ENV === "development") {
-      const previewUrl = nodemailer.getTestMessageUrl(info);
-      if (previewUrl) {
-        console.log("📧 Email preview URL (open in browser):", previewUrl);
-        console.log(
-          "📝 You can also check your Ethereal inbox at: https://ethereal.email",
-        );
-      }
-    }
-
     return info;
   } catch (error) {
     console.error("❌ Error sending email:", error);

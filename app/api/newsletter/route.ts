@@ -1,10 +1,9 @@
 // app/api/newsletter/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@sanity/client";
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email";
 import { getActiveLogo, urlFor } from "@/lib/sanity/logo";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -57,8 +56,7 @@ export async function POST(req: Request) {
 
     const logoAlt = activeLogo?.alt || "Daima Mkenya Africa Logo";
 
-    await resend.emails.send({
-      from: "Daima Mkenya <info@daimamkenyaafrica.com>",
+    await sendEmail({
       to: email,
       subject: "A New Standard of Heritage",
       html: `

@@ -229,7 +229,7 @@ export default function ContactSubmissionDetailPage() {
     setSavingField("email");
 
     try {
-      // Send email via Resend
+      // Send email through the server-side SMTP route
       const emailResponse = await fetch("/api/contact/reply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -1,10 +1,9 @@
 // app/api/contact/route.ts
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email";
 import { client } from "@/sanity/lib/client";
 import { generateSanityKey } from "@/lib/utils/sanity";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const subjectTemplates: Record<string, string> = {
   general: "General Enquiry",
@@ -123,22 +122,13 @@ export async function POST(request: Request) {
       </html>
     `;
 
-    // Send email using Resend
-    const { data, error } = await resend.emails.send({
-      from: "Daima Mkenya Africa <info@daimamkenyaafrica.com>",
-      to: ["info@daimamkenyaafrica.com"],
+    // Send email through the Daima Mkenya Namecheap mailbox
+    const info = await sendEmail({
+      to: "info@daimamkenyaafrica.com",
       replyTo: email,
       subject: `Contact Form: ${subjectLine} - ${name}`,
       html: emailContent,
     });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json(
-        { error: "Failed to send email" },
-        { status: 500 },
-      );
-    }
 
     // Store in Sanity with empty notes array (will be populated later via admin)
     try {
@@ -163,7 +153,7 @@ export async function POST(request: Request) {
       {
         success: true,
         message: "Message sent successfully",
-        id: data?.id,
+        id: info.messageId,
       },
       { status: 200 },
     );

@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@sanity/client";
 import { isValidSignature, SIGNATURE_HEADER_NAME } from "@sanity/webhook";
-import { Resend } from "resend";
+import { sendBulkEmail } from "@/lib/email";
 import { getActiveLogo, urlFor as getLogoUrl } from "@/lib/sanity/logo";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 const client = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -230,14 +229,11 @@ export async function POST(req: Request) {
       logoAlt,
     );
 
-    const { error } = await resend.emails.send({
-      from: "Daima Mkenya <info@daimamkenyaafrica.com>",
-      to: emails as string[],
+    const sendResult = await sendBulkEmail({
+      recipients: emails as string[],
       subject: `New Collection: ${batchData.batchName}`,
       html: emailHTML,
     });
-
-    if (error) throw error;
 
     await client
       .patch(body._id)
@@ -245,11 +241,11 @@ export async function POST(req: Request) {
         emailSent: true,
         sentAt: new Date().toISOString(),
         triggerEmail: false,
-        recipientCount: emails.length,
+        recipientCount: sendResult.sent,
       })
       .commit();
 
-    return NextResponse.json({ success: true, count: emails.length });
+    return NextResponse.json({ success: true, count: sendResult.sent });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

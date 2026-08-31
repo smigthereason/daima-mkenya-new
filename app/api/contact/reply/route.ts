@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { sendEmail } from "@/lib/email";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getActiveLogo, urlFor } from "@/lib/sanity/logo";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
+    const session = await getServerSession(authOptions);
+    const isAdmin = Boolean(
+      (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin,
+    );
+
+    if (!session?.user || !isAdmin) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { to, name, subject, message, originalMessage } = body;
 
@@ -84,7 +93,9 @@ export async function POST(request: Request) {
                         </p>
                       </div>
 
-                      <!-- Original message block -->
+                      ${
+                        originalMessage
+                          ? `<!-- Original message block -->
                       <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 40px 0;">
                         <tr>
                           <td style="background-color: #f9f9f9; padding: 25px; border-left: 3px solid #be1e2d;">
@@ -96,7 +107,9 @@ export async function POST(request: Request) {
                             </p>
                           </td>
                         </tr>
-                      </table>
+                      </table>`
+                          : ""
+                      }
 
                       <!-- Signature -->
                       <div style="margin-top: 50px;">
@@ -148,26 +161,18 @@ export async function POST(request: Request) {
       </html>
     `;
 
-    const { data, error } = await resend.emails.send({
-      from: "Daima Mkenya Africa <info@daimamkenyaafrica.com>",
-      to: [to],
-      subject: subject,
+    const info = await sendEmail({
+      to,
+      replyTo: "info@daimamkenyaafrica.com",
+      subject,
       html: emailContent,
     });
-
-    if (error) {
-      console.error("Resend error:", error);
-      return NextResponse.json(
-        { error: "Failed to send email" },
-        { status: 500 },
-      );
-    }
 
     return NextResponse.json(
       {
         success: true,
         message: "Reply sent successfully",
-        id: data?.id,
+        id: info.messageId,
       },
       { status: 200 },
     );

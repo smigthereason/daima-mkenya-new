@@ -331,7 +331,29 @@ export default function InquiryDetailPage() {
     const updatedComms = [...(inquiry?.communicationLog || []), comm];
 
     try {
-      // First update the inquiry with the communication log
+      const quotedPriceLine =
+        replyEmail.includePrice && inquiry?.quotedPrice
+          ? `\n\nQuoted price: ${inquiry.currency || "KES"} ${inquiry.quotedPrice}`
+          : "";
+
+      const emailResponse = await fetch("/api/contact/reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: inquiry?.customer?.email,
+          name: inquiry?.customer?.name,
+          subject: replyEmail.subject,
+          message: `${replyEmail.message}${quotedPriceLine}`,
+          originalMessage: inquiry?.customer?.message || "",
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        const result = await emailResponse.json().catch(() => null);
+        throw new Error(result?.error || "Failed to send email");
+      }
+
+      // Log the communication only after SMTP confirms the message was accepted.
       const response = await fetch("/api/inquiries", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -341,23 +363,21 @@ export default function InquiryDetailPage() {
         }),
       });
 
-      if (response.ok) {
-        setInquiry((prev) =>
-          prev ? { ...prev, communicationLog: updatedComms } : prev,
-        );
-
-        // Here you would integrate with your actual email service
-        // For now, show success message
-        setEmailSent(true);
-        setTimeout(() => setEmailSent(false), 3000);
-
-        // Clear form
-        setReplyEmail((prev) => ({
-          ...prev,
-          message: "",
-          includePrice: false,
-        }));
+      if (!response.ok) {
+        throw new Error("Email sent, but the communication log could not be updated");
       }
+
+      setInquiry((prev) =>
+        prev ? { ...prev, communicationLog: updatedComms } : prev,
+      );
+      setEmailSent(true);
+      setTimeout(() => setEmailSent(false), 3000);
+
+      setReplyEmail((prev) => ({
+        ...prev,
+        message: "",
+        includePrice: false,
+      }));
     } catch (error) {
       console.error("Error sending email:", error);
     } finally {

@@ -128,6 +128,18 @@ export default {
       initialValue: () => new Date().toISOString(),
     },
     {
+      name: "invoiceSentAt",
+      title: "Invoice Last Sent At",
+      type: "datetime",
+      readOnly: true,
+    },
+    {
+      name: "invoiceEmailId",
+      title: "Invoice Email ID",
+      type: "string",
+      readOnly: true,
+    },
+    {
       name: "updatedAt",
       title: "Updated At",
       type: "datetime",

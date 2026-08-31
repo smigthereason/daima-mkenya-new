@@ -15,6 +15,8 @@ export default async function OrderManagementPage() {
       paymentStatus,
       paymentMethod,
       paymentConfirmedAt,
+      invoiceSentAt,
+      invoiceEmailId,
       amount,
       shippingFee,
       _createdAt,
@@ -30,7 +32,8 @@ export default async function OrderManagementPage() {
         city,
         pickupStationName,
         pickupStationId,
-        shippingAddress
+        shippingAddress,
+        additionalInfo
       },
       items[] {
         productName,

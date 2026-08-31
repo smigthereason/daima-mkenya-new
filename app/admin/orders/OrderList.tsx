@@ -15,8 +15,10 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronDown,
+  CalendarDays,
+  Mail,
 } from "lucide-react";
-import { updateOrderStatus } from "./actions";
+import { sendOrderInvoice, updateOrderStatus } from "./actions";
 
 interface OrderItem {
   productName: string;
@@ -52,6 +54,8 @@ interface Order {
   paymentDate?: string;
   pesapalOrderTrackingId?: string;
   transactionId?: string;
+  invoiceSentAt?: string;
+  invoiceEmailId?: string;
 }
 
 const PAGE_SIZE = 10;
@@ -63,6 +67,8 @@ export default function OrderList({
 }) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [sendingInvoiceId, setSendingInvoiceId] = useState<string | null>(null);
+  const [invoiceFeedback, setInvoiceFeedback] = useState<Record<string, { type: "success" | "error"; message: string }>>({});
   const router = useRouter();
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -132,6 +138,70 @@ export default function OrderList({
     }
     setUpdatingId(null);
   }
+
+  async function handleSendInvoice(order: Order) {
+    if (!order.customer?.email) {
+      setInvoiceFeedback((prev) => ({
+        ...prev,
+        [order._id]: { type: "error", message: "Customer email is missing." },
+      }));
+      return;
+    }
+
+    const action = order.invoiceSentAt ? "resend" : "send";
+    const confirmed = window.confirm(
+      `${action === "resend" ? "Resend" : "Send"} invoice ${order.orderNumber || ""} to ${order.customer.email}?`,
+    );
+    if (!confirmed) return;
+
+    setSendingInvoiceId(order._id);
+    setInvoiceFeedback((prev) => {
+      const next = { ...prev };
+      delete next[order._id];
+      return next;
+    });
+
+    const result = await sendOrderInvoice(order._id);
+
+    if (result.success && result.sentAt) {
+      setOrders((prev) =>
+        prev.map((existing) =>
+          existing._id === order._id
+            ? {
+                ...existing,
+                invoiceSentAt: result.sentAt,
+                invoiceEmailId: result.emailId,
+              }
+            : existing,
+        ),
+      );
+      setInvoiceFeedback((prev) => ({
+        ...prev,
+        [order._id]: {
+          type: "success",
+          message: `Invoice sent to ${result.recipient}.`,
+        },
+      }));
+      router.refresh();
+    } else {
+      setInvoiceFeedback((prev) => ({
+        ...prev,
+        [order._id]: {
+          type: "error",
+          message: result.error || "Failed to send invoice.",
+        },
+      }));
+    }
+
+    setSendingInvoiceId(null);
+  }
+
+  const formatOrderDate = (value: string) =>
+    new Intl.DateTimeFormat("en-KE", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone: "Africa/Nairobi",
+    }).format(new Date(value));
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -248,13 +318,23 @@ export default function OrderList({
                 {order.paymentStatus}
               </span>
             </div>
-            <div className="text-right">
-              <p className="text-[9px] text-neutral-400 uppercase font-bold">
-                Payment Method
-              </p>
-              <p className="text-xs font-bold uppercase">
-                {order.paymentMethod || "N/A"}
-              </p>
+            <div className="flex flex-col sm:items-end gap-2">
+              <div className="text-left sm:text-right">
+                <p className="text-[9px] text-neutral-400 uppercase font-bold flex items-center sm:justify-end gap-1">
+                  <CalendarDays size={11} /> Order Date
+                </p>
+                <p className="text-xs font-bold">
+                  {formatOrderDate(order._createdAt)}
+                </p>
+              </div>
+              <div className="text-left sm:text-right">
+                <p className="text-[9px] text-neutral-400 uppercase font-bold">
+                  Payment Method
+                </p>
+                <p className="text-xs font-bold uppercase">
+                  {order.paymentMethod || "N/A"}
+                </p>
+              </div>
             </div>
           </div>
 
@@ -439,9 +519,49 @@ export default function OrderList({
             </div>
           </div>
 
-          {/* Footer - Status Update Form */}
-          <div className="flex flex-col sm:flex-row justify-end items-center gap-4 pt-4 border-t border-neutral-100">
-            <form action={handleUpdate} className="flex gap-2 w-full sm:w-auto">
+          {/* Footer - Invoice + Status Actions */}
+          <div className="flex flex-col gap-3 pt-4 border-t border-neutral-100">
+            {invoiceFeedback[order._id] && (
+              <div
+                className={`text-xs px-4 py-3 border ${
+                  invoiceFeedback[order._id].type === "success"
+                    ? "bg-green-50 border-green-200 text-green-700"
+                    : "bg-red-50 border-red-200 text-red-700"
+                }`}
+              >
+                {invoiceFeedback[order._id].message}
+              </div>
+            )}
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleSendInvoice(order)}
+                  disabled={sendingInvoiceId === order._id || !order.customer?.email}
+                  className="border border-black bg-white text-black px-5 py-3 text-[11px] font-bold uppercase hover:bg-black hover:text-white transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {sendingInvoiceId === order._id ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      Sending Invoice...
+                    </>
+                  ) : (
+                    <>
+                      <Mail size={14} />
+                      {order.invoiceSentAt ? "Resend Invoice" : "Send Invoice"}
+                    </>
+                  )}
+                </button>
+
+                {order.invoiceSentAt && (
+                  <p className="text-[10px] text-neutral-500">
+                    Last sent {formatOrderDate(order.invoiceSentAt)}
+                  </p>
+                )}
+              </div>
+
+              <form action={handleUpdate} className="flex gap-2 w-full lg:w-auto">
               <input type="hidden" name="id" value={order._id} />
 
               {/* Individual Item Status Select */}
@@ -478,7 +598,8 @@ export default function OrderList({
                   </>
                 )}
               </button>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       ))}
